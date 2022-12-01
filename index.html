@@ -4,10 +4,68 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/x-icon" href="https://openlayers.org/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Using OpenLayers with Vite</title>
+    <title>MetalTechAlley Map</title>
   </head>
-  <body>
-    <div id="map"></div>
+  <body> 
+    <div id="wrapper" class="">
+      <div id="list-container">
+      <nav id="list" >
+        <div id="mta_logo">
+          <img src="https://metaltechalley.com/wp-content/uploads/2021/08/MTA_Logo_NoTagLine-1024x140.png">
+        </div>
+        <dl id="groups" ></dl>
+      </nav>
+      <nav id="feature-list" >
+        <div id="feature-content">
+          <span id="feature-closer" class="close">&times;</span>
+          <img id="companyIcon" src="" alt="" width="60px" height="100%">
+          <h1 id="business" class="title"></h1>
+          <table id="attributes">
+            <tr>
+              <th>CATEGORY</th>
+              <td id="category-value"></td>
+            </tr>
+            <tr>
+              <th>WEBSITE</th>
+              <td ><a id="web-value" href=""></a></td>
+            </tr>
+            <tr>
+              <th>EMAIL</th>
+              <td ><a id="email-value" href=""></a></td>
+            </tr>
+            <tr>
+              <th>PHONE</th>
+              <td ><a id="phone-value" href=""></a></td>
+            </tr>
+            <tr>
+              <th>ADDRESS</th>
+              <td id="address-value"></td>
+            </tr>
+            <tr>
+              <th>REGION</th>
+              <td id="region-value"></td>
+            </tr>
+            <tr>
+              <th>DESCRIPTION</th>
+              <td id="description-value"></td>
+            </tr>
+            <tr>
+              <th>TAGS</th>
+              <td id="tags-value"></td>
+            </tr>
+          </table>          
+        </div>
+      </nav>
+    </div>
+      <div id='list-toggle'>
+        <div>&#8942;</div>
+      </div>
+      <div id="map" class="map"></div>
+  </div>
+    <div id="popup" class="ol-popup">
+      <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+      <ul id="popup-content"></ul>
+    </div>
     <script type="module" src="./main.js"></script>
   </body>
 </html>
