@@ -5,7 +5,8 @@ import OSM from 'ol/source/OSM';
 import VectorLayer from 'ol/layer/Vector';
 import Overlay from 'ol/Overlay';
 import GeoJSON from 'ol/format/GeoJSON';
-import sync from 'ol-hashed';
+import {Icon, Circle, Style} from 'ol/style';
+// import sync from 'ol-hashed'; // need to import if using sync
 import Feature from 'ol/feature';
 import { fromLonLat } from 'ol/proj';
 import {Control, defaults as defaultControls} from 'ol/control';
@@ -112,11 +113,11 @@ const map = new Map({
 var fullscreen = new FullScreen();
 map.addControl(fullscreen);
 
-// sync(map);
+// sync(map); need to import ol-hashed if using
 
 function styleFunction (feature) {
   let styleZoom = view.getZoom();
-  var markerSource = 'images/mtaMarker_blk.png'
+  var markerSource = 'https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk.png' // 'images/mtaMarker_blk.png'
   var iconSource = feature.get('image');
   var iconStyle = new Style({
       image: iconSource ? new Icon({
@@ -203,7 +204,7 @@ regions.forEach((group)=>{
   li.setAttribute("id", "li_" + group.region);
   a.setAttribute("id", "a_" + group.region);
   a.setAttribute("href", "#");
-  img.setAttribute("src", "images/opened_org.png");
+  // img.setAttribute("src", "images/opened_org.png");
   img.setAttribute("alt", "");
   img.setAttribute("id", group.region);
   img.setAttribute("border", "0");
@@ -276,10 +277,10 @@ async function toggle_businessList() {
     if (ulElement){
       if (ulElement.className == 'closed'){
         ulElement.className = "open";
-        imgElement.src = "images/opened_org.png";
+        imgElement.src = 'https://marktrueman.ca/wp-content/uploads/2022/12/opened_org.png'; //"images/opened_org.png";
         }else{
         ulElement.className = "closed";
-        imgElement.src = "images/closed_org.png";
+        imgElement.src = 'https://marktrueman.ca/wp-content/uploads/2022/12/closed_org.png'; //"images/closed_org.png";
       }
     }
   });
