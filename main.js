@@ -204,7 +204,7 @@ regions.forEach((group)=>{
   li.setAttribute("id", "li_" + group.region);
   a.setAttribute("id", "a_" + group.region);
   a.setAttribute("href", "#");
-  // img.setAttribute("src", "images/opened_org.png");
+  img.setAttribute("src", "https://marktrueman.ca/wp-content/uploads/2022/12/opened_org.png");
   img.setAttribute("alt", "");
   img.setAttribute("id", group.region);
   img.setAttribute("border", "0");
