@@ -197,6 +197,11 @@ let featureCloser = document.getElementById('feature-closer');
 let wrapper = document.getElementById('wrapper');
 let current_view_values = []; // holding variable for current mapview
 
+// event listeners
+featureCloser.addEventListener('click', showList);
+listToggle.addEventListener('click', hideList);
+
+// create elements for business list and set attributes
 regions.forEach((group)=>{
   let li = document.createElement("li");
   let ul = document.createElement("ul");
@@ -236,36 +241,17 @@ regions.forEach((group)=>{
   });
 });
 
-listToggle.addEventListener('click', hideList);
-
-function hideList() {
-    // Update container size, timeout must match or exceed css transition for list pane closing
-    setTimeout(function () {
-      map.updateSize();
-    }, 500)
-    wrapper.classList.toggle('no-list');
-    
-};
-
-featureCloser.addEventListener('click', showList);
-
-function showList() {
-  FeatureList.style.display = "none";
-  List.style.display = "block"; 
-  view.animate({
-    center: current_view_values.currentCenter, 
-    zoom: current_view_values.currentZoom,
-    duration: 1000,
-  });
-};
-
+// dynamically created DOM element selections
 const groupItems = document.querySelector('#groups');
+const regionItems = document.querySelectorAll('.regions > a > span');
+const listItems = document.querySelectorAll('.business');
+
+
+//console.log(toggle_1Id);
+//let fieldHeadings = Object.keys(jsonObj[0]);
+//console.log('headings ' + fieldHeadings);
 
 await toggle_businessList();
-//console.log(toggle_1Id);
-let fieldHeadings = Object.keys(jsonObj[0]);
-console.log('headings ' + fieldHeadings);
-
 async function toggle_businessList() {
   groupItems.addEventListener('click', (e) => 
   {
@@ -289,10 +275,6 @@ async function toggle_businessList() {
     }
   });
 };
-
-const listItems = document.querySelectorAll('.business');
-
-const regionItems = document.querySelectorAll('.regions > a > span');
 
 await listClick();
 async function listClick() {
@@ -359,6 +341,24 @@ async function listClick() {
           console.log("An element without an id was clicked.");
       }
     });  
+  });
+};
+
+function hideList() {
+    // Update container size, timeout must match or exceed css transition for list pane closing
+    setTimeout(function () {
+      map.updateSize();
+    }, 500)
+    wrapper.classList.toggle('no-list');
+};
+
+function showList() {
+  FeatureList.style.display = "none";
+  List.style.display = "block"; 
+  view.animate({
+    center: current_view_values.currentCenter, 
+    zoom: current_view_values.currentZoom,
+    duration: 1000,
   });
 };
 
