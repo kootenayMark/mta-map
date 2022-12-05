@@ -192,6 +192,10 @@ map.on('click', function(evt){
 let groups = document.getElementById("groups");
 let List = document.getElementById('list');
 let FeatureList = document.getElementById("feature-list");
+let listToggle = document.getElementById('list-toggle');
+let featureCloser = document.getElementById('feature-closer');
+let wrapper = document.getElementById('wrapper');
+let current_view_values = []; // holding variable for current mapview
 
 regions.forEach((group)=>{
   let li = document.createElement("li");
@@ -232,18 +236,18 @@ regions.forEach((group)=>{
   });
 });
 
-document.getElementById('list-toggle').addEventListener('click', hideList);
+listToggle.addEventListener('click', hideList);
 
 function hideList() {
     // Update container size, timeout must match or exceed css transition for list pane closing
     setTimeout(function () {
       map.updateSize();
     }, 500)
-    document.getElementById('wrapper').classList.toggle('no-list');
+    wrapper.classList.toggle('no-list');
     
 };
 
-document.getElementById('feature-closer').addEventListener('click', showList);
+featureCloser.addEventListener('click', showList);
 
 function showList() {
   FeatureList.style.display = "none";
@@ -257,7 +261,7 @@ function showList() {
 
 const groupItems = document.querySelector('#groups');
 
-const toggle_1Id = await toggle_businessList();
+await toggle_businessList();
 //console.log(toggle_1Id);
 let fieldHeadings = Object.keys(jsonObj[0]);
 console.log('headings ' + fieldHeadings);
@@ -290,10 +294,13 @@ const listItems = document.querySelectorAll('.business');
 
 const regionItems = document.querySelectorAll('.regions > a > span');
 
-const elementId = await listClick();
+await listClick();
 async function listClick() {
-  //var company_values = []
-  // Create event listener
+  // click event listener for groups headings/regions
+  regionItems.forEach(item => {
+    item.addEventListener('click', regionCLick); 
+  });
+  // click event listener for businesses
   listItems.forEach(item => {
     item.addEventListener('click', (e) => {
       // Retrieve id from clicked element
@@ -319,18 +326,13 @@ async function listClick() {
       let description_value = document.getElementById('description-value');
       let tags_value = document.getElementById('tags-value');
 
-      e.target.classList.add('active');
-
-      if (item.classList.contains('active')){
-        item.removeEventListener('mouseleave', zoomToLast);
-      }
       while(tags.indexOf("|") >= 0) {
         tags = tags.replace("|", " ")
       }
 
       // If element has id, build company info pane based on id 
       if (eleId !== '') {
-        //company_values = getValues();
+        current_view_values = getValues();
         List.style.display = "none";
         FeatureList.style.display = "block";
         business.innerText = jsonObj[eleId].label;
@@ -349,7 +351,7 @@ async function listClick() {
         view.animate({
           center: coords,
           zoom: 16,
-          duration:0,
+          duration:2000,
         });
       }
       // If element has no id
@@ -357,84 +359,8 @@ async function listClick() {
           console.log("An element without an id was clicked.");
       }
     });  
-  });  
-};
-
-const elementId1 = await onHover();
-// console.log(elementId1);
-
-// holding variable for current mapview
-var current_view_values = [];
-
-// Variables for onHover function - outside of function scope as they are shared with zoomToLast()
-// delays in milliseconds
-let showDelay = 600, hideDelay = 600;
-// holding variables for timers
-let menuEnterTimer, menuLeaveTimer;
-
-async function onHover() {
-  // Create event listener for businesses - does not apply to regional headings
-  listItems.forEach(item => {
-    item.addEventListener('mouseenter', function() {
-      // clear the opposite timer
-      clearTimeout(menuLeaveTimer);
-      // Retrieve id from mouseover element
-      let eleId = this.id;
-      
-      // set time out delay
-      menuEnterTimer = setTimeout(function() {
-        // retrieve longitude from json using ID
-        let coordX = jsonObj[eleId].longitude;
-        // retrieve latitude from json using ID
-        let coordY = jsonObj[eleId].latitude;
-        //convert coords from lat-long to UTM
-        let coords = fromLonLat([coordX, coordY])
-        
-        // class used to control mouseleave onHover() and onClick() 
-        item.classList.remove('active');
-        
-        // get current coords and zoom
-        current_view_values = getValues();
-    
-        // If element has id
-        if (eleId !== '') {
-          view.animate({
-            center: coords,
-            zoom: 16,
-            duration: 2000,
-          });
-        }
-        // If element has no id
-        else { 
-            console.log("An element without an id was hovered.");
-        } 
-        return menuEnterTimer;
-      }, showDelay);  
-    }, false);
-
-    // mouseleave event listener for businesses
-    item.addEventListener('mouseleave', zoomToLast);
-  
-    // click event listener for groups headings/regions
-    regionItems.forEach(item => {
-      item.addEventListener('click', regionCLick); 
-    });
   });
 };
-
-// mouseleave event listener 
-function zoomToLast() { 
-      // clear the opposite timer
-      clearTimeout(menuEnterTimer);
-      // remove active class after a delay
-      menuLeaveTimer = setTimeout(function() {
-        view.animate({
-          center: current_view_values.currentCenter, 
-          zoom: current_view_values.currentZoom,
-          duration: 1000,
-        });
-      }, hideDelay); 
-    }
 
 // function to zoom in to region from clicking regional heading
 function regionCLick() {
