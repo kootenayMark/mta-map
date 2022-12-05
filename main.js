@@ -117,18 +117,18 @@ map.addControl(fullscreen);
 
 function styleFunction (feature) {
   let styleZoom = view.getZoom();
-  var markerSource = 'https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk.png' // 'images/mtaMarker_blk.png'
+  var markerSource = 'https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_sm.png' // 'images/mtaMarker_blk.png'
   var iconSource = feature.get('image');
   var iconStyle = new Style({
       image: iconSource ? new Icon({
         src: iconSource,
-        scale: 0.01
+        scale: 0.8
       }) : undefined
     });
   var markerStyle = new Style({
     image: markerSource ? new Icon({
       src: markerSource,
-      scale: 0.15
+      scale: 1
     }) : undefined
   })
   if (styleZoom < 11) {
