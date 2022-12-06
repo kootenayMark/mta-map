@@ -290,7 +290,7 @@ async function listClick() {
       // convert coords from lat-long to UTM
       let coords = fromLonLat([coordX, coordY])
       // replace character delimiters
-      let tags = jsonObj[eleId].tags; tags = tags.split("|");
+      let tags = jsonObj[eleId].tags; //tags = tags.split("|");
       
       // elementID variables
       let business = document.getElementById('business');

@@ -125,7 +125,14 @@ td {
 #phone-value{
   color: #f6921b;
 }
-
+.tags {
+  color: #8e8d8d;
+  background-color: black;
+  border-color: #8e8d8d;
+  border-radius: 0.25em;
+  padding: 0.5em;
+  margin: 0.1em;
+}
 /* styles for switching panes */
 #feature-closer {
   float: right;
