@@ -12,7 +12,7 @@ import { fromLonLat } from 'ol/proj';
 import {Control, defaults as defaultControls} from 'ol/control';
 import FullScreen from 'ol/control/FullScreen';
 import {Vector as VectorSource} from 'ol/source';
-import { intersectsSegment } from 'ol/extent';
+import { clone, intersectsSegment } from 'ol/extent';
 import XYZ from 'ol/source/XYZ';
 
 
@@ -189,6 +189,7 @@ map.on('click', function(evt){
 //     map.getTarget().style.cursor = hit ? 'pointer' : '';
 // });
 
+// DOM element variables
 let groups = document.getElementById("groups");
 let List = document.getElementById('list');
 let FeatureList = document.getElementById("feature-list");
@@ -246,11 +247,6 @@ const groupItems = document.querySelector('#groups');
 const regionItems = document.querySelectorAll('.regions > a > span');
 const listItems = document.querySelectorAll('.business');
 
-
-//console.log(toggle_1Id);
-//let fieldHeadings = Object.keys(jsonObj[0]);
-//console.log('headings ' + fieldHeadings);
-
 await toggle_businessList();
 async function toggle_businessList() {
   groupItems.addEventListener('click', (e) => 
@@ -294,7 +290,7 @@ async function listClick() {
       // convert coords from lat-long to UTM
       let coords = fromLonLat([coordX, coordY])
       // replace character delimiters
-      let tags = jsonObj[eleId].tags;
+      let tags = jsonObj[eleId].tags; tags = tags.split("|");
       
       // elementID variables
       let business = document.getElementById('business');
@@ -307,16 +303,16 @@ async function listClick() {
       let region_value = document.getElementById('region-value');
       let description_value = document.getElementById('description-value');
       let tags_value = document.getElementById('tags-value');
-
-      while(tags.indexOf("|") >= 0) {
-        tags = tags.replace("|", " ")
-      }
+      
 
       // If element has id, build company info pane based on id 
       if (eleId !== '') {
+        // get current view value 
         current_view_values = getValues();
+        // hide list, show business info pane
         List.style.display = "none";
         FeatureList.style.display = "block";
+        // populate business info fields
         business.innerText = jsonObj[eleId].label;
         companyIcon.src = jsonObj[eleId].image;
         category_value.innerText = jsonObj[eleId].category;
@@ -329,10 +325,16 @@ async function listClick() {
         address_value.innerText = jsonObj[eleId].address;
         region_value.innerText = jsonObj[eleId].region;
         description_value.innerText = jsonObj[eleId].description;
-        tags_value.innerText = tags;
+        // create buttons from tags (add filter function later)
+        tags.forEach(function (t, index) {
+          let tagButton = document.createElement('button');
+          tagButton.id = 'tag_' + index; tagButton.className = "tags";
+          tagButton.innerHTML = t;
+          tags_value.appendChild(tagButton);
+        });
         view.animate({
           center: coords,
-          zoom: 16,
+          zoom: 17,
           duration:2000,
         });
       }

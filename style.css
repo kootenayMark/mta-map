@@ -24,6 +24,8 @@ html, body {
   height: 100vh;
   text-align: center;
 }
+
+/* business list styles */
 #list {
   display: block;
   padding-left: 10px;
@@ -32,71 +34,6 @@ html, body {
   visibility: visible; 
   transition: all 0.5s;
   left: 0px;
-}
-#feature-list {
-  display: none;
-  padding-left: 10px;
-  height: 100vh;
-  width:355px;
-  visibility: visible; 
-  transition: all 0.5s;
-  left: 0px;
-}
-#feature-content > h1 {
-  color: #f6921b;
-  display:block;
-  text-align: center;
-}
-#companyIcon {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-#attributes{
-  width: 100%;
-  display: inline-block;
-  color:#8e8d8d
-}
-th {
-  text-align: right;
-  vertical-align: top;
-  width: 30%;
-  padding: 0 1em 1em .5em;
-}
-td {
-  padding-bottom: 1em;
-}
-#web-value {
-  color: red;
-  text-decoration: underline;
-}
-#feature-closer {
-  float: right;
-  cursor: pointer;
-}
-.close {
-  font-size: 45px;
-  font-weight: 600;
-}
-.no-list #list-container {
-  display: none;
-}   
-.no-list #map {
-  width: calc(100% - 20px);
-}   
-#list-toggle {
-  display:flex;
-  height: auto;
-  justify-content: center;
-  width:20px;   
-  background-color: black; 
-}    
-#list-toggle > div {
-  margin:auto;
-  width: 50%;
-  color: red;
-  font-size:xx-large;
-  cursor: pointer;
 }
 #groups {
   height: 92%; 
@@ -143,10 +80,89 @@ a:visited {
   padding: 0.2em;
   border-radius: 0.25em;
 }
-.grid-container {
+
+/* styles for business info pane */
+#feature-list {
+  display: none;
+  padding-left: 10px;
+  height: 100vh;
+  width:355px;
+  visibility: visible; 
+  transition: all 0.5s;
+  left: 0px;
+}
+#feature-content > h1 {
+  color: #f6921b;
+  display:block;
+  text-align: center;
+}
+#companyIcon {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+#attributes{
+  width: 100%;
+  display: inline-block;
+  color:#8e8d8d
+}
+th {
+  text-align: right;
+  vertical-align: top;
+  width: 30%;
+  padding: 0 1em 1em .5em;
+}
+td {
+  padding-bottom: 1em;
+}
+#web-value {
+  color: red;
+  text-decoration: underline;
+}
+#email-value{
+  color: #f6921b;
+}
+#phone-value{
+  color: #f6921b;
+}
+
+/* styles for switching panes */
+#feature-closer {
+  float: right;
+  cursor: pointer;
+}
+.close {
+  font-size: 45px;
+  font-weight: 600;
+}
+.no-list #list-container {
+  display: none;
+}   
+.no-list #map {
+  width: calc(100% - 20px);
+}   
+#list-toggle {
+  display:flex;
+  height: auto;
+  justify-content: center;
+  width:20px;   
+  background-color: black; 
+}    
+#list-toggle > div {
+  margin:auto;
+  width: 50%;
+  color: red;
+  font-size:xx-large;
+  cursor: pointer;
+}
+
+
+/* .grid-container {
   display: grid;
   grid-template-columns: auto auto;
-}
+} */
+
+/* popup styles */
 .ol-popup {
   position: absolute;
   background-color: white;
