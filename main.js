@@ -18,6 +18,7 @@ import XYZ from 'ol/source/XYZ';
 
 const opensheet = "https://opensheet.elk.sh/19o_WmjjKn1ZE1940Brh9VrD9gaTyStMTF-kwbz2LJm4/elements"
 const basemapUrl = 'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+const dataURL = './data/mtaData.json'
 
 // Region center Coords
 const britishcolumbia = fromLonLat([-118.27998, 49.75215])
@@ -45,8 +46,8 @@ async function getData() {
 }
 console.log(jsonObj) 
 
-let jsonString = JSON.stringify(jsonObj);
-console.log(jsonString);
+//let jsonString = JSON.stringify(jsonObj);
+//console.log(jsonString);
 
 // to GeoJSON.Point array
 const geoJSONPointArr = jsonObj.map(row => {
@@ -67,8 +68,8 @@ const pointArrFeatureCollection = {
 }
 
 const geojsonString = JSON.stringify(pointArrFeatureCollection)
-console.log(pointArrFeatureCollection);
-console.log(geojsonString);
+// console.log(pointArrFeatureCollection);
+// console.log(geojsonString);
 
 // map Variables
 const vectorSource = new VectorSource({
@@ -140,8 +141,7 @@ function styleFunction (feature) {
 }
 
 // popup
-var
-    container = document.getElementById('popup'),
+var container = document.getElementById('popup'),
     content_element = document.getElementById('popup-content'),
     closer = document.getElementById('popup-closer');
 
@@ -167,7 +167,7 @@ map.on('click', function(evt){
         var coord = geometry.getCoordinates();
         
         var content = '<h3>' + feature.get('label') + '</h3>';
-        content += '<h5>' + feature.get('Website') + '</h5>';
+        content += '<h5>' + feature.get('website') + '</h5>';
         content += '<h5>' + feature.get('email') + '</h5>';
         content += '<h5>' + feature.get('phone') + '</h5>';
         content += '<h5>' + feature.get('address') + '</h5>';
@@ -242,6 +242,86 @@ regions.forEach((group)=>{
   });
 });
 
+const filtered_jsonObj = [];
+jsonObj.forEach((item)=>{
+  const selectedFields = ['label', 'category', 'website', 'email', 'phone', 'address', 'region', 'description', 'tags']
+  const arr = Object.keys(item)
+  .filter((key) => selectedFields.includes(key))
+  .reduce((obj, key) => {
+    obj[key] = item[key];
+    return obj;
+  }, {});
+filtered_jsonObj.push(arr);
+});
+
+console.log(filtered_jsonObj); 
+
+for (let i =0; i < filtered_jsonObj.length; i++) {  
+  // replace character delimiters
+  let tags = filtered_jsonObj[i].tags; tags = tags.split("|");
+  let attributes = document.getElementById('attributes');
+  let table = document.createElement("table");
+  table.id = 'table-' + [i]; 
+  table.classList.add('hidden');
+  attributes.appendChild(table);
+  
+  for(let h in filtered_jsonObj[i]) {  
+    let tr = document.createElement("tr"); 
+    let th = document.createElement("th");
+    let td = document.createElement("td");
+    let a = document.createElement("a");
+   
+    if (h != 'label') {
+      th.id = h; th.innerText = h;
+      td.id = h + '-value';
+      
+      if (th.id === 'category') {
+        td.innerText = filtered_jsonObj[i].category;
+      } 
+      else if (th.id === 'website') {
+        a.id = h + '-innerValue';
+        a.setAttribute("href", filtered_jsonObj[i].website);
+        a.innerText = filtered_jsonObj[i].label;
+        td.appendChild(a);
+      }
+      else if (th.id === 'email') {
+        a.id = h + '-innerValue';
+        a.setAttribute("href", "mailto:"+filtered_jsonObj[i].email);
+        a.innerText = filtered_jsonObj[i].email;
+        td.appendChild(a);
+      }
+      else if (th.id === 'phone') {
+        a.id = h + '-innerValue';
+        a.setAttribute("href", "tel:"+filtered_jsonObj[i].phone);
+        a.innerText = filtered_jsonObj[i].phone;
+        td.appendChild(a);
+      }
+      else if (th.id === 'address') {
+        td.innerText = filtered_jsonObj[i].address;
+      }
+      else if (th.id === 'region') {
+        td.innerText = filtered_jsonObj[i].region;
+      }
+      else if (th.id === 'description') {
+        td.innerText = filtered_jsonObj[i].description;
+      };
+      // create buttons from tags (add filter function later)
+      if (th.id == 'tags') {
+        tags.forEach(function (t, index) {
+          let tagButton = document.createElement('button');
+          tagButton.id = 'tag_' + index; tagButton.className = "tags";
+          tagButton.innerHTML = t;
+          td.appendChild(tagButton);
+        });
+      };
+      tr.appendChild(th);
+      tr.appendChild(td);
+      table.appendChild(tr); 
+    };
+  };
+};
+
+
 // dynamically created DOM element selections
 const groupItems = document.querySelector('#groups');
 const regionItems = document.querySelectorAll('.regions > a > span');
@@ -251,15 +331,15 @@ await toggle_businessList();
 async function toggle_businessList() {
   groupItems.addEventListener('click', (e) => 
   {
-    console.log(e.target.id);
+    // console.log(e.target.id);
     let ul = "ul_" + e.target.id;
     let img = e.target.id;
-    console.log(ul);
-    console.log(img);
+    // console.log(ul);
+    // console.log(img);
     let ulElement = document.getElementById(ul);
-    console.log(ulElement);
+    // console.log(ulElement);
     let imgElement = document.getElementById(img);
-    console.log(imgElement)
+    // console.log(imgElement)
     if (ulElement){
       if (ulElement.className == 'closed'){
         ulElement.className = "open";
@@ -271,13 +351,14 @@ async function toggle_businessList() {
     }
   });
 };
-
+let tableid = "";
 await listClick();
 async function listClick() {
   // click event listener for groups headings/regions
   regionItems.forEach(item => {
     item.addEventListener('click', regionCLick); 
   });
+
   // click event listener for businesses
   listItems.forEach(item => {
     item.addEventListener('click', (e) => {
@@ -288,23 +369,10 @@ async function listClick() {
       // retrieve latitude from json using ID
       let coordY = jsonObj[eleId].latitude;
       // convert coords from lat-long to UTM
-      let coords = fromLonLat([coordX, coordY])
-      // replace character delimiters
-      let tags = jsonObj[eleId].tags; //tags = tags.split("|");
-      
-      // elementID variables
-      let business = document.getElementById('business');
-      let companyIcon = document.getElementById('companyIcon');
-      let category_value = document.getElementById('category-value');
-      let web_value = document.getElementById('web-value');
-      let email_value = document.getElementById('email-value');
-      let phone_value = document.getElementById('phone-value');
-      let address_value = document.getElementById('address-value');
-      let region_value = document.getElementById('region-value');
-      let description_value = document.getElementById('description-value');
-      let tags_value = document.getElementById('tags-value');
-      
-
+      let coords = fromLonLat([coordX, coordY]);
+      let tableID = 'table-' + eleId;
+      let table = document.getElementById(tableID);
+      tableid = tableID;
       // If element has id, build company info pane based on id 
       if (eleId !== '') {
         // get current view value 
@@ -312,26 +380,10 @@ async function listClick() {
         // hide list, show business info pane
         List.style.display = "none";
         FeatureList.style.display = "block";
+        table.classList.remove('hidden');
         // populate business info fields
         business.innerText = jsonObj[eleId].label;
         companyIcon.src = jsonObj[eleId].image;
-        category_value.innerText = jsonObj[eleId].category;
-        web_value.href = jsonObj[eleId].Website;
-        web_value.innerText = jsonObj[eleId].label;
-        email_value.href = 'mailto:' + jsonObj[eleId].email;
-        email_value.innerText = jsonObj[eleId].email;
-        phone_value.href = 'tel:' + jsonObj[eleId].phone;
-        phone_value.innerText = jsonObj[eleId].phone;
-        address_value.innerText = jsonObj[eleId].address;
-        region_value.innerText = jsonObj[eleId].region;
-        description_value.innerText = jsonObj[eleId].description;
-        // create buttons from tags (add filter function later)
-        tags.forEach(function (t, index) {
-          let tagButton = document.createElement('button');
-          tagButton.id = 'tag_' + index; tagButton.className = "tags";
-          tagButton.innerHTML = t;
-          tags_value.appendChild(tagButton);
-        });
         view.animate({
           center: coords,
           zoom: 17,
@@ -357,6 +409,9 @@ function hideList() {
 function showList() {
   FeatureList.style.display = "none";
   List.style.display = "block"; 
+  let table = document.getElementById(tableid);
+  console.log(table);
+  table.classList.add('hidden');
   view.animate({
     center: current_view_values.currentCenter, 
     zoom: current_view_values.currentZoom,
