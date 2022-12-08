@@ -68,6 +68,12 @@ a:visited {
   text-decoration: none;
   color: #8e8d8d;
 }
+.regions > a > span:hover {
+  color:red;
+}
+.business:hover {
+  color:#f6921b;
+}
 
 /* styles for business info pane */
 #feature-list {
@@ -94,7 +100,6 @@ a:visited {
   width: 100%;
   
 }
-
 #attributes {
   width: 100%;
   height: 70%;
