@@ -3,9 +3,7 @@
 html, body {
   margin: 0;
   height: 100vh;
-}
-#mta_logo > img {
-  width:98%;
+  font-family: Comfortaa;
 }
 #wrapper {
   margin:0;
@@ -35,8 +33,12 @@ html, body {
   transition: all 0.5s;
   left: 0px;
 }
+#mta_logo > img {
+  width:98%;
+  /* height:10% */
+} 
 #groups {
-  height: 92%; 
+  height: 90%; 
   overflow-y: auto;
   margin-bottom: 0;
 }
@@ -66,20 +68,6 @@ a:visited {
   text-decoration: none;
   color: #8e8d8d;
 }
-.regions > a > span:hover {
-  color:#8e8d8d;
-  font-size:x-large;
-  background-color:#f6921b;
-  padding: 0.2em;
-  border-radius: 0.25em;
-}
-.business:hover {
-  color:#f6921b;
-  font-size:large;
-  background-color:#8e8d8d;
-  padding: 0.2em;
-  border-radius: 0.25em;
-}
 
 /* styles for business info pane */
 #feature-list {
@@ -91,20 +79,35 @@ a:visited {
   transition: all 0.5s;
   left: 0px;
 }
-#feature-content > h1 {
-  color: #f6921b;
-  display:block;
-  text-align: center;
+#feature-content {
+  height: 100vh;
 }
 #companyIcon {
   display: block;
   margin-left: auto;
   margin-right: auto;
 }
-#attributes{
+#feature-content > h1 {
+  color: #f6921b;
+  display:block;
+  text-align: center;
   width: 100%;
+  
+}
+
+#attributes {
+  width: 100%;
+  height: 70%;
   display: inline-block;
-  color:#8e8d8d
+  color:#8e8d8d;
+  overflow-y: auto;
+}
+table {
+  width: 100%;
+  table-layout: fixed;
+}
+tr {
+  width: 100%;
 }
 th {
   text-align: right;
@@ -112,9 +115,12 @@ th {
   vertical-align: top;
   width: 30%;
   padding: 0 1em 1em .5em;
+  font-size: 0.9em;
 }
 td {
+  display: block;
   padding-bottom: 1em;
+  font-size: 0.9em;
 }
 #website-innerValue {
   color: red;
@@ -122,6 +128,8 @@ td {
 }
 #email-innerValue{
   color: #f6921b;
+  /* word-wrap: break-word; */
+  word-break: break-all; 
 }
 #phone-innerValue{
   color: #f6921b;
@@ -129,16 +137,14 @@ td {
 .hidden {
   display: none;
 }
-.show {
-  display: block;
-}
 .tags {
-  color: #8e8d8d;
-  background-color: black;
+  color: black;
+  background-color:#8e8d8d ;
   border-color: #8e8d8d;
-  border-radius: 0.25em;
-  padding: 0.4em;
+  border-radius: 0.5em;
+  padding: 0.2em 0.3em 0.3em 0.3em;
   margin: 0.1em;
+  font-size: 1em;
 }
 /* styles for switching panes */
 #feature-closer {
@@ -169,12 +175,6 @@ td {
   font-size:xx-large;
   cursor: pointer;
 }
-
-
-/* .grid-container {
-  display: grid;
-  grid-template-columns: auto auto;
-} */
 
 /* popup styles */
 .ol-popup {
