@@ -14,7 +14,7 @@ import FullScreen from 'ol/control/FullScreen';
 import {Vector as VectorSource} from 'ol/source';
 import { clone, intersectsSegment } from 'ol/extent';
 import XYZ from 'ol/source/XYZ';
-
+//import LayerSwitcher from 'ol-layerswitcher';
 
 const opensheet = "https://opensheet.elk.sh/19o_WmjjKn1ZE1940Brh9VrD9gaTyStMTF-kwbz2LJm4/elements"
 const basemapUrl = 'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
