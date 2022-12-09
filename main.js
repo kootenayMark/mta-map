@@ -19,21 +19,23 @@ import XYZ from 'ol/source/XYZ';
 const opensheet = "https://opensheet.elk.sh/19o_WmjjKn1ZE1940Brh9VrD9gaTyStMTF-kwbz2LJm4/elements"
 const basemapUrl = 'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
 const dataURL = './data/mtaData.json'
+const markerURL ='https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_xsm-1.png'
 
 // Region center Coords
-const britishcolumbia = fromLonLat([-118.27998, 49.75215])
-const westkootenay = fromLonLat([-117.58374303482402, 49.34945272204586])
+const initialView = fromLonLat([-117.97998, 49.55215])
+const britishcolumbia = fromLonLat([-119.57998, 49.75215])
+const westkootenay = fromLonLat([-117.38374303482402, 49.34945272204586])
 const trailandarea = fromLonLat([-117.66993534984215, 49.100971359691975])
-const castlegarandarea = fromLonLat([-117.62051713085089, 49.312790603205])
-const nelsonandarea = fromLonLat([-117.2900500026088, 49.487387788103334])
+const castlegarandarea = fromLonLat([-117.69479454290793, 49.295732630900695])
+const nelsonandarea = fromLonLat([-117.2900500026088, 49.477387788103334])
 const rosslandandarea = fromLonLat([-117.80493087932007, 49.078833201701485])
 
 const regions = [
-  {region:'British Columbia', id: 0, coords: britishcolumbia, zoom: 8.5},
+  {region:'British Columbia', id: 0, coords: britishcolumbia, zoom: 7.5},
   {region:'West Kootenay', id: 1, coords: westkootenay, zoom: 9},
-  {region:'Trail and Area', id: 2, coords: trailandarea, zoom: 11.5},
-  {region:'Castlegar and Area', id: 3, coords: castlegarandarea, zoom: 13},
-  {region:'Nelson and Area', id: 4, coords: nelsonandarea, zoom: 14},
+  {region:'Trail and Area', id: 2, coords: trailandarea, zoom: 12},
+  {region:'Castlegar and Area', id: 3, coords: castlegarandarea, zoom: 12},
+  {region:'Nelson and Area', id: 4, coords: nelsonandarea, zoom: 13.5},
   {region:'Rossland and Area', id: 5, coords: rosslandandarea, zoom: 15}
 ]
 
@@ -98,10 +100,10 @@ const vectorLayer = new VectorLayer({
 })
 
 const view = new View({
-  center: britishcolumbia,
+  center: initialView,
   zoom: 8.5,
   minZoom: 2,
-  maxZoom: 20
+  maxZoom: 21
 })
 
 const map = new Map({
@@ -118,25 +120,35 @@ map.addControl(fullscreen);
 
 function styleFunction (feature) {
   let styleZoom = view.getZoom();
-  var markerSource = 'https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_sm.png' // 'images/mtaMarker_blk.png'
+  let resolution = view.getResolution();
+  var markerSource = markerURL; 
   var iconSource = feature.get('image');
   var iconStyle = new Style({
-      image: iconSource ? new Icon({
-        src: iconSource,
-        scale: 0.8
-      }) : undefined
-    });
+    image: iconSource ? new Icon({
+      src: iconSource,
+      scale: 0.6
+    }) : undefined
+  });
+  var iconStyle2 = new Style({
+    image: iconSource ? new Icon({
+      src: iconSource,
+      scale: 1/Math.pow(resolution, 1/2)
+    }) : undefined
+  });
   var markerStyle = new Style({
     image: markerSource ? new Icon({
       src: markerSource,
       scale: 1
     }) : undefined
-  })
+  });
   if (styleZoom < 11) {
     return [markerStyle];
   }
-  else {
+  else if (styleZoom < 16 ){
     return [iconStyle];
+  }
+  else {
+    return [iconStyle2];
   }
 }
 
