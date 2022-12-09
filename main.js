@@ -333,7 +333,6 @@ for (let i =0; i < filtered_jsonObj.length; i++) {
   };
 };
 
-
 // dynamically created DOM element selections
 const groupItems = document.querySelector('#groups');
 const regionItems = document.querySelectorAll('.regions > a > span');
@@ -465,3 +464,7 @@ function getValues() {
   return viewValues;
 };
 
+window.onresize = function()
+{
+  setTimeout( function() { map.updateSize();}, 200);
+}
