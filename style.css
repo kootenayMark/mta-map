@@ -72,6 +72,9 @@ a:visited {
 .regions > a > span:hover {
   color:red;
 }
+.business {
+  color: #8e8d8d;
+}
 .business:hover {
   color:#f6921b;
 }

@@ -338,8 +338,8 @@ const groupItems = document.querySelector('#groups');
 const regionItems = document.querySelectorAll('.regions > a > span');
 const listItems = document.querySelectorAll('.business');
 
-await toggle_businessList();
-async function toggle_businessList() {
+toggle_businessList();
+function toggle_businessList() {
   groupItems.addEventListener('click', (e) => 
   {
     // console.log(e.target.id);
@@ -363,8 +363,8 @@ async function toggle_businessList() {
   });
 };
 let tableid = "";
-await listClick();
-async function listClick() {
+listClick();
+function listClick() {
   // click event listener for groups headings/regions
   regionItems.forEach(item => {
     item.addEventListener('click', regionCLick); 
