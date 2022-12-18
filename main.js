@@ -209,6 +209,7 @@ let listToggle = document.getElementById('list-toggle');
 let featureCloser = document.getElementById('feature-closer');
 let wrapper = document.getElementById('wrapper');
 let current_view_values = []; // holding variable for current mapview
+let tableid = ""; //holding variable for clicked business
 
 // event listeners
 featureCloser.addEventListener('click', showList);
@@ -362,7 +363,7 @@ function toggle_businessList() {
     }
   });
 };
-let tableid = "";
+
 listClick();
 function listClick() {
   // click event listener for groups headings/regions
@@ -419,9 +420,9 @@ function hideList() {
 
 function showList() {
   FeatureList.style.display = "none";
-  List.style.display = "block"; 
+  List.style.display = "flex"; 
   let table = document.getElementById(tableid);
-  console.log(table);
+  //console.log(table);
   table.classList.add('hidden');
   view.animate({
     center: current_view_values.currentCenter, 
