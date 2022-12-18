@@ -467,5 +467,5 @@ function getValues() {
 
 window.onresize = function()
 {
-  setTimeout( function() { map.updateSize();}, 200);
+  setTimeout( function() { map.updateSize();}, 300);
 }
