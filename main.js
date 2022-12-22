@@ -122,17 +122,24 @@ function styleFunction (feature) {
   let styleZoom = view.getZoom();
   let resolution = view.getResolution();
   var markerSource = markerURL; 
-  var iconSource = feature.get('image');
-  var iconStyle = new Style({
-    image: iconSource ? new Icon({
-      src: iconSource,
+  var iconSource1 = feature.get('image60x60');
+  var iconSource2 = feature.get('image120x120');
+  var iconStyle1 = new Style({
+    image: iconSource1 ? new Icon({
+      src: iconSource1,
       scale: 0.6
     }) : undefined
   });
   var iconStyle2 = new Style({
-    image: iconSource ? new Icon({
-      src: iconSource,
-      scale: 1/Math.pow(resolution, 1/2)
+    image: iconSource1 ? new Icon({
+      src: iconSource1,
+      scale: 0.8/Math.pow(resolution, 1/2)
+    }) : undefined
+  });
+  var iconStyle3 = new Style({
+    image: iconSource2 ? new Icon({
+      src: iconSource2,
+      scale: 0.4/Math.pow(resolution, 1/2)
     }) : undefined
   });
   var markerStyle = new Style({
@@ -141,16 +148,21 @@ function styleFunction (feature) {
       scale: 1
     }) : undefined
   });
+  console.log(styleZoom);
   if (styleZoom < 11) {
     return [markerStyle];
   }
-  else if (styleZoom < 16 ){
-    return [iconStyle];
+  else if (styleZoom <= 17 ){
+    return [iconStyle1];
   }
-  else {
+  else if (styleZoom > 17 && styleZoom < 18 ){
     return [iconStyle2];
   }
+  else {
+    return [iconStyle3];
+  }
 }
+
 
 // popup
 var container = document.getElementById('popup'),
@@ -396,7 +408,7 @@ function listClick() {
         table.classList.remove('hidden');
         // populate business info fields
         business.innerText = jsonObj[eleId].label;
-        companyIcon.src = jsonObj[eleId].image;
+        companyIcon.src = jsonObj[eleId].image60x60;
         view.animate({
           center: coords,
           zoom: 17,
