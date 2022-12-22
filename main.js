@@ -178,12 +178,13 @@ map.on('click', function(evt){
         var geometry = feature.getGeometry();
         var coord = geometry.getCoordinates();
         
-        var content = '<h3>' + feature.get('label') + '</h3>';
-        content += '<h5 id=popup-category >' + "Category - " + feature.get('category') + '</h5>';
+        var content = '<h2>' + feature.get('label') + '</h2>';
+        content += '<h5 id=popup-category >' + "CATEGORY - " + feature.get('category') + '</h5>';
         content += '<h5 id=popup-website ><a href=' + feature.get('website') + '>' + feature.get('label') + '</a></h5>';
         content += '<h5 id=popup-email><a href=mailto:' + feature.get('email') + '>' + feature.get('email') + '</a></h5>';
         content += '<h5 id=popup-phone><a href=tel:' + feature.get('phone') + '>' + feature.get('phone') + '</a></h5>';
         content += '<h5 id=popup-address>' + feature.get('address') + '</h5>';
+        content += '<hr class=rounded >'
         content += '<h5 id=popup-description>' + feature.get('description') + '</h5>';
 
         content_element.innerHTML = content;
