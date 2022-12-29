@@ -309,6 +309,28 @@ hr.rounded {
 #popup-email > a, #popup-phone > a {
   color: #f6921b;
 }
+/* Layer Switcher Styles */
+div.ol-unselectable:nth-child(6) {
+  border-radius: 5px !important;
+  padding-right: 2px !important;
+  background-color: black !important;
+}
+.layer-switcher button {
+  background-image: url('https://marktrueman.ca/wp-content/uploads/2022/12/layerSwitcher_blk_sm.png') !important;
+  background-color: black !important;
+}
+.layer-switcher .panel {
+  border-color: black !important;
+  background-color: black !important;
+  color: #8e8d8d !important;
+
+}
+li.group:nth-child(1) > label:nth-child(2) {
+  color: #f6921b;
+}
+li.group:nth-child(2) > label:nth-child(1) {
+  color: #f6921b;
+}
 /* .rotate-north {
   top: 65px;
   left: .5em;

@@ -1,4 +1,6 @@
 import './style.css';
+import 'ol-layerswitcher/dist/ol-layerswitcher.css';
+
 import {Map, View} from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
@@ -14,7 +16,9 @@ import FullScreen from 'ol/control/FullScreen';
 import {Vector as VectorSource} from 'ol/source';
 import { clone, intersectsSegment } from 'ol/extent';
 import XYZ from 'ol/source/XYZ';
-//import LayerSwitcher from 'ol-layerswitcher';
+import LayerGroup from 'ol/layer/Group';
+import LayerSwitcher from 'ol-layerswitcher';
+import { BaseLayerOptions, GroupLayerOptions } from 'ol-layerswitcher';
 
 const opensheet = "https://opensheet.elk.sh/19o_WmjjKn1ZE1940Brh9VrD9gaTyStMTF-kwbz2LJm4/elements"
 const basemapUrl = 'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
@@ -79,42 +83,67 @@ const vectorSource = new VectorSource({
   url: 'data:,' + encodeURIComponent(geojsonString)
 });
 
-const baseMap1 = new TileLayer({
-  source: new XYZ({
-    attributions:
-      'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' +
-      'rest/services/Canvas/World_Dark_Gray_Base/MapServer">ArcGIS</a>',
-    url:
-      'https://server.arcgisonline.com/ArcGIS/rest/services/' +
-      'Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-  }),
-})
+const tileSource = new XYZ({
+  attributions:
+    'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' +
+    'rest/services/Canvas/World_Dark_Gray_Base/MapServer">ArcGIS</a>',
+  url:
+    'https://server.arcgisonline.com/ArcGIS/rest/services/' +
+    'Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+});
 
-const baseMap = new TileLayer({
+const OSMbaseMap = new TileLayer({
+  title: 'Open Street Maps',
+  type: 'base',
+  visible: false,
   source: new OSM()
-})
+});
+
+const DkGybaseMap = new TileLayer({
+  title: 'Dark Grey',
+  type: 'base',
+  visible: true,
+  source: tileSource,
+});
 
 const vectorLayer = new VectorLayer({
+  title: 'Businesses',
   style: styleFunction,
+  visible: true,
   source: vectorSource
-})
+});
 
 const view = new View({
   center: initialView,
   zoom: 8.5,
   minZoom: 2,
   maxZoom: 21
-})
+});
 
 const map = new Map({
   //controls: defaultControls().extend([new NorthControl()]),
   target: 'map',
-  layers: [baseMap, vectorLayer],
+  layers: [
+    new LayerGroup({
+      title: 'Base maps',
+      layers: [OSMbaseMap, DkGybaseMap]
+    }),
+    new LayerGroup({
+      title: 'Overlays',
+      layers: [vectorLayer]
+    })
+  ],
   view: view
 });
 
 var fullscreen = new FullScreen();
 map.addControl(fullscreen);
+
+var layerSwitcher = new LayerSwitcher({
+  tipLabel: 'Légende', // Optional label for button
+  groupSelectStyle: 'children' // Can be 'children' [default], 'group' or 'none'
+});
+map.addControl(layerSwitcher);
 
 // sync(map); need to import ol-hashed if using
 
@@ -148,7 +177,7 @@ function styleFunction (feature) {
       scale: 1
     }) : undefined
   });
-  console.log(styleZoom);
+  //console.log(styleZoom);
   if (styleZoom < 11) {
     return [markerStyle];
   }
