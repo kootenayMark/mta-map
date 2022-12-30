@@ -26,6 +26,9 @@ article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
 	display: block;
 }
+/* * {
+  box-sizing: border-box;
+} */
 body {
 	line-height: 1;
 }
@@ -39,6 +42,7 @@ html, body {
   height: 100vh;
   font-family: Comfortaa;
   color: #8e8d8d;
+  overflow: hidden;
 }
 #wrapper {
   margin:0;
@@ -312,7 +316,7 @@ hr.rounded {
 /* Layer Switcher Styles */
 div.ol-unselectable:nth-child(6) {
   border-radius: 5px !important;
-  padding-right: 2px !important;
+  padding: 2px 3px 2px 0 !important;
   background-color: black !important;
 }
 .layer-switcher button {

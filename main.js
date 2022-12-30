@@ -507,7 +507,7 @@ function getValues() {
   return viewValues;
 };
 
-window.onresize = function()
-{
-  setTimeout( function() { map.updateSize();}, 300);
-}
+// window.onresize = function()
+// {
+//   setTimeout( function() { map.updateSize();}, 300);
+// }
