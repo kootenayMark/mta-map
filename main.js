@@ -1,27 +1,31 @@
 import './style.css';
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
-
+import Stroke from 'ol/style/Stroke.js';
 import {Map, View} from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import VectorLayer from 'ol/layer/Vector';
 import Overlay from 'ol/Overlay';
 import GeoJSON from 'ol/format/GeoJSON';
-import {Icon, Circle, Style} from 'ol/style';
+import {Icon, Circle, Style, Fill} from 'ol/style';
 // import sync from 'ol-hashed'; // need to import if using sync
 import Feature from 'ol/feature';
 import { fromLonLat } from 'ol/proj';
 import {Control, defaults as defaultControls} from 'ol/control';
 import FullScreen from 'ol/control/FullScreen';
-import {Vector as VectorSource} from 'ol/source';
+import {Vector as VectorSource, WMTS} from 'ol/source';
 import { clone, intersectsSegment } from 'ol/extent';
 import XYZ from 'ol/source/XYZ';
 import LayerGroup from 'ol/layer/Group';
 import LayerSwitcher from 'ol-layerswitcher';
 import { BaseLayerOptions, GroupLayerOptions } from 'ol-layerswitcher';
+import TileWMS from 'ol/source/TileWMS';
+import BingMaps from 'ol/source/BingMaps.js';
+
 
 const opensheet = "https://opensheet.elk.sh/19o_WmjjKn1ZE1940Brh9VrD9gaTyStMTF-kwbz2LJm4/elements"
-const basemapUrl = 'http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+const featureLayer1 = './data/LCICLandInv_select_clean_civAdrs.json'
+// const featureLayer1 = 'http://51.79.71.43:8080/geoserver/LCICLandInventory/wms?service=WMS&version=1.1.0&request=GetMap&layers=LCICLandInventory%3ALCICLandInv_select_clean_civAdrs&bbox=428432.875%2C5427680.5%2C465716.65625%2C5453057.5&width=768&height=522&srs=EPSG%3A26911&styles=&format=application/openlayers#toggle'
 const dataURL = './data/mtaData.json'
 const markerURL ='https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_xsm-1.png'
 
@@ -50,7 +54,15 @@ async function getData() {
   return fetch(opensheet)
   .then(res => res.json())
 }
-console.log(jsonObj) 
+//console.log('jsonObj' + jsonObj) 
+
+const geojsonObj1 = await getData1();
+
+async function getData1() {
+  return fetch(featureLayer1)
+  .then(res => res.json())
+}
+//console.log('geojsonObj1' + geojsonObj1) 
 
 //let jsonString = JSON.stringify(jsonObj);
 //console.log(jsonString);
@@ -74,14 +86,43 @@ const pointArrFeatureCollection = {
 }
 
 const geojsonString = JSON.stringify(pointArrFeatureCollection)
-// console.log(pointArrFeatureCollection);
-// console.log(geojsonString);
+//console.log(pointArrFeatureCollection);
+//console.log('geojsonString' + geojsonString);
+
+const geojsonString1 = JSON.stringify(geojsonObj1)
+//console.log('geojsonString1' + geojsonString1);
 
 // map Variables
 const vectorSource = new VectorSource({
   format: new GeoJSON(),
   url: 'data:,' + encodeURIComponent(geojsonString)
 });
+console.log(vectorSource);
+
+
+// const vectorSource1 = new VectorSource({
+//   format: new GeoJSON(),
+//   url: 'data:,' + encodeURIComponent(geojsonString1)
+// });
+// console.log(vectorSource1);
+// const vectorSource1 = new VectorSource({
+//   features: new GeoJSON().readFeatures(geojsonObj1)
+// });
+
+const vectorSource1 = new TileWMS({
+  url: 'http://51.79.71.43:8080/geoserver/wms/LCICLandInventory',
+  params: {
+    LAYERS: 'LCICLandInv_select_clean_civAdrs',
+    TRANSPARENT: 'True'
+  }
+});
+const styles = [
+  'RoadOnDemand',
+  'Aerial',
+  'AerialWithLabelsOnDemand',
+  'CanvasDark',
+  'OrdnanceSurvey',
+];
 
 const tileSource = new XYZ({
   attributions:
@@ -99,6 +140,26 @@ const OSMbaseMap = new TileLayer({
   source: new OSM()
 });
 
+const BingBaseDark = new TileLayer({
+  title: 'Bing Canvas Dark',
+  type: 'base',
+  visible: true,
+  source: new BingMaps({
+    key: 'Aq3zTnJcwqxgsr49ctWDJQbSaZsmhkdIrDuFMBdoCXZTBE31Gl-nam7XhVkbHHy9',
+    imagerySet: 'CanvasDark'
+  })
+});
+
+const BingArielBase = new TileLayer({
+  title: 'Bing Ariel Image',
+  type: 'base',
+  visible: false,
+  source: new BingMaps({
+    key: 'Aq3zTnJcwqxgsr49ctWDJQbSaZsmhkdIrDuFMBdoCXZTBE31Gl-nam7XhVkbHHy9',
+    imagerySet: 'Aerial'
+  })
+});
+
 const DkGybaseMap = new TileLayer({
   title: 'Dark Grey',
   type: 'base',
@@ -106,12 +167,27 @@ const DkGybaseMap = new TileLayer({
   source: tileSource,
 });
 
-const vectorLayer = new VectorLayer({
+const businessLayer = new VectorLayer({
   title: 'Businesses',
   style: styleFunction,
   visible: true,
   source: vectorSource
 });
+// const landInvLayer = new VectorLayer({
+//   title: 'Land Inventory',
+//   visible: true,
+//   source: vectorSource1
+// });
+const landInvLayer = new TileLayer({
+  title: 'Land Inventory',
+  visible: false,
+  source: vectorSource1
+});
+// const tileLayer = new TileLayer({
+//   title: 'Land Inventory',
+//   visible: false,
+//   source: vectorSource1
+// });
 
 const view = new View({
   center: initialView,
@@ -126,11 +202,11 @@ const map = new Map({
   layers: [
     new LayerGroup({
       title: 'Base maps',
-      layers: [OSMbaseMap, DkGybaseMap]
+      layers: [BingArielBase, OSMbaseMap, BingBaseDark]
     }),
     new LayerGroup({
       title: 'Overlays',
-      layers: [vectorLayer]
+      layers: [ landInvLayer, businessLayer]
     })
   ],
   view: view
@@ -191,7 +267,143 @@ function styleFunction (feature) {
     return [iconStyle3];
   }
 }
+function styleFunction2 (feature) {
+  let fillColour = feature.get(utilization_score_weighted); 
+  console.log(fillColour);
 
+  let style5 = new Style({
+      stroke: new Stroke({
+        color: 'black',
+        width: 0.5,
+      }),
+      fill: new Fill({
+        color: '#d7191c',
+      }),
+    });
+  let style6 = new Style({
+      stroke: new Stroke({
+        color: 'black',
+        width: 0.5,
+      }),
+      fill: new Fill({
+        color: '#e54f35',
+      }),
+    });
+  let style7 = new Style({
+      stroke: new Stroke({
+        color: 'black',
+        width: 0.5,
+      }),
+      fill: new Fill({
+        color: '#f3854e',
+      }),
+    });
+  let style8 = new Style({
+      stroke: new Stroke({
+        color: 'black',
+        width: 0.5,
+      }),
+      fill: new Fill({
+        color: '#feb66a',
+      }),
+    });
+  let style9 = new Style({
+      stroke: new Stroke({
+        color: 'black',
+        width: 0.5,
+      }),
+      fill: new Fill({
+        color: '#fed38c',
+      }),
+    });
+  let style10 = new Style({
+      stroke: new Stroke({
+        color: 'black',
+        width: 0.5,
+      }),
+      fill: new Fill({
+        color: '#fff1af',
+      }),
+    });
+  let style11 = new Style({
+      stroke: new Stroke({
+        color: 'black',
+        width: 0.5,
+      }),
+      fill: new Fill({
+        color: '#eff9b1',
+      }),
+    });
+  let style12 = new Style({
+      stroke: new Stroke({
+        color: 'black',
+        width: 0.5,
+      }),
+      fill: new Fill({
+        color: '#cfeb91',
+      }),
+    });
+  let style13 = new Style({
+      stroke: new Stroke({
+        color: 'black',
+        width: 0.5,
+      }),
+      fill: new Fill({
+        color: '#aedd72',
+      }),
+    });
+  let style14 = new Style({
+      stroke: new Stroke({
+        color: 'black',
+        width: 0.5,
+      }),
+      fill: new Fill({
+        color: '#80c75f',
+      }),
+    });
+  let style15 = new Style({
+      stroke: new Stroke({
+        color: 'black',
+        width: 0.5,
+      }),
+      fill: new Fill({
+        color: '#4daf50',
+      }),
+    });
+    if (fillColour === 5) {
+      return [style5];
+    }
+    else if (fillColour === 6 ){
+      return [style6];
+    }
+    else if (fillColour === 7 ){
+      return [style7];
+    }
+    else if (fillColour === 8 ){
+      return [style8];
+    }
+    else if (fillColour === 9 ){
+      return [style9];
+    }
+    else if (fillColour === 10 ){
+      return [style10];
+    }
+    else if (fillColour === 11 ){
+      return [style11];
+    }
+    else if (fillColour === 12 ){
+      return [style12];
+    }
+    else if (fillColour === 13 ){
+      return [style13];
+    }
+    else if (fillColour === 14 ){
+      return [style14];
+    }
+    else {
+      return [style15];
+    }
+  }
 
 // popup
 var container = document.getElementById('popup'),
@@ -309,7 +521,7 @@ jsonObj.forEach((item)=>{
 filtered_jsonObj.push(arr);
 });
 
-console.log(filtered_jsonObj); 
+//console.log('filtered_jsonObj ' + filtered_jsonObj); 
 
 for (let i =0; i < filtered_jsonObj.length; i++) {  
   // replace character delimiters
