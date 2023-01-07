@@ -205,8 +205,8 @@ const map = new Map({
   view: view
 });
 
-var fullscreen = new FullScreen();
-map.addControl(fullscreen);
+// var fullscreen = new FullScreen();
+// map.addControl(fullscreen);
 
 var layerSwitcher = new LayerSwitcher({
   tipLabel: 'Légende', // Optional label for button

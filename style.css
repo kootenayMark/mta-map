@@ -314,6 +314,9 @@ hr.rounded {
   color: #f6921b;
 }
 /* Layer Switcher Styles */
+div.ol-unselectable:nth-child(5) {
+  top:1em;
+}
 div.ol-unselectable:nth-child(6) {
   border-radius: 5px !important;
   padding: 2px 3px 2px 0 !important;
