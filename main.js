@@ -24,10 +24,14 @@ import BingMaps from 'ol/source/BingMaps.js';
 
 
 const opensheet = "https://opensheet.elk.sh/19o_WmjjKn1ZE1940Brh9VrD9gaTyStMTF-kwbz2LJm4/elements"
-const featureLayer1 = './data/LCICLandInv_select_clean_civAdrs.json'
-// const featureLayer1 = 'http://51.79.71.43:8080/geoserver/LCICLandInventory/wms?service=WMS&version=1.1.0&request=GetMap&layers=LCICLandInventory%3ALCICLandInv_select_clean_civAdrs&bbox=428432.875%2C5427680.5%2C465716.65625%2C5453057.5&width=768&height=522&srs=EPSG%3A26911&styles=&format=application/openlayers#toggle'
+
+// const featureLayer1WMS = 'http://51.79.71.43:8080/geoserver/LCICLandInventory/wms?service=WMS&version=1.1.0&request=GetMap&layers=LCICLandInventory%3ALCICLandInv_select_clean_civAdrs&bbox=428432.875%2C5427680.5%2C465716.65625%2C5453057.5&width=768&height=522&srs=EPSG%3A26911&styles=&format=application/openlayers#toggle'
+const featureLayer1 = 'http://51.79.71.43:8080/geoserver/LCICLandInventory/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=LCICLandInventory%3ALCICLandInv_select_clean_civAdrs&maxFeatures=1434&outputFormat=application%2Fjson'
 const dataURL = './data/mtaData.json'
 const markerURL ='https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_xsm-1.png'
+
+// http://localhost:8080/geoserver/myworkspace/wfs?service=WFS&version=2.0.0&request=GetFeature&typename=myfeature&outputFormat=application/json
+
 
 // Region center Coords
 const initialView = fromLonLat([-117.97998, 49.55215])
@@ -86,11 +90,9 @@ const pointArrFeatureCollection = {
 }
 
 const geojsonString = JSON.stringify(pointArrFeatureCollection)
-//console.log(pointArrFeatureCollection);
-//console.log('geojsonString' + geojsonString);
 
 const geojsonString1 = JSON.stringify(geojsonObj1)
-//console.log('geojsonString1' + geojsonString1);
+
 
 // map Variables
 const vectorSource = new VectorSource({
@@ -99,30 +101,24 @@ const vectorSource = new VectorSource({
 });
 console.log(vectorSource);
 
+const vectorSource1 = new VectorSource({
+  format: new GeoJSON(),
+  url: 'data:,' + encodeURIComponent(geojsonString1)
+});
 
-// const vectorSource1 = new VectorSource({
-//   format: new GeoJSON(),
-//   url: 'data:,' + encodeURIComponent(geojsonString1)
-// });
-// console.log(vectorSource1);
 // const vectorSource1 = new VectorSource({
 //   features: new GeoJSON().readFeatures(geojsonObj1)
 // });
+console.log(vectorSource1);
 
-const vectorSource1 = new TileWMS({
-  url: 'http://51.79.71.43:8080/geoserver/wms/LCICLandInventory',
-  params: {
-    LAYERS: 'LCICLandInv_select_clean_civAdrs',
-    TRANSPARENT: 'True'
-  }
-});
-const styles = [
-  'RoadOnDemand',
-  'Aerial',
-  'AerialWithLabelsOnDemand',
-  'CanvasDark',
-  'OrdnanceSurvey',
-];
+// const styles = [
+//   'RoadOnDemand',
+//   'Aerial',
+//   'AerialWithLabelsOnDemand',
+//   'CanvasDark',
+//   'OrdnanceSurvey',
+// ];
+
 
 const tileSource = new XYZ({
   attributions:
@@ -173,17 +169,14 @@ const businessLayer = new VectorLayer({
   visible: true,
   source: vectorSource
 });
-// const landInvLayer = new VectorLayer({
-//   title: 'Land Inventory',
-//   visible: true,
-//   source: vectorSource1
-// });
-const landInvLayer = new TileLayer({
+
+const landInvLayer = new VectorLayer({
   title: 'Land Inventory',
+  style: styleFunction2, 
   visible: false,
   source: vectorSource1
 });
-// const tileLayer = new TileLayer({
+// const landInvLayer = new TileLayer({
 //   title: 'Land Inventory',
 //   visible: false,
 //   source: vectorSource1
@@ -206,7 +199,7 @@ const map = new Map({
     }),
     new LayerGroup({
       title: 'Overlays',
-      layers: [ landInvLayer, businessLayer]
+      layers: [landInvLayer, businessLayer]
     })
   ],
   view: view
@@ -267,17 +260,19 @@ function styleFunction (feature) {
     return [iconStyle3];
   }
 }
-function styleFunction2 (feature) {
-  let fillColour = feature.get(utilization_score_weighted); 
-  console.log(fillColour);
 
+function styleFunction2 (feature) {
+
+  let fillColour = feature.get('utilization_score_weighted'); 
+  const transparency = 0.4;
+  
   let style5 = new Style({
       stroke: new Stroke({
         color: 'black',
         width: 0.5,
       }),
       fill: new Fill({
-        color: '#d7191c',
+        color: `rgb(215, 25, 28, ${transparency})`,
       }),
     });
   let style6 = new Style({
@@ -286,7 +281,7 @@ function styleFunction2 (feature) {
         width: 0.5,
       }),
       fill: new Fill({
-        color: '#e54f35',
+        color: `rgb(229, 79, 53, ${transparency})`,
       }),
     });
   let style7 = new Style({
@@ -295,7 +290,7 @@ function styleFunction2 (feature) {
         width: 0.5,
       }),
       fill: new Fill({
-        color: '#f3854e',
+        color: `rgb(243, 133, 78, ${transparency})`,
       }),
     });
   let style8 = new Style({
@@ -304,7 +299,7 @@ function styleFunction2 (feature) {
         width: 0.5,
       }),
       fill: new Fill({
-        color: '#feb66a',
+        color: `rgb(254, 182, 106, ${transparency})`,
       }),
     });
   let style9 = new Style({
@@ -313,7 +308,7 @@ function styleFunction2 (feature) {
         width: 0.5,
       }),
       fill: new Fill({
-        color: '#fed38c',
+        color: `rgb(254, 211, 140, ${transparency})`,
       }),
     });
   let style10 = new Style({
@@ -322,7 +317,7 @@ function styleFunction2 (feature) {
         width: 0.5,
       }),
       fill: new Fill({
-        color: '#fff1af',
+        color: `rgb(255, 241, 175, ${transparency})`,
       }),
     });
   let style11 = new Style({
@@ -331,7 +326,7 @@ function styleFunction2 (feature) {
         width: 0.5,
       }),
       fill: new Fill({
-        color: '#eff9b1',
+        color: `rgb(239, 249, 177, ${transparency})`,
       }),
     });
   let style12 = new Style({
@@ -340,7 +335,7 @@ function styleFunction2 (feature) {
         width: 0.5,
       }),
       fill: new Fill({
-        color: '#cfeb91',
+        color: `rgb(207, 235, 145,${transparency})`,
       }),
     });
   let style13 = new Style({
@@ -349,7 +344,7 @@ function styleFunction2 (feature) {
         width: 0.5,
       }),
       fill: new Fill({
-        color: '#aedd72',
+        color: `rgb(174, 221, 114, ${transparency})`,
       }),
     });
   let style14 = new Style({
@@ -358,7 +353,7 @@ function styleFunction2 (feature) {
         width: 0.5,
       }),
       fill: new Fill({
-        color: '#80c75f',
+        color: 'rgb(128, 199, 95, 0.4)',
       }),
     });
   let style15 = new Style({
@@ -367,7 +362,7 @@ function styleFunction2 (feature) {
         width: 0.5,
       }),
       fill: new Fill({
-        color: '#4daf50',
+        color: 'rgb(77, 175, 80, 0.4)',
       }),
     });
     if (fillColour === 5) {
