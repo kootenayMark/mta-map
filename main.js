@@ -21,14 +21,15 @@ import LayerSwitcher from 'ol-layerswitcher';
 import { BaseLayerOptions, GroupLayerOptions } from 'ol-layerswitcher';
 import TileWMS from 'ol/source/TileWMS';
 import BingMaps from 'ol/source/BingMaps.js';
-
+import * as olExtent from 'ol/extent';
+//import geojsonObjWFS from './LCICLandInv_select_clean_civAdrs.json';
 
 const opensheet = "https://opensheet.elk.sh/19o_WmjjKn1ZE1940Brh9VrD9gaTyStMTF-kwbz2LJm4/elements"
 
 const featureLayerWMS = 'http://51.79.71.43:8080/geoserver/LCICLandInventory/wms?service=WMS&version=1.1.0&request=GetMap&layers=LCICLandInventory%3ALCICLandInv_select_clean_civAdrs&bbox=428432.875%2C5427680.5%2C465716.65625%2C5453057.5&width=768&height=522&srs=EPSG%3A26911&styles=&format=application/openlayers#toggle'
-// const featureLayerWFS = 'http://51.79.71.43:8080/geoserver/LCICLandInventory/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=LCICLandInventory%3ALCICLandInv_select_clean_civAdrs&maxFeatures=1434&outputFormat=application%2Fjson'
+const featureLayerWFS = 'http://51.79.71.43:8080/geoserver/LCICLandInventory/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=LCICLandInventory%3ALCICLandInv_select_clean_civAdrs&maxFeatures=1434&outputFormat=application%2Fjson'
 
-const featureLayerWFS = './LCICLandInv_select_clean_civAdrs.json'
+//const featureLayerWFS = './LCICLandInv_select_clean_civAdrs.json'
 // console.log(featureLayerWFS);
 const markerURL ='https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_xsm-1.png'
 
@@ -449,7 +450,9 @@ map.on('click', function(evt){
     if (feature) {
         var geometry = feature.getGeometry();
         var geometryType = geometry.getType();
-        var coord = geometry.getCoordinates();
+        var point_coord = geometry.getCoordinates();
+        var extent = geometry.getExtent()
+        var poly_coord = olExtent.getCenter(extent);
         
         console.log(geometryType);
         
@@ -464,10 +467,11 @@ map.on('click', function(evt){
         content += `<h5 id=popup-description>${feature.get('description')}</h5>`;
 
         content_element.innerHTML = content;
-        overlay.setPosition(coord);
+        overlay.setPosition(point_coord);
         
         console.info(feature.getProperties());
-      } else {
+      } 
+      else if (geometryType == 'MultiPolygon') {
         var content = `<h2 id= popup-pid class= landInv>PID - ${feature.get('pid')}</h2>`;
         content += `<h5 id=popup-legal class= landInv>Legal Description - ${feature.get('legal_description')}</h5>`;
         content += `<h5 id=popup-stated-area class= landInv>Stated Area - ${feature.get('stated_area')} Acres</h5>`;
@@ -496,7 +500,7 @@ map.on('click', function(evt){
         content += `<h5 id=popup-utilization-score-weighted class= landInv>Utilization Score Weighted - ${feature.get('utilization_score_weighted')}</h5>`;
 
         content_element.innerHTML = content;
-        overlay.setPosition(coord);
+        overlay.setPosition(poly_coord);
         
         console.info(feature.getProperties());
       }
