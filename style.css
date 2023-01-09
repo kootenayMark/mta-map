@@ -313,6 +313,14 @@ hr.rounded {
 #popup-email > a, #popup-phone > a {
   color: #f6921b;
 }
+
+/* Land Inventory Popup Styles */
+.landInv {
+  background-color: black;
+  color: #8e8d8d;
+  text-align: left;
+}
+
 /* Layer Switcher Styles */
 div.ol-unselectable:nth-child(5) {
   top:1.5em;

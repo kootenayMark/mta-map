@@ -98,7 +98,7 @@ const vectorSource = new VectorSource({
   format: new GeoJSON(),
   url: 'data:,' + encodeURIComponent(geojsonString)
 });
-
+//console.log(vectorSource);
 
 // const vectorSourceWFS = new VectorSource({
 //   format: new GeoJSON(),
@@ -108,7 +108,7 @@ const vectorSource = new VectorSource({
 const vectorSourceWFS_1 = new VectorSource({
   features: new GeoJSON().readFeatures(geojsonObjWFS)
 });
-console.log(vectorSourceWFS_1);
+//console.log(vectorSourceWFS_1);
 
 // const styles = [
 //   'RoadOnDemand',
@@ -193,57 +193,6 @@ const view = new View({
   minZoom: 2,
   maxZoom: 21
 });
-class UtilizationScore extends Control {
-  constructor(opt_options) {
-    const options = opt_options || {};
-
-    const button = document.createElement('button');
-    button.innerHTML = 'i';
-
-    const element = document.createElement('div');
-    element.className = 'toggle-utilization ol-unselectable ol-control';
-    element.appendChild(button);
-
-    super({
-      element: element,
-      target: options.target,
-    });
-
-    button.addEventListener('click', this.handleRotateNorth.bind(this), false);
-  }
-
-  handleRotateNorth() {
-    this.getMap().getView().setRotation(0);
-  }
-
-  // constructor(opt_options) {
-  //   const options = opt_options || {};
-
-  //   const uti_button = document.createElement('button');
-  //   uti_button.innerHTML = 'i';
-
-  //   const element = document.createElement('div');
-  //   const uti_content = document.createElement('div');
-  //   uti_content.setAttribute('innerText', 'Hello World')
-  //   element.className = 'uti-button ol-unselectable ol-control';
-  //   element.appendChild(uti_button);
-
-  //   super({
-  //     element: element,
-  //     target: options.target,
-  //   });
-
-  //   uti_button.addEventListener('click', this.toggle_uti_button().bind(this), false);
-  // }
-
-  // toggle_uti_button(uti_content) {
-  //   if (uti_content.style.display === "none") {
-  //     uti_content.style.display = "block";
-  //   } else {
-  //     uti_content.style.display = "none";
-  //   };
-}
-
 
 const map = new Map({
   //controls: defaultControls().extend([new UtilizationScore()]),
@@ -499,21 +448,58 @@ map.on('click', function(evt){
       });
     if (feature) {
         var geometry = feature.getGeometry();
+        var geometryType = geometry.getType();
         var coord = geometry.getCoordinates();
         
-        var content = '<h2>' + feature.get('label') + '</h2>';
-        content += '<h5 id=popup-category >' + "CATEGORY - " + feature.get('category') + '</h5>';
-        content += '<h5 id=popup-website ><a href=' + feature.get('website') + '>' + feature.get('label') + '</a></h5>';
-        content += '<h5 id=popup-email><a href=mailto:' + feature.get('email') + '>' + feature.get('email') + '</a></h5>';
-        content += '<h5 id=popup-phone><a href=tel:' + feature.get('phone') + '>' + feature.get('phone') + '</a></h5>';
-        content += '<h5 id=popup-address>' + feature.get('address') + '</h5>';
-        content += '<hr class=rounded >'
-        content += '<h5 id=popup-description>' + feature.get('description') + '</h5>';
+        console.log(geometryType);
+        
+      if (geometryType == 'Point'){
+        var content = `<h2> ${feature.get('label')} </h2>`;
+        content += `<h5 id=popup-category >CATEGORY - ${feature.get('category')}</h5>`;
+        content += `<h5 id=popup-website ><a href= ${feature.get('website')}> ${feature.get('label')}</a></h5>`;
+        content += `<h5 id=popup-email><a href=mailto: ${feature.get('email')}> ${feature.get('email')}</a></h5>`;
+        content += `<h5 id=popup-phone><a href=tel: ${feature.get('phone')}>${feature.get('phone')}</a></h5>`;
+        content += `<h5 id=popup-address>${feature.get('address')}</h5>`;
+        content += `<hr class=rounded >`
+        content += `<h5 id=popup-description>${feature.get('description')}</h5>`;
 
         content_element.innerHTML = content;
         overlay.setPosition(coord);
         
         console.info(feature.getProperties());
+      } else {
+        var content = `<h2 id= popup-pid class= landInv>PID - ${feature.get('pid')}</h2>`;
+        content += `<h5 id=popup-legal class= landInv>Legal Description - ${feature.get('legal_description')}</h5>`;
+        content += `<h5 id=popup-stated-area class= landInv>Stated Area - ${feature.get('stated_area')} Acres</h5>`;
+        content += `<h5 id=popup-zone-name class= landInv>Zone - ${feature.get('zone_name')}</h5>`;
+        content += `<h5 id=popup-zone-admin class= landInv>Zone Administration - ${feature.get('zone_admin')}</h5>`;
+        content += `<h5 id=popup-water-service class= landInv>Water Service - ${feature.get('water_service')}</h5>`;
+        content += `<h5 id=popup-sanitary-service class= landInv>Sanitary Service - ${feature.get('sanitary_service')}</h5>`;
+        content += `<h5 id=popup-connectivity class= landInv>Connectivity - ${feature.get('connectivity')}</h5>`;
+        content += `<h5 id=popup-flood-risk class= landInv>Flood Risk - ${feature.get('flood_risk')}</h5>`;
+        content += `<h5 id=popup-environmental-remediation class= landInv>Environmental Remediation - ${feature.get('environmental_remediation')}</h5>`;
+        content += `<h5 id=popup-electric-service class= landInv>Electrical Service - ${feature.get('electric_service')}</h5>`;
+        content += `<h5 id=popup-natural-gas-service class= landInv>Natural Gas Service - ${feature.get('natural_gas_service')}</h5>`;
+        content += `<h5 id=popup-ms-building class= landInv>Building Present - ${feature.get('ms_building')}</h5>`;
+        content += `<h5 id=popup-size-threshold class= landInv>Greater than 0.3 Acres - ${feature.get('size_threshold(greaterthan0.3)')}</h5>`;
+        content += `<h5 id=popup-zone-priority class= landInv>Zone Priority - ${feature.get('zone_priority')}</h5>`;
+        content += `<h5 id=popup-current-use class= landInv>Current Usage - ${feature.get('current_use')}</h5>`;
+        content += `<h5 id=popup-services class= landInv>Services - ${feature.get('services')}</h5>`;
+        content += `<h5 id=popup-avg-slope class= landInv>Average Slope - ${feature.get('avg_slope')}</h5>`;
+        content += `<h5 id=popup-civic-id class= landInv>Civic Id - ${feature.get('civic_id')}</h5>`;
+        content += `<h5 id=popup-full-addr class= landInv>Address - ${feature.get('full_addr')}</h5>`;
+        content += `<h5 id=popup-name-alias class= landInv>Name Alias - ${feature.get('name_alias')}</h5>`;
+        content += `<h5 id=popup-notes class= landInv>Property Notes - ${feature.get('notes')}</h5>`;
+        content += `<h5 id=popup-services-score-sum class= landInv>Services Sum - ${feature.get('services_score_sum')}</h5>`;
+        content += `<h5 id=popup-utilization-score-basic class= landInv>Utilization Score Basic - ${feature.get('utilization_score_basic')}</h5>`;
+        content += `<h5 id=popup-utilization-score-services class= landInv>Utilization Score Services - ${feature.get('utilization_score_services')}</h5>`;
+        content += `<h5 id=popup-utilization-score-weighted class= landInv>Utilization Score Weighted - ${feature.get('utilization_score_weighted')}</h5>`;
+
+        content_element.innerHTML = content;
+        overlay.setPosition(coord);
+        
+        console.info(feature.getProperties());
+      }
     }
 });
 // map.on('pointermove', function(e) {
