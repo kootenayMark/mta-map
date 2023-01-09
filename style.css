@@ -315,16 +315,20 @@ hr.rounded {
 }
 /* Layer Switcher Styles */
 div.ol-unselectable:nth-child(5) {
-  top:1em;
+  top:1.5em;
 }
 div.ol-unselectable:nth-child(6) {
   border-radius: 5px !important;
-  padding: 2px 3px 2px 0 !important;
+  /* padding: 2px 3px 2px 0px !important; */
   background-color: black !important;
 }
 .layer-switcher button {
+  display: block;
+  margin: auto;
   background-image: url('https://marktrueman.ca/wp-content/uploads/2022/12/layerSwitcher_blk_sm.png') !important;
+  background-position: center center !important;
   background-color: black !important;
+  border-radius: 5px;
 }
 .layer-switcher .panel {
   border-color: black !important;
@@ -358,6 +362,50 @@ input[type="checkbox"]:checked {
 ul li{
   cursor:pointer;
 }
+/* splash screen styles */
+#utilization {
+  padding: 1em;
+  display: none;
+  position: absolute;
+  color: black;
+  background-color: #8e8d8d;
+  top: 50%;
+  left: 50%;
+  max-width: 500px;
+  max-height: 300px;
+  overflow-y: auto;
+  transform: translate(-50%, -50%);
+  border-radius: 4px;
+}
+#utilization > h4 {
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+#utilization > ol {
+  list-style-type: decimal;
+}
+#utilization > li {
+  padding-left: 10px;
+}
+#uti-button {
+  position: absolute;
+  right: 0.9em;
+  top: 5.5em;
+  font-weight: bold;
+  color: #EC2034;
+  font-size: 1em;
+  background-color: #f6921b;
+  width:1.5em;
+  height: 1.5em;
+  border: none;
+  border-radius: 3px;
+
+}
+/*
+#utilization-button {
+  color: #EC2034;
+  background-color: #f6921b;
+} */
 /* Style the scrollbar background */
 ::-webkit-scrollbar {
   background: black;
