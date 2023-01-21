@@ -22,19 +22,29 @@ import { BaseLayerOptions, GroupLayerOptions } from 'ol-layerswitcher';
 import TileWMS from 'ol/source/TileWMS';
 import BingMaps from 'ol/source/BingMaps.js';
 import * as olExtent from 'ol/extent';
+import { defaults } from 'ol/interaction';
+import {and} from 'ol/format/filter';
 //import geojsonObjWFS from './LCICLandInv_select_clean_civAdrs.json';
 
-const opensheet = "https://opensheet.elk.sh/19o_WmjjKn1ZE1940Brh9VrD9gaTyStMTF-kwbz2LJm4/elements"
+const markerURL ='https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_xsm-1.png'
+const businessLayerURL = "https://opensheet.elk.sh/19o_WmjjKn1ZE1940Brh9VrD9gaTyStMTF-kwbz2LJm4/elements"
 
 const featureLayerWMS = 'http://51.79.71.43:8080/geoserver/LCICLandInventory/wms?service=WMS&version=1.1.0&request=GetMap&layers=LCICLandInventory%3ALCICLandInv_select_clean_civAdrs&bbox=428432.875%2C5427680.5%2C465716.65625%2C5453057.5&width=768&height=522&srs=EPSG%3A26911&styles=&format=application/openlayers#toggle'
 
-const featureLayerWFS = 'https://geoserver.marktrueman.ca/geoserver/LCICLandInventory/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=LCICLandInventory%3ALCICLandInv_Weighted&maxFeatures=1434&outputFormat=application%2Fjson'
-//const featureLayerWFS = './LCICLandInv_select_clean_civAdrs.json'
+const featureLayerWFS_1 = 'https://geoserver.marktrueman.ca/geoserver/LCICLandInventory/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=LCICLandInventory%3ALCICLandInv_Weighted&maxFeatures=1434&outputFormat=application%2Fjson'
+
+/* ****geoserver layer parameters**** */
+const geoServerDomain = 'https://geoserver.marktrueman.ca/geoserver/'
+const nameSpace = 'LCICLandInventory'
+const service = 'WFS'
+const version = '2.0.0'
+const request = 'GetFeature'
+const typeName = 'LCICLandInventory%3ALCICLandInv_Weighted'
+const count = '1434'
+
+// Geoserver layer url
+const featureLayerWFS = `${geoServerDomain}${nameSpace}/ows?service=${service}&version=${version}&request=${request}&typeName=${typeName}&count=${count}&outputFormat=application%2Fjson`
 // console.log(featureLayerWFS);
-const markerURL ='https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_xsm-1.png'
-
-// http://localhost:8080/geoserver/myworkspace/wfs?service=WFS&version=2.0.0&request=GetFeature&typename=myfeature&outputFormat=application/json
-
 
 /* ****Region center Coords **** */
 const initialView = fromLonLat([-117.97998, 49.55215])
@@ -58,7 +68,7 @@ const regions = [
 const jsonObj = await getData();
 
 async function getData() {
-  return fetch(opensheet)
+  return fetch(businessLayerURL)
   .then(res => res.json())
 }
 //console.log(jsonObj) 
@@ -74,8 +84,6 @@ async function getData1() {
   return fetch(featureLayerWFS)
   .then(res => res.json())
 }
-
-// console.log(geojsonObjWFS);
 
 // to GeoJSON.Point array
 const geoJSONPointArr = jsonObj.map(row => {
@@ -100,6 +108,8 @@ const geojsonString = JSON.stringify(pointArrFeatureCollection)
 //const geojsonStringWFS = JSON.stringify(geojsonObjWFS)
 
 
+
+
 /* ***map Variables*** */
 const vectorSource = new VectorSource({
   format: new GeoJSON(),
@@ -121,6 +131,10 @@ const vectorSource = new VectorSource({
 const vectorSourceWFS_1 = new VectorSource({
   features: new GeoJSON().readFeatures(geojsonObjWFS)
 });
+// const vectorSourceWFS_filtered = new VectorSource({
+//   features: new GeoJSON().readFeatures(filtered_geojsonObjWFS)
+// });
+
 // console.log(vectorSourceWFS_1);
 
 // const styles = [
@@ -130,16 +144,6 @@ const vectorSourceWFS_1 = new VectorSource({
 //   'CanvasDark',
 //   'OrdnanceSurvey',
 // ];
-
-
-const tileSource = new XYZ({
-  attributions:
-    'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/' +
-    'rest/services/Canvas/World_Dark_Gray_Base/MapServer">ArcGIS</a>',
-  url:
-    'https://server.arcgisonline.com/ArcGIS/rest/services/' +
-    'Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-});
 
 const OSMbaseMap = new TileLayer({
   title: 'Open Street Maps',
@@ -200,15 +204,22 @@ const businessLayer = new VectorLayer({
 const landInvLayer_1 = new VectorLayer({
   title: 'Land Inventory 1',
   style: styleFunction2, 
-  visible: false,
+  visible: true,
   source: vectorSourceWFS_1,
 });
+// const landInvLayer_filtered = new VectorLayer({
+//   title: 'Land Inventory Filtered',
+//   style: styleFunction2, 
+//   visible: false,
+//   source: vectorSourceWFS_filtered,
+// });
 
 const view = new View({
-  center: initialView,
-  zoom: 8.5,
+  center: trailandarea, //initialView,
+  zoom: 11, //8.5,
   minZoom: 2,
-  maxZoom: 21,
+  maxZoom: 20,
+  //constrainResolution: true,
   // updateWhileAnimating: false,
   // updateWhileInteracting: false,
   //resolutions: [0.07465, 0.944, 0.1196, 0.15, 0.19, 0.25, 0.31, 0.39, 0.49, 0.62, 0.79, 1.0, 1.26, 1.6, 2, 2.56, 3.25, 4, 5.2, 6.6, 8.4, 10.5, 13.3, 16.9, 21.4, 27, 35, 43, 55, 70, 90, 111, 140, 180, 225, 409.6, 5665, 9060, 14516]
@@ -224,10 +235,11 @@ const map = new Map({
     }),
     new LayerGroup({
       title: 'Overlays',
-      layers: [landInvLayer_1, /*landInvLayer,*/ businessLayer]
+      layers: [landInvLayer_1, /*landInvLayer_filtered,*/ businessLayer]
     })
   ],
-  view: view
+  view: view,
+  //interactions: defaults({ zoomDuration: 0 })
 });
 
 var layerSwitcher = new LayerSwitcher({
@@ -247,197 +259,88 @@ map.addControl(layerSwitcher);
 //   }
 // });
 
-function styleFunction (feature) {
-  var newRes = map.getView().getResolution();
-  map.on('moveend', (function() {
-      if (newRes != map.getView().getResolution()) {
-          newRes = map.getView().getResolution();
-          console.log('zoomend');
-      }
-  }));
+//var newRes = map.getView().getResolution();
+
+//console.log('newRes1 ' + newRes)
+function styleFunction (feature, resolution) {
+  const resolutionThreshold_1 = 80;
+  const resolutionThreshold_2 = 1.1;
+  const resolutionThreshold_3 = 0.55;
+  const markerSource = markerURL; 
   var iconSource1 = feature.get('image60x60');
   var iconSource2 = feature.get('image120x120');
-  var markerSource = markerURL; 
-  
-  var iconStyle1 = new Style({
-    image: iconSource1 ? new Icon({
-      src: iconSource1,
-      scale: 0.6
-    }) : undefined
-  });
-  var iconStyle2 = new Style({
-    image: iconSource1 ? new Icon({
-      src: iconSource1,
-      scale: 0.8/Math.pow(newRes, 1/2)
-    }) : undefined
-  });
-  var iconStyle3 = new Style({
-    image: iconSource2 ? new Icon({
-      src: iconSource2,
-      scale: 0.4/Math.pow(newRes, 1/2)
-    }) : undefined
-  });
+
   var markerStyle = new Style({
     image: markerSource ? new Icon({
       src: markerSource,
       scale: 1
     }) : undefined
   });
-  
-  console.log('newRes ' + newRes);
-  if (newRes > 80 ) {
-    return [markerStyle];
+  var iconStyle1 = new Style({
+    image: iconSource1 ? new Icon({
+      src: iconSource1,
+      scale: 0.6,
+      maxCacheSize: 100
+    }) : undefined
+  });
+  var iconStyle2 = new Style({
+    image: iconSource1 ? new Icon({
+      src: iconSource1,
+      scale: 0.8/Math.pow(resolution, 1/2)
+    }) : undefined
+  });
+  var iconStyle3 = new Style({
+    image: iconSource2 ? new Icon({
+      src: iconSource2,
+      scale: 0.4/Math.pow(resolution, 1/2)
+    }) : undefined
+  });
+//   map.on('moveend', (function() {
+//       if (newRes != map.getView().getResolution()) {
+//           newRes = map.getView().getResolution();
+//       }
+// }));
+  // console.log('newRes2 ' + newRes)
+  switch (true) {
+    case (resolution > resolutionThreshold_1):
+      return [markerStyle];
+      break;
+    case (resolution <= resolutionThreshold_1 && resolution > resolutionThreshold_2):
+      return [iconStyle1];
+      break;
+    case (resolution <= resolutionThreshold_2 && resolution > resolutionThreshold_3):
+      return [iconStyle2];
+      break;
+    default:
+      return [iconStyle3];
   }
-  else if (newRes <= 80 && newRes > 1.1){
-    return [iconStyle1];
-  }
-  else if (newRes <= 1.1 && newRes > 0.55){
-    return [iconStyle2];
-  }
-  else {
-    return [iconStyle3];
-  }
-}
-
+};
+   
 function styleFunction2 (feature) {
 
-  let fillColour = feature.get('utilization_score_weighted'); 
-  const transparency = 0.4;
-  
-  let style5 = new Style({
-      stroke: new Stroke({
-        color: 'black',
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: `rgb(215, 25, 28, ${transparency})`,
-      }),
-    });
-  let style6 = new Style({
-      stroke: new Stroke({
-        color: 'black',
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: `rgb(229, 79, 53, ${transparency})`,
-      }),
-    });
-  let style7 = new Style({
-      stroke: new Stroke({
-        color: 'black',
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: `rgb(243, 133, 78, ${transparency})`,
-      }),
-    });
-  let style8 = new Style({
-      stroke: new Stroke({
-        color: 'black',
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: `rgb(254, 182, 106, ${transparency})`,
-      }),
-    });
-  let style9 = new Style({
-      stroke: new Stroke({
-        color: 'black',
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: `rgb(254, 211, 140, ${transparency})`,
-      }),
-    });
-  let style10 = new Style({
-      stroke: new Stroke({
-        color: 'black',
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: `rgb(255, 241, 175, ${transparency})`,
-      }),
-    });
-  let style11 = new Style({
-      stroke: new Stroke({
-        color: 'black',
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: `rgb(239, 249, 177, ${transparency})`,
-      }),
-    });
-  let style12 = new Style({
-      stroke: new Stroke({
-        color: 'black',
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: `rgb(207, 235, 145,${transparency})`,
-      }),
-    });
-  let style13 = new Style({
-      stroke: new Stroke({
-        color: 'black',
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: `rgb(174, 221, 114, ${transparency})`,
-      }),
-    });
-  let style14 = new Style({
-      stroke: new Stroke({
-        color: 'black',
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: 'rgb(128, 199, 95, 0.4)',
-      }),
-    });
-  let style15 = new Style({
-      stroke: new Stroke({
-        color: 'black',
-        width: 0.5,
-      }),
-      fill: new Fill({
-        color: 'rgb(77, 175, 80, 0.4)',
-      }),
-    });
-    if (fillColour === 5) {
-      return [style5];
-    }
-    else if (fillColour === 6 ){
-      return [style6];
-    }
-    else if (fillColour === 7 ){
-      return [style7];
-    }
-    else if (fillColour === 8 ){
-      return [style8];
-    }
-    else if (fillColour === 9 ){
-      return [style9];
-    }
-    else if (fillColour === 10 ){
-      return [style10];
-    }
-    else if (fillColour === 11 ){
-      return [style11];
-    }
-    else if (fillColour === 12 ){
-      return [style12];
-    }
-    else if (fillColour === 13 ){
-      return [style13];
-    }
-    else if (fillColour === 14 ){
-      return [style14];
-    }
-    else {
-      return [style15];
-    }
-  }
+let symbolValue = feature.get('utilization_score_weighted');
+const transparency = 0.4;
 
+const fillColors = ['215, 25, 28,', '229, 79, 53,', '243, 133, 78,', '254, 182, 106,', '254, 211, 140,', '255, 241, 175,', '239, 249, 177,', '207, 235, 145,', '174, 221, 114,', '128, 199, 95,', '77, 175, 80,']
+const stroke_blk = new Stroke({
+  color: 'black',
+  width: 0.5,
+})
+
+let styles = [];
+  for(let i = 0; i < fillColors.length; i++) {
+    let style = new Style({
+      stroke: stroke_blk,
+      fill: new Fill({
+        color: `rgb(${fillColors[i]} ${transparency})`,
+      }),
+    });
+    styles.push(style);
+  }
+  if (symbolValue >= 5 && symbolValue <= 15) {
+    return [styles[symbolValue-5]];
+  }
+};
 
 /* ***popup*** */
 var container = document.getElementById('popup'),
@@ -795,13 +698,12 @@ function getValues() {
   return viewValues;
 };
 
-
 const utilization = document.getElementById("utilization");
 const uti_button = document.getElementById("uti-button");
 
 utilization.innerHTML = `
 <h4>Utilization Score</h4>
-  <p>The utilization score is generated by weighting and summing up factor such as zoning, connectivity, flood risk, utility service, minimum size, average slope of parcel,and current use/ownership. Current use was established using Microsoft Canadian building footprints, Satelite Imagery, and local knowledge and given a score from 1 to 4.</p>
+  <p>The utilization score is generated by weighting and summing up factors such as zoning, connectivity, flood risk, utility service, minimum size, average slope of parcel,and current use/ownership. Current use was established using Microsoft Canadian building footprints, Satelite Imagery, and local knowledge and given a score from 1 to 4.</p>
     <ul>
       <li>1 - In use long term by known entity</li> 
       <li>2 - In use, term unknown</li>
