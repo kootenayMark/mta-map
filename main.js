@@ -4,6 +4,7 @@ import Stroke from 'ol/style/Stroke.js';
 import {Map, View} from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
+import Vector from 'ol/source/OSM';
 import VectorLayer from 'ol/layer/Vector';
 import Overlay from 'ol/Overlay';
 import GeoJSON from 'ol/format/GeoJSON';
@@ -220,9 +221,6 @@ const view = new View({
   minZoom: 2,
   maxZoom: 20,
   //constrainResolution: true,
-  // updateWhileAnimating: false,
-  // updateWhileInteracting: false,
-  //resolutions: [0.07465, 0.944, 0.1196, 0.15, 0.19, 0.25, 0.31, 0.39, 0.49, 0.62, 0.79, 1.0, 1.26, 1.6, 2, 2.56, 3.25, 4, 5.2, 6.6, 8.4, 10.5, 13.3, 16.9, 21.4, 27, 35, 43, 55, 70, 90, 111, 140, 180, 225, 409.6, 5665, 9060, 14516]
 });
 
 const map = new Map({
@@ -342,6 +340,7 @@ let styles = [];
   }
 };
 
+
 /* ***popup*** */
 var container = document.getElementById('popup'),
     content_element = document.getElementById('popup-content'),
@@ -357,72 +356,85 @@ var overlay = new Overlay({
     autoPan: true,
     offset: [0, -10]
 });
+
+
 map.addOverlay(overlay);
 
 map.on('click', function(evt){
-    var feature = map.forEachFeatureAtPixel(evt.pixel,
-      function(feature) {
-        return feature;
-      });
+  var feature = map.forEachFeatureAtPixel(evt.pixel,
+    function(feature) {
+      return feature;
+    });
     if (feature) {
-        var geometry = feature.getGeometry();
-        var geometryType = geometry.getType();
-        var point_coord = geometry.getCoordinates();
-        var extent = geometry.getExtent()
-        var poly_coord = olExtent.getCenter(extent);
-        
-        console.log(geometryType);
-        
-      if (geometryType == 'Point'){
-        var content = `<h2> ${feature.get('label')} </h2>`;
-        content += `<h5 id=popup-category >CATEGORY - ${feature.get('category')}</h5>`;
-        content += `<h5 id=popup-website ><a href= ${feature.get('website')}> ${feature.get('label')}</a></h5>`;
-        content += `<h5 id=popup-email><a href=mailto: ${feature.get('email')}> ${feature.get('email')}</a></h5>`;
-        content += `<h5 id=popup-phone><a href=tel: ${feature.get('phone')}>${feature.get('phone')}</a></h5>`;
-        content += `<h5 id=popup-address>${feature.get('address')}</h5>`;
-        content += `<hr class=rounded >`
-        content += `<h5 id=popup-description>${feature.get('description')}</h5>`;
+      var geometry = feature.getGeometry();
+      var geometryType = geometry.getType();
 
-        content_element.innerHTML = content;
-        overlay.setPosition(point_coord);
-        
-        console.info(feature.getProperties());
+      if (geometryType === 'Point'){
+        pointPopupContent(feature);
       } 
-      else if (geometryType == 'MultiPolygon') {
-        var content = `<h2 id= popup-pid class= landInv>PID - ${feature.get('pid')}</h2>`;
-        content += `<h5 id=popup-legal class= landInv>Legal Description - ${feature.get('legal_description')}</h5>`;
-        content += `<h5 id=popup-stated-area class= landInv>Stated Area - ${feature.get('stated_area')} Acres</h5>`;
-        content += `<h5 id=popup-zone-name class= landInv>Zone - ${feature.get('zone_name')}</h5>`;
-        content += `<h5 id=popup-zone-admin class= landInv>Zone Administration - ${feature.get('zone_admin')}</h5>`;
-        content += `<h5 id=popup-water-service class= landInv>Water Service - ${feature.get('water_service')}</h5>`;
-        content += `<h5 id=popup-sanitary-service class= landInv>Sanitary Service - ${feature.get('sanitary_service')}</h5>`;
-        content += `<h5 id=popup-connectivity class= landInv>Connectivity - ${feature.get('connectivity')}</h5>`;
-        content += `<h5 id=popup-flood-risk class= landInv>Flood Risk - ${feature.get('flood_risk')}</h5>`;
-        content += `<h5 id=popup-environmental-remediation class= landInv>Environmental Remediation - ${feature.get('environmental_remediation')}</h5>`;
-        content += `<h5 id=popup-electric-service class= landInv>Electrical Service - ${feature.get('electric_service')}</h5>`;
-        content += `<h5 id=popup-natural-gas-service class= landInv>Natural Gas Service - ${feature.get('natural_gas_service')}</h5>`;
-        content += `<h5 id=popup-ms-building class= landInv>Building Present - ${feature.get('ms_building')}</h5>`;
-        content += `<h5 id=popup-size-threshold class= landInv>Greater than 0.3 Acres - ${feature.get('size_threshold(greaterthan0.3)')}</h5>`;
-        content += `<h5 id=popup-zone-priority class= landInv>Zone Priority - ${feature.get('zone_priority')}</h5>`;
-        content += `<h5 id=popup-current-use class= landInv>Current Usage - ${feature.get('current_use')}</h5>`;
-        content += `<h5 id=popup-services class= landInv>Services - ${feature.get('services')}</h5>`;
-        content += `<h5 id=popup-avg-slope class= landInv>Average Slope - ${feature.get('avg_slope')}</h5>`;
-        content += `<h5 id=popup-civic-id class= landInv>Civic Id - ${feature.get('civic_id')}</h5>`;
-        content += `<h5 id=popup-full-addr class= landInv>Address - ${feature.get('full_addr')}</h5>`;
-        content += `<h5 id=popup-name-alias class= landInv>Name Alias - ${feature.get('name_alias')}</h5>`;
-        content += `<h5 id=popup-notes class= landInv>Property Notes - ${feature.get('notes')}</h5>`;
-        content += `<h5 id=popup-services-score-sum class= landInv>Services Sum - ${feature.get('services_score_sum')}</h5>`;
-        content += `<h5 id=popup-utilization-score-basic class= landInv>Utilization Score Basic - ${feature.get('utilization_score_basic')}</h5>`;
-        content += `<h5 id=popup-utilization-score-services class= landInv>Utilization Score Services - ${feature.get('utilization_score_services')}</h5>`;
-        content += `<h5 id=popup-utilization-score-weighted class= landInv>Utilization Score Weighted - ${feature.get('utilization_score_weighted')}</h5>`;
-
-        content_element.innerHTML = content;
-        overlay.setPosition(poly_coord);
-        
-        console.info(feature.getProperties());
+      else if (geometryType === 'MultiPolygon') {
+        multipolyPopupContent(feature);
       }
     }
 });
+// Function for creating content for point feature
+function pointPopupContent(feature) {
+  var geometry = feature.getGeometry();
+  var point_coord = geometry.getCoordinates();
+  var content = `
+    <h2> ${feature.get('label')} </h2>
+    <h5 id=popup-category >CATEGORY - ${feature.get('category')}</h5>
+    <h5 id=popup-website ><a href= ${feature.get('website')}> ${feature.get('label')}</a></h5>
+    <h5 id=popup-email><a href=mailto: ${feature.get('email')}> ${feature.get('email')}</a></h5>
+    <h5 id=popup-phone><a href=tel: ${feature.get('phone')}>${feature.get('phone')}</a></h5>
+    <h5 id=popup-address>${feature.get('address')}</h5>
+    <hr class=rounded >
+    <h5 id=popup-description>${feature.get('description')}</h5>
+  `;
+  content_element.innerHTML = content;
+  overlay.setPosition(point_coord);
+
+  console.info(feature.getProperties());
+}
+// Function for creating content for multipolygon feature
+function multipolyPopupContent(feature) {
+  var geometry = feature.getGeometry();
+  var extent = geometry.getExtent()
+  var poly_coord = olExtent.getCenter(extent);
+  var content = `
+    <h2 id= popup-pid class= landInv>PID - ${feature.get('pid')}</h2>
+    <h5 id=popup-legal class= landInv>Legal Description - ${feature.get('legal_description')}</h5>
+    <h5 id=popup-stated-area class= landInv>Stated Area - ${feature.get('stated_area')} Acres</h5>
+    <h5 id=popup-zone-name class= landInv>Zone - ${feature.get('zone_name')}</h5>
+    <h5 id=popup-zone-admin class= landInv>Zone Administration - ${feature.get('zone_admin')}</h5>
+    <h5 id=popup-water-service class= landInv>Water Service - ${feature.get('water_service')}</h5>
+    <h5 id=popup-sanitary-service class= landInv>Sanitary Service - ${feature.get('sanitary_service')}</h5>
+    <h5 id=popup-connectivity class= landInv>Connectivity - ${feature.get('connectivity')}</h5>
+    <h5 id=popup-flood-risk class= landInv>Flood Risk - ${feature.get('flood_risk')}</h5>
+    <h5 id=popup-environmental-remediation class= landInv>Environmental Remediation - ${feature.get('environmental_remediation')}</h5>
+    <h5 id=popup-electric-service class= landInv>Electrical Service - ${feature.get('electric_service')}</h5>
+    <h5 id=popup-natural-gas-service class= landInv>Natural Gas Service - ${feature.get('natural_gas_service')}</h5>
+    <h5 id=popup-ms-building class= landInv>Building Present - ${feature.get('ms_building')}</h5>
+    <h5 id=popup-size-threshold class= landInv>Greater than 0.3 Acres - ${feature.get('size_threshold(greaterthan0.3)')}</h5>
+    <h5 id=popup-zone-priority class= landInv>Zone Priority - ${feature.get('zone_priority')}</h5>
+    <h5 id=popup-current-use class= landInv>Current Usage - ${feature.get('current_use')}</h5>
+    <h5 id=popup-services class= landInv>Services - ${feature.get('services')}</h5>
+    <h5 id=popup-avg-slope class= landInv>Average Slope - ${feature.get('avg_slope')}</h5>
+    <h5 id=popup-civic-id class= landInv>Civic Id - ${feature.get('civic_id')}</h5>
+    <h5 id=popup-full-addr class= landInv>Address - ${feature.get('full_addr')}</h5>
+    <h5 id=popup-name-alias class= landInv>Name Alias - ${feature.get('name_alias')}</h5>
+    <h5 id=popup-notes class= landInv>Property Notes - ${feature.get('notes')}</h5>
+    <h5 id=popup-services-score-sum class= landInv>Services Sum - ${feature.get('services_score_sum')}</h5>
+    <h5 id=popup-utilization-score-basic class= landInv>Utilization Score Basic - ${feature.get('utilization_score_basic')}</h5>
+    <h5 id=popup-utilization-score-services class= landInv>Utilization Score Services - ${feature.get('utilization_score_services')}</h5>
+    <h5 id=popup-utilization-score-weighted class= landInv>Utilization Score Weighted - ${feature.get('utilization_score_weighted')}</h5>  
+  `;
+  content_element.innerHTML = content;
+  overlay.setPosition(poly_coord);
+
+  console.info(feature.getProperties());
+}
+
 // map.on('pointermove', function(e) {
 //     if (e.dragging) return;
        
@@ -697,6 +709,8 @@ function getValues() {
   console.log(viewValues);
   return viewValues;
 };
+
+/* **** Filter functions **** */
 
 const utilization = document.getElementById("utilization");
 const uti_button = document.getElementById("uti-button");
