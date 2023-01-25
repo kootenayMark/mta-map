@@ -25,27 +25,30 @@ import BingMaps from 'ol/source/BingMaps.js';
 import * as olExtent from 'ol/extent';
 import { defaults } from 'ol/interaction';
 import {and} from 'ol/format/filter';
-//import geojsonObjWFS from './LCICLandInv_select_clean_civAdrs.json';
+import ImageWMS from 'ol/source/ImageWMS.js';
+import ImageLayer from 'ol/layer/Image';
 
 const markerURL ='https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_xsm-1.png'
 const businessLayerURL = "https://opensheet.elk.sh/19o_WmjjKn1ZE1940Brh9VrD9gaTyStMTF-kwbz2LJm4/elements"
 
-const featureLayerWMS = 'http://51.79.71.43:8080/geoserver/LCICLandInventory/wms?service=WMS&version=1.1.0&request=GetMap&layers=LCICLandInventory%3ALCICLandInv_select_clean_civAdrs&bbox=428432.875%2C5427680.5%2C465716.65625%2C5453057.5&width=768&height=522&srs=EPSG%3A26911&styles=&format=application/openlayers#toggle'
-
-const featureLayerWFS_1 = 'https://geoserver.marktrueman.ca/geoserver/LCICLandInventory/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=LCICLandInventory%3ALCICLandInv_Weighted&maxFeatures=1434&outputFormat=application%2Fjson'
-
 /* ****geoserver layer parameters**** */
 const geoServerDomain = 'https://geoserver.marktrueman.ca/geoserver/'
+const geoServerDomain1 = 'http://51.79.71.43:8080/geoserver/'
 const nameSpace = 'LCICLandInventory'
 const service = 'WFS'
 const version = '2.0.0'
 const request = 'GetFeature'
-const typeName = 'LCICLandInventory%3ALCICLandInv_Weighted'
+const layerName = 'LCICLandInv_Weighted'
+const typeName = `${nameSpace}%3A${layerName}`
 const count = '1434'
 
-// Geoserver layer url
+// Geoserver geojson (WFS) layer url
 const featureLayerWFS = `${geoServerDomain}${nameSpace}/ows?service=${service}&version=${version}&request=${request}&typeName=${typeName}&count=${count}&outputFormat=application%2Fjson`
-// console.log(featureLayerWFS);
+
+// Geoserver WMS layer url
+const featureLayerWMS = `${geoServerDomain1}${nameSpace}/wms?service=WMS&version=1.1.0&request=GetMap&layers=${typeName}&bbox=428432.875%2C5427680.5%2C465716.65625%2C5453057.5&width=768&height=522&srs=EPSG%3A26911&styles=&format=application/openlayers#toggle`
+
+const featureLayerWFS_1 = 'https://geoserver.marktrueman.ca/geoserver/LCICLandInventory/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=LCICLandInventory%3ALCICLandInv_Weighted&maxFeatures=1434&outputFormat=application%2Fjson'
 
 /* ****Region center Coords **** */
 const initialView = fromLonLat([-117.97998, 49.55215])
@@ -71,11 +74,9 @@ const jsonObj = await getData();
 async function getData() {
   return fetch(businessLayerURL)
   .then(res => res.json())
-}
-//console.log(jsonObj) 
-// fetch('//51.79.71.43:8080/geoserver/LCICLandInventory/wfs?service=WFS&' +
-//         'version=1.1.0&request=GetFeature&typeName=LCICLandInventory:LCICLandInv_select_clean_civAdrs&' +
-//         'outputFormat=application/json').then(function(response) {
+} 
+
+// fetch(featureLayerWFS).then(function(response) {
 //   return response.json();
 // }).then(function(geojsonObjWFS) {
 
@@ -109,34 +110,35 @@ const geojsonString = JSON.stringify(pointArrFeatureCollection)
 //const geojsonStringWFS = JSON.stringify(geojsonObjWFS)
 
 
-
-
 /* ***map Variables*** */
 const vectorSource = new VectorSource({
   format: new GeoJSON(),
   url: 'data:,' + encodeURIComponent(geojsonString)
 });
 //console.log(vectorSource);
-// const vectorSource1 = new TileWMS({
-//   url: 'http://51.79.71.43:8080/geoserver/wms/LCICLandInventory',
-//   params: {
-//     LAYERS: 'LCICLandInv_select_clean_civAdrs',
-//     TRANSPARENT: 'True'
-//   }
-// });
-// const vectorSourceWFS = new VectorSource({
+const vectorSourceWMS_1 = new ImageWMS({
+  //url: `${geoServerDomain1}${nameSpace}/wms?`,
+  url: 'http://51.79.71.43:8080/geoserver/wms',
+  // params: {
+  //   LAYERS: 'LCICLandInv_select_clean_civAdrs', 'TILED': true,
+  //   TRANSPARENT: 'True'
+  // },
+  params: {'LAYERS': 'LCICLandInventory:Land Inventory WMS'},
+  ratio: 1,
+  serverType: 'geoserver'
+});
+// const vectorSourceWFS_1 = new VectorSource({
 //   format: new GeoJSON(),
 //   url: 'data:,' + encodeURIComponent(geojsonStringWFS)
 // });
-// console.log(vectorSourceWFS);
-const vectorSourceWFS_1 = new VectorSource({
+// console.log(vectorSourceWFS_1);
+const vectorSourceWFS = new VectorSource({
   features: new GeoJSON().readFeatures(geojsonObjWFS)
 });
+// console.log(vectorSourceWFS);
 // const vectorSourceWFS_filtered = new VectorSource({
 //   features: new GeoJSON().readFeatures(filtered_geojsonObjWFS)
 // });
-
-// console.log(vectorSourceWFS_1);
 
 // const styles = [
 //   'RoadOnDemand',
@@ -173,14 +175,6 @@ const BingArielBase = new TileLayer({
   })
 });
 
-// const DkGybaseMap = new TileLayer({
-//   title: 'Dark Grey',
-//   type: 'base',
-//   visible: true,
-//   source: tileSource,
-//   renderer: 'canvas',
-// });
-
 const businessLayer = new VectorLayer({
   title: 'Businesses',
   style: styleFunction,
@@ -190,23 +184,18 @@ const businessLayer = new VectorLayer({
   
 });
 
-// const landInvLayer = new TileLayer({
-//   title: 'Land Inventory',
-//   visible: false,
-//   source: vectorSource1
-// });
-// const landInvLayer = new VectorLayer({
-//   title: 'Land Inventory',
-//   style: styleFunction2, 
-//   visible: false,
-//   source: vectorSourceWFS,
-// });
-
-const landInvLayer_1 = new VectorLayer({
-  title: 'Land Inventory 1',
-  style: styleFunction2, 
+const landInvLayerWMS = new ImageLayer({
+  title: 'Land Inventory WMS',
   visible: true,
-  source: vectorSourceWFS_1,
+  source: vectorSourceWMS_1,
+  // style: styleFunction2
+});
+
+const landInvLayerWFS = new VectorLayer({
+  title: 'Land Inventory',
+  style: styleFunction2, 
+  visible: false,
+  source: vectorSourceWFS,
 });
 // const landInvLayer_filtered = new VectorLayer({
 //   title: 'Land Inventory Filtered',
@@ -223,19 +212,20 @@ const view = new View({
   //constrainResolution: true,
 });
 
+const baseMaps = new LayerGroup({
+  title: 'Base maps',
+  layers: [BingArielBase, OSMbaseMap, BingBaseDark]
+})
+
+var overlays = new LayerGroup({
+  title: 'Overlays',
+  layers: [landInvLayerWFS, /*landInvLayer_filtered,*/ landInvLayerWMS, businessLayer]
+})
+
 const map = new Map({
   //controls: defaultControls().extend([new UtilizationScore()]),
   target: 'map',
-  layers: [
-    new LayerGroup({
-      title: 'Base maps',
-      layers: [BingArielBase, OSMbaseMap, BingBaseDark]
-    }),
-    new LayerGroup({
-      title: 'Overlays',
-      layers: [landInvLayer_1, /*landInvLayer_filtered,*/ businessLayer]
-    })
-  ],
+  layers: [baseMaps, overlays],
   view: view,
   //interactions: defaults({ zoomDuration: 0 })
 });
@@ -247,6 +237,36 @@ var layerSwitcher = new LayerSwitcher({
 map.addControl(layerSwitcher);
 // sync(map); need to import ol-hashed if using
 
+function legend() {
+    document.querySelector("#legend").innerHTML = "";
+    var no_layers = overlays.getLayers().get("length");
+    var head = document.createElement("h4");
+    var txt = document.createTextNode("Legend");
+    head.appendChild(txt);
+    var element = document.getElementById("legend");
+    element.appendChild(head);
+    var ar = [];
+    for (var i = 0; i < no_layers; i++) {
+        ar.push(
+            "http://51.79.71.43:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=10&LAYER=" +
+                overlays.getLayers().item(i).get("title") + 
+                "&legend_options=fontName:Comfortaa;fontAntiAliasing:true;fontColor:0x000033;fontSize:8;bgColor:0x8e8d8d;dpi:180;"
+        );
+    }
+    for (var i = 0; i < no_layers; i++) {
+        var head = document.createElement("p");
+        var txt = document.createTextNode(overlays.getLayers().item(i).get("title"));
+        head.appendChild(txt);
+        var element = document.getElementById("legend");
+        element.appendChild(head);
+        var img = new Image();
+        img.src = ar[i];
+        var src = document.getElementById("legend");
+        src.appendChild(img);
+    }
+}
+legend();
+
 // var newRes =""
 // var currRes = map.getView().getResolution();
 // map.on('moveend', function() {
@@ -256,9 +276,7 @@ map.addControl(layerSwitcher);
 //     currRes = newRes;
 //   }
 // });
-
 //var newRes = map.getView().getResolution();
-
 //console.log('newRes1 ' + newRes)
 function styleFunction (feature, resolution) {
   const resolutionThreshold_1 = 80;
@@ -374,9 +392,32 @@ map.on('click', function(evt){
       } 
       else if (geometryType === 'MultiPolygon') {
         multipolyPopupContent(feature);
+      } else {
+      WMSPopup (evt)
       }
     }
 });
+function WMSPopup () {
+  var url = landInvLayerWMS.getSource().getFeatureInfoUrl(evt.coordinate, resolution, 'EPSG: 26911',{
+    'INFO_FORMAT': 'application/json',
+    'propertyName': 'fid, zone_name'
+  });
+  console.log(evt.coordinate)
+  if (url){
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      var feature = data.features[0];
+      console.log(feature)
+      var props = feature.properties;
+      console.log(props)
+      content.innerHTML = `<h3> Fid : </h3> <p>${props.fid}</p> <br> <h3> Zone : </h3> <p>${props.zone_name.toUpperCase()}</p>`;
+      overlay.setPosition(evt.coordinate);
+    })
+  } else {
+    overlay.setPosition(undefined);
+  }
+}
 // Function for creating content for point feature
 function pointPopupContent(feature) {
   var geometry = feature.getGeometry();
@@ -394,7 +435,7 @@ function pointPopupContent(feature) {
   content_element.innerHTML = content;
   overlay.setPosition(point_coord);
 
-  console.info(feature.getProperties());
+  // console.info(feature.getProperties());
 }
 // Function for creating content for multipolygon feature
 function multipolyPopupContent(feature) {
@@ -432,7 +473,7 @@ function multipolyPopupContent(feature) {
   content_element.innerHTML = content;
   overlay.setPosition(poly_coord);
 
-  console.info(feature.getProperties());
+  // console.info(feature.getProperties());
 }
 
 // map.on('pointermove', function(e) {
@@ -499,7 +540,7 @@ regions.forEach((group)=>{
 });
 
 // filter business attributes for feature panel
-const filtered_jsonObj = [];
+const filter_businessATT_jsonObj = [];
 jsonObj.forEach((item)=>{
   const selectedFields = ['label', 'category', 'website', 'email', 'phone', 'address', 'region', 'description', 'tags']
   const arr = Object.keys(item)
@@ -508,22 +549,21 @@ jsonObj.forEach((item)=>{
     obj[key] = item[key];
     return obj;
   }, {});
-filtered_jsonObj.push(arr);
+  filter_businessATT_jsonObj.push(arr);
 });
-
-//console.log(filtered_jsonObj); 
+//console.log(filter_businessATT_jsonObj); 
 
 /* ****function to create and populate business feature**** */
-for (let i =0; i < filtered_jsonObj.length; i++) {  
+for (let i =0; i < filter_businessATT_jsonObj.length; i++) {  
   // replace character delimiters
-  let tags = filtered_jsonObj[i].tags; tags = tags.split("|");
+  let tags = filter_businessATT_jsonObj[i].tags; tags = tags.split("|");
   let attributes = document.getElementById('attributes');
   let table = document.createElement("table");
   table.id = 'table-' + [i]; 
   table.classList.add('hidden');
   attributes.appendChild(table);
   
-  for(let h in filtered_jsonObj[i]) {  
+  for(let h in filter_businessATT_jsonObj[i]) {  
     let tr = document.createElement("tr"); 
     let th = document.createElement("th");
     let td = document.createElement("td");
@@ -534,34 +574,34 @@ for (let i =0; i < filtered_jsonObj.length; i++) {
       td.id = h + '-value';
       
       if (th.id === 'category') {
-        td.innerText = filtered_jsonObj[i].category;
+        td.innerText = filter_businessATT_jsonObj[i].category;
       } 
       else if (th.id === 'website') {
         a.id = h + '-innerValue';
-        a.setAttribute("href", filtered_jsonObj[i].website);
-        a.innerText = filtered_jsonObj[i].label;
+        a.setAttribute("href", filter_businessATT_jsonObj[i].website);
+        a.innerText = filter_businessATT_jsonObj[i].label;
         td.appendChild(a);
       }
       else if (th.id === 'email') {
         a.id = h + '-innerValue';
-        a.setAttribute("href", "mailto:"+filtered_jsonObj[i].email);
-        a.innerText = filtered_jsonObj[i].email;
+        a.setAttribute("href", "mailto:" + filter_businessATT_jsonObj[i].email);
+        a.innerText = filter_businessATT_jsonObj[i].email;
         td.appendChild(a);
       }
       else if (th.id === 'phone') {
         a.id = h + '-innerValue';
-        a.setAttribute("href", "tel:"+filtered_jsonObj[i].phone);
-        a.innerText = filtered_jsonObj[i].phone;
+        a.setAttribute("href", "tel:" + filter_businessATT_jsonObj[i].phone);
+        a.innerText = filter_businessATT_jsonObj[i].phone;
         td.appendChild(a);
       }
       else if (th.id === 'address') {
-        td.innerText = filtered_jsonObj[i].address;
+        td.innerText = filter_businessATT_jsonObj[i].address;
       }
       else if (th.id === 'region') {
-        td.innerText = filtered_jsonObj[i].region;
+        td.innerText = filter_businessATT_jsonObj[i].region;
       }
       else if (th.id === 'description') {
-        td.innerText = filtered_jsonObj[i].description;
+        td.innerText = filter_businessATT_jsonObj[i].description;
       };
       // create buttons from tags (add filter function later)
       if (th.id == 'tags') {

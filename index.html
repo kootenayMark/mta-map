@@ -10,36 +10,65 @@
   <body> 
     <div id="wrapper" class="">
       <div id="list-container">
-      <nav id="list" >
-        <div id="mta_logo">
-          <img src="https://metaltechalley.com/wp-content/uploads/2021/08/MTA_Logo_NoTagLine-1024x140.png">
+        <!--single property filter-->
+        <!-- <div class="tab-content">
+          <div id="form" class="tab-pane fade in active">
+            <label class="bs-styles" for="layer">Select Layer</label>
+            <select class="form-control" id="layer" name="layer">
+              <option value="">Select Layer</option>
+            </select>
+            <br>
+            <label class="bs-styles" for="attributes">Select attribute</label>
+            <select class="form-control" id="attributes" name="attributes">
+              <option value="">Select Attributes</option>
+            </select>
+            <br>
+            <label class="bs-styles" for="operator">Select operator</label>
+            <select class="form-control" id="operator" name="operator">
+              <option value="">Select operator</option>
+            </select>
+            <br>
+            <label class="bs-styles" for="value">Enter Value</label>
+            <input type="text" class="form-control" id="value" name="value">
+            <br>
+            <button class="bs-styles-btn bs-styles-btn-success" onclick="query()">Load Query</button>
+          </div>
         </div>
-        <dl id="groups" ></dl>
-      </nav>
-      <nav id="feature-list">
-        <div id="feature-content">
-          <img id="companyIcon" src="" alt="" width="60px" height="auto">
-          <span id="feature-closer" class="close">&times;</span>
-          <h1 id="business" class="title"></h1>
-          <div id="attributes">
-          </div>          
-        </div>
-      </nav>
-    </div>
+        <div id = "table_data"> </div> -->
+        <!--<div id="wms_layers_window" title="Available WMS Layers" style="display:none"></div>
+	      <table id="table_wms_layers" class = "table-bordered"></table> -->
+        <nav id="list" >
+          <div id="mta_logo">
+            <img src="https://metaltechalley.com/wp-content/uploads/2021/08/MTA_Logo_NoTagLine-1024x140.png">
+          </div>
+          
+          <dl id="groups" ></dl>
+        </nav>
+        <nav id="feature-list">
+          <div id="feature-content">
+            <img id="companyIcon" src="" alt="" width="60px" height="auto">
+            <span id="feature-closer" class="close">&times;</span>
+            <h1 id="business" class="title"></h1>
+            <div id="attributes"></div>          
+          </div>
+        </nav>
+      </div>
       <div id='list-toggle'>
         <div>&#8942;</div>
       </div>
-      <div id="map" class="map"></div>
+      <div id="map" class="map">
+      </div>
     </div>
+    <div id="legend"></div>
     <div id="utilization"></div>
     <button id="uti-button">i</button>
-<!--single property filter-->
-    <div id="filter-container">
+    
+    <!-- <div id="filter-container">
       <label for="property-select">Filter by:</label>
       <select id="property-select"></select>
       <label for="value-select">Value:</label>
       <select id="value-select"></select>
-    </div>
+    </div> -->
 
 <!-- multi property filter -->    
     <!-- <div id="filter-inputs">
