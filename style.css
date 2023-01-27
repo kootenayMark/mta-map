@@ -371,39 +371,11 @@ input[type="checkbox"]:checked {
 ul li{
   cursor:pointer;
 }
-/* splash screen styles */
-#utilization {
-  padding: 1em;
-  display: none;
-  position: absolute;
-  color: black;
-  background-color: #8e8d8d;
-  top: 50%;
-  left: 50%;
-  max-width: 500px;
-  max-height: 300px;
-  overflow-y: auto;
-  transform: translate(-50%, -50%);
-  border-radius: 4px;
-}
-#utilization > h4 {
-  margin: 0 0 10px 0;
-  text-align: center;
-}
-#utilization > ol {
-  list-style-type: decimal;
-}
-#utilization > li {
-  padding-left: 10px;
-}
-#uti-button {
-  right: 0.9em;
-  top: 5.5em;
-}
+
 
 /* *** Filter Styles *** */
 #form {
-  width: 90%;
+  width: 85%;
   margin: 0 auto;
   padding: 20px;
 }
@@ -438,23 +410,27 @@ select {
   border-radius: 4px;
   padding: 0.5em;
   margin: 1em 0;
-  
 }
-#filter-button {
-  right: 0.9em;
-  top: 8em;
-} 
+
 .right-panel-btn {
   position: absolute;
   font-weight: bold;
-  color: #EC2034;
+  color: #f6921b;
   font-size: 1em;
-  background-color: #f6921b;
+  background-color: #8e8d8d;
   width:1.5em;
   height: 1.5em;
   border: none;
   border-radius: 3px;
 }
+
+#filter-button {
+  width: fit-content;
+  right: 0.9em;
+  top: 5.5em;
+} 
+
+
 #filter-pane {
   display: none;
   padding-left: 10px;
@@ -463,8 +439,45 @@ select {
   visibility: visible; 
   transition: all 0.5s;
   left: 0px;
+  overflow-y: auto;
 }
-
+/* splash screen styles */
+#utilization {
+  padding: 1em;
+  display: none;
+  position: absolute;
+  color: black;
+  background-color: #8e8d8d;
+  top: 50%;
+  left: 50%;
+  width: 500px;
+  height: 250px;
+  overflow-y: auto;
+  transform: translate(-50%, -50%);
+  border-radius: 4px;
+}
+#uti-content {
+  position:relative;
+}
+#uti-content > h4 {
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+#uti-content > ul {
+  list-style-type: decimal;
+}
+#uti-content > li {
+  padding-left: 10px;
+}
+#uti-closer {
+  position: absolute;
+  top: 0;
+  right: calc(100%-2px);
+}
+#uti-button {
+  right: 0.9em;
+  top: 8em;
+}
 #legend {
   display:absolute;
   padding: 1em;
