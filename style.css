@@ -35,7 +35,9 @@ body {
 ol, ul {
 	list-style: none;
 } 
-
+.button {
+ margin: auto;
+}
 /* STyles */
 html, body {
   margin: 0;
@@ -206,17 +208,18 @@ td {
   font-size: 1em;
 }
 /* styles for switching panes */
-#feature-closer {
+.close {
   display: block;
   position: absolute;
-  top: 10px;
-  left: 350px;
+  color: #f6921b;
+  background-color: black;
+  border: none;
+  top: 8px;
+  left: 340px;
+  font-size: 30px;
+  font-weight: 600;
   text-align: right;
   cursor: pointer;
-}
-.close {
-  font-size: 45px;
-  font-weight: 600;
 }
 .no-list #list-container {
   display: none;
@@ -364,9 +367,7 @@ input[type="checkbox"]:checked {
 .ol-touch .rotate-north {
   top: 80px;
 } */
-.button {
- margin: auto;
-}
+
 ul li{
   cursor:pointer;
 }
@@ -396,152 +397,84 @@ ul li{
   padding-left: 10px;
 }
 #uti-button {
-  position: absolute;
   right: 0.9em;
   top: 5.5em;
-  font-weight: bold;
-  color: #EC2034;
-  font-size: 1em;
-  background-color: #f6921b;
-  width:1.5em;
-  height: 1.5em;
-  border: none;
-  border-radius: 3px;
-
-}
-/*
-#utilization-button {
-  color: #EC2034;
-  background-color: #f6921b;
-} */
-/* #filter-inputs {
-  display: flex;
-    flex-wrap: wrap;
-    position: absolute;
-  left: 27em;
-  bottom: 5.5em;
-}
-.filter-input {
-  display: flex;
-    align-items: center;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    position: absolute;
-  left: 27em;
-  bottom: 5.5em;
-}
-.filter-input label {
-  margin-right: 5px;
-  position: absolute;
-  left: 27em;
-  bottom: 5.5em;
 }
 
-.filter-input select,
-.filter-input input {
-  position: absolute;
-  left: 27em;
-  bottom: 5.5em;
-  padding: 5px;
-  font-size: 16px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+/* *** Filter Styles *** */
+#form {
+  width: 90%;
+  margin: 0 auto;
+  padding: 20px;
 }
-#add-filter-btn {
-  
-  font-weight: bold;
+/* Label styles */
+label {
+  font-size: 1.2em;
   color: #f6921b;
-  font-size: 1em;
-  background-color: #EC2034;
-  width:1.5em;
-  height: 1.5em;
-  border: none;
-  border-radius: 3px;
-}
-#filter-button {
-  position: absolute;
-  left: 0.9em;
-  bottom: 5.5em;
   font-weight: bold;
-  color: #EC2034;
-  font-size: 1em;
-  background-color: #f6921b;
-  width:1.5em;
-  height: 1.5em;
-  border: none;
-  border-radius: 3px;
-} */
-#filter-container {
-  position: absolute;
-  left: 0.9em;
-  bottom: 5.5em;
-  display: block; 
-  position: absolute;
-  left: 27em;
-  bottom: 2.5em;
+  display: block;
+  margin-bottom: 10px;
 }
 
-#filter-container select {
-  padding: 8px;
+/* Select styles */
+select {
+  width: 100%;
+  color: #8e8d8d;
+  background-color: black;
+  padding: 12px 20px;
+  margin-bottom: 20px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 100%;
   box-sizing: border-box;
 }
-
-#filter-container label {
-  margin-right: 8px;
+#value {
+  color: #8e8d8d;
+  background-color: black;
 }
-/* *** Filter Form Styles *** */
-/* Form controls */
-select, input {
-  padding: 0.5em;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 100%;
-}
-
-/* Labels */
-.bs-styles {
-  font-size: 0.9em;
-  font-weight: bold;
-  margin-bottom: 0.5em;
-}
-
-/* Tab navigation */
-.tab-content {
-  overflow: hidden;
-}
-
-.tab-pane {
-  display: none;
-}
-
-.tab-pane.active {
-  display: block;
-}
-
-/* Button */
-.bs-styles-btn {
-  background-color: #3cb371;
-  color: #fff;
-  padding: 0.5em 1em;
-  border-radius: 4px;
+#filter-submit-btn {
+  color: black;
+  background-color: #8e8d8d;
   border: none;
-  font-size: 1em;
-  cursor: pointer;
+  border-radius: 4px;
+  padding: 0.5em;
+  margin: 1em 0;
+  
 }
+#filter-button {
+  right: 0.9em;
+  top: 8em;
+} 
+.right-panel-btn {
+  position: absolute;
+  font-weight: bold;
+  color: #EC2034;
+  font-size: 1em;
+  background-color: #f6921b;
+  width:1.5em;
+  height: 1.5em;
+  border: none;
+  border-radius: 3px;
+}
+#filter-pane {
+  display: none;
+  padding-left: 10px;
+  height: 100vh;
+  width:355px;
+  visibility: visible; 
+  transition: all 0.5s;
+  left: 0px;
+}
+
 #legend {
   display:absolute;
   padding: 1em;
+  right: 20em;
+  bottom: 20em;
   color: black;
   background-color: #8e8d8d;
-  top: 10em;
-  right: 5em;
   max-width: 10em;
   max-height: 20em;
   overflow-y: auto;
-  transform: translate(560%, -120%);
   border-radius: 4px;
 }
 /* Style the scrollbar background */

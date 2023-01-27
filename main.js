@@ -68,6 +68,8 @@ const regions = [
   {region:'Rossland and Area', id: 5, coords: rosslandandarea, zoom: 15}
 ]
 
+var geojson, layer_name, featureOverlay;
+
 /* **** data **** */
 const jsonObj = await getData();
 
@@ -106,9 +108,7 @@ const pointArrFeatureCollection = {
 }
 
 const geojsonString = JSON.stringify(pointArrFeatureCollection)
-
-//const geojsonStringWFS = JSON.stringify(geojsonObjWFS)
-
+  
 
 /* ***map Variables*** */
 const vectorSource = new VectorSource({
@@ -219,7 +219,7 @@ const baseMaps = new LayerGroup({
 
 var overlays = new LayerGroup({
   title: 'Overlays',
-  layers: [landInvLayerWFS, /*landInvLayer_filtered,*/ landInvLayerWMS, businessLayer]
+  layers: [landInvLayerWFS,/* landInvLayer_filtered, landInvLayerWMS, */businessLayer]
 })
 
 const map = new Map({
@@ -374,9 +374,23 @@ var overlay = new Overlay({
     autoPan: true,
     offset: [0, -10]
 });
+// var container2 = document.getElementById('popup2'),
+//     content_element2 = document.getElementById('popup-content2'),
+//     closer2 = document.getElementById('popup-closer2');
 
+// closer2.onclick = function() {
+//     overlay2.setPosition(undefined);
+//     closer2.blur();
+//     return false;
+// };
+// var overlay2 = new Overlay({
+//     element: container2,
+//     autoPan: true,
+//     offset: [0, -10]
+// });
 
 map.addOverlay(overlay);
+// map.addOverlay(overlay2);
 
 map.on('click', function(evt){
   var feature = map.forEachFeatureAtPixel(evt.pixel,
@@ -392,32 +406,13 @@ map.on('click', function(evt){
       } 
       else if (geometryType === 'MultiPolygon') {
         multipolyPopupContent(feature);
-      } else {
-      WMSPopup (evt)
-      }
+      } 
+      // else if (geometryType === 'MultiPolygon') {
+      //   WMSPopup (evt);
+      // }
     }
 });
-function WMSPopup () {
-  var url = landInvLayerWMS.getSource().getFeatureInfoUrl(evt.coordinate, resolution, 'EPSG: 26911',{
-    'INFO_FORMAT': 'application/json',
-    'propertyName': 'fid, zone_name'
-  });
-  console.log(evt.coordinate)
-  if (url){
-    fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      var feature = data.features[0];
-      console.log(feature)
-      var props = feature.properties;
-      console.log(props)
-      content.innerHTML = `<h3> Fid : </h3> <p>${props.fid}</p> <br> <h3> Zone : </h3> <p>${props.zone_name.toUpperCase()}</p>`;
-      overlay.setPosition(evt.coordinate);
-    })
-  } else {
-    overlay.setPosition(undefined);
-  }
-}
+
 // Function for creating content for point feature
 function pointPopupContent(feature) {
   var geometry = feature.getGeometry();
@@ -434,9 +429,383 @@ function pointPopupContent(feature) {
   `;
   content_element.innerHTML = content;
   overlay.setPosition(point_coord);
-
-  // console.info(feature.getProperties());
 }
+
+//   // Function for retrieving popup content from WMS service
+// function WMSPopup(evt) {
+//   var coordinate = evt.coordinate;
+//   var viewResolution = view.getResolution();
+
+//   document.getElementById("popup-content2").innerHTML = "";
+//   document.getElementById("info").innerHTML = "";
+//   var no_layers = overlays.getLayers().get("length");
+//   var url = new Array();
+//   var wmsSource = new Array();
+//   var layer_title = new Array();
+
+//   for (var i = 0; i < no_layers; i++) {
+//       var visibility = overlays.getLayers().item(i).getVisible();
+//       if (visibility == true) {
+//           layer_title[i] = overlays.getLayers().item(i).get("title");
+//           wmsSource[i] = new ImageWMS({
+//               url: "http://51.79.71.43:8080/geoserver/wms",
+//               params: { LAYERS: layer_title[i] },
+//               serverType: "geoserver",
+//               crossOrigin: "anonymous",
+//           });
+//           url[i] = wmsSource[i].getFeatureInfoUrl(
+//               evt.coordinate,
+//               viewResolution,
+//               "EPSG:4326",
+//               { INFO_FORMAT: "text/html" }
+//           );
+
+//           //using fetch API
+//           fetch(url[i])
+//               .then((response) => response.text())
+//               .then((data) => {
+//                   document.querySelector("#popup-content2").innerHTML += data;
+//               });
+
+//           overlay.setPosition(coordinate);
+//           layerSwitcher.renderPanel();
+//       }
+//   }
+// };
+// map.on('singleclick', WMSPopup);	
+
+// attributes_dropdown
+// document.getElementById("layer").addEventListener("change", function() {
+//   var attributes = document.getElementById("attributes");
+//   while (attributes.options.length > 0) {
+//       attributes.options.remove(0);
+//   }
+
+//   var value_layer = this.value;
+//   attributes.options.add(new Option("Select attributes", ""));
+
+//   fetch("http://51.79.71.43:8080/geoserver/wfs?service=WFS&request=DescribeFeatureType&version=1.1.0&typeName=" + value_layer)
+//       .then(response => response.text())
+//       .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
+//       .then(data => {
+//           var select = document.querySelector("#attributes");
+//           var elements = data.getElementsByTagName("xsd:element");
+//           for (var i = 0, len = elements.length; i < len; i++) {
+//               var name = elements[i].getAttribute("name");
+//               var type = elements[i].getAttribute("type");
+//               if (name != 'geom' && name != 'the_geom') {
+//                   var option = document.createElement("option");
+//                   option.value = type;
+//                   option.innerHTML = name;
+//                   select.appendChild(option);
+//               }
+//           }
+//       });
+// });
+
+
+// // operator combo
+// document.getElementById("attributes").addEventListener("change", function() {
+//   var operator = document.getElementById("operator");
+//   while (operator.options.length > 0) {
+//       operator.options.remove(0);
+//   }
+
+//   var value_type = this.value;
+//   var value_attribute = this.options[this.selectedIndex].text;
+//   operator.options.add(new Option("Select operator", ""));
+
+//   if (value_type == "xsd:short" || value_type == "xsd:int" || value_type == "xsd:double") {
+//       operator.options.add(new Option("Greater than", ">"));
+//       operator.options.add(new Option("Less than", "<"));
+//       operator.options.add(new Option("Equal to", "="));
+//   } else if (value_type == "xsd:string") {
+//       operator.options.add(new Option("Like", "ILike"));
+//   }
+// });
+
+// var highlightStyle = new Style({
+//   fill: new Fill({
+//       color: 'rgba(255,255,255,0.7)',
+//   }),
+//   stroke: new Stroke({
+//       color: '#3399CC',
+//       width: 3,
+//   }),
+//   image: new Circle({
+//       radius: 10,
+//       fill: new Fill({
+//           color: '#3399CC'
+//       })
+//   })
+// });
+
+// featureOverlay = new VectorLayer({
+//   source: new VectorSource(),
+//   map: map,
+// style: highlightStyle
+// });
+  
+// function findRowNumber(cn1, v1){
+
+// var table = document.querySelector('#table');
+// var rows = table.querySelectorAll("tr");
+// var msg = "No such row exist"
+// for(i=1;i<rows.length;i++){
+//   var tableData = rows[i].querySelectorAll("td");
+//   if(tableData[cn1-1].textContent==v1){
+//     msg = i;
+//     break;
+//   }
+// }
+// return msg;
+// }
+// function addRowHandlers() {
+// var table = document.getElementById("table");
+// var rows = table.getElementsByTagName("tr");
+// var heads = table.getElementsByTagName("th");
+// var col_no;
+
+// // find the column number of the 'id' column
+// for (var i = 0; i < heads.length; i++) {
+//   var head = heads[i];
+//   if (head.innerHTML === "id") {
+//     col_no = i + 1;
+//   }
+// }
+
+// for (i = 0; i < rows.length; i++) {
+//   rows[i].onclick = function () {
+//     featureOverlay.getSource().clear();
+
+//     // reset all row background colors to white
+//     for (var j = 0; j < rows.length; j++) {
+//       rows[j].style.backgroundColor = "white";
+//     }
+
+//     var cell = this.cells[col_no - 1];
+//     var id = cell.innerHTML;
+
+//     // highlight the selected row
+//     this.style.backgroundColor = "grey";
+
+//     var features = geojson.getSource().getFeatures();
+
+//     for (var k = 0; k < features.length; k++) {
+//       if (features[k].getId() === id) {
+//         featureOverlay.getSource().addFeature(features[k]);
+//         featureOverlay.getSource().on("addfeature", function () {
+//           map.getView().fit(featureOverlay.getSource().getExtent(), {
+//             duration: 1590,
+//             size: map.getSize(),
+//           });
+//         });
+//       }
+//     }
+//   };
+// }
+// }
+
+// function highlight(evt) {
+// featureOverlay.getSource().clear();
+// var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+//   return feature;
+// });
+
+// if (feature) {
+//   var geometry = feature.getGeometry();
+//   var coord = geometry.getCoordinates();
+//   var coordinate = evt.coordinate;
+
+//   var table = document.getElementById("table");
+//   var rows = table.getElementsByTagName("tr");
+//   for (var i = 0; i < rows.length; i++) {
+//     rows[i].style.backgroundColor = "white";
+//   }
+
+//   featureOverlay.getSource().addFeature(feature);
+// }
+//   var table = document.getElementById('table');
+//   var cells = table.getElementsByTagName('td');
+// var rows = document.getElementById("table").rows;
+// var heads = table.getElementsByTagName('th');
+// var col_no;
+// for (var i = 0; i < heads.length; i++) {
+//       // Take each cell
+//       var head = heads[i];
+//   //alert(head.innerHTML);
+//   if (head.innerHTML == 'id') {
+//           col_no = i+1; 
+//           //alert(col_no);
+//   }
+//   }
+//   var row_no = findRowNumber(col_no, feature.getId());
+//   //alert(row_no);
+//   var rows = document.querySelectorAll('#table tr');
+
+//   rows[row_no].scrollIntoView({
+//       behavior: 'smooth',
+//       block: 'center'
+//   });
+//   var table = document.getElementById("table");
+//   var rows = table.getElementsByTagName("tr");
+//   for (var i = 0; i < rows.length; i++) {
+//       var cells = rows[i].getElementsByTagName("td");
+//       for (var j = 0; j < cells.length; j++) {
+//           if (j+1 == col_no && cells[j].textContent == feature.getId()) {
+//               rows[i].style.backgroundColor = "grey";
+//           }
+//       }
+//   }
+// };
+// function query(){
+//   //$('#table').empty();
+//   //document.getElementById("table").innerHTML = "";
+
+//   if(geojson){
+//     map.removeLayer(geojson);
+// }	
+// if(featureOverlay){
+//   featureOverlay.getSource().clear();
+//   map.removeLayer(featureOverlay);
+// }
+// //alert('jsbchdb');	
+//   var layer = document.getElementById("layer");
+//   var value_layer = layer.options[layer.selectedIndex].value;
+//   //alert(value_layer);
+
+//   var attribute = document.getElementById("attributes");
+//   var value_attribute = attribute.options[attribute.selectedIndex].text;
+//   //alert(value_attribute);
+
+//   var operator = document.getElementById("operator");
+//   var value_operator = operator.options[operator.selectedIndex].value;
+//   //alert(value_operator);
+
+//   var txt = document.getElementById("value");
+//   var value_txt = txt.value;
+
+//   if (value_operator == 'ILike'){
+//   value_txt = ""+value_txt+"%25";
+//   //alert(value_txt);
+//   //value_attribute = 'strToLowerCase('+value_attribute+')';
+// } else {
+//   value_txt = value_txt;
+//   //value_attribute = value_attribute;
+// }
+//   //alert(value_txt);
+
+//   var url = "http://51.79.71.43:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName="+value_layer+"&CQL_FILTER="+value_attribute+"+"+value_operator+"+'"+value_txt+"'&outputFormat=application/json"
+//   //alert(url);
+
+//   var style = new Style({
+//       fill: new Fill({
+//           color: 'rgba(255, 255, 255, 0.7)'
+//       }),
+//       stroke: new Stroke({
+//           color: '#ffcc33',
+//           width: 3
+//       }),
+//       image: new Circle({
+//           radius: 7,
+//           fill: new Fill({
+//               color: '#ffcc33'
+//           })
+//       })
+//   });
+  
+// geojson = new VectorLayer({
+//       //title:'dfdfd',
+//     //title: '<h5>' + value_crop+' '+ value_param +' '+ value_seas+' '+value_level+'</h5>',
+//       source: new VectorSource({
+//       url: url,
+//           format: new GeoJSON()
+//       }),
+//   style: style,
+//   });
+ 
+// geojson.getSource().on('addfeature', function(){
+//   //alert(geojson.getSource().getExtent());
+//       map.getView().fit(
+//           geojson.getSource().getExtent(),{ 
+//               duration: 1590, 
+//               size: map.getSize() 
+//           }
+//       );
+//   });
+
+//   //overlays.getLayers().push(geojson);
+// map.addLayer(geojson);
+//   fetch(url)
+//   .then(response => response.json())
+//   .then(data => {
+//       var col = [];
+//       col.push("id");
+//       for (var i = 0; i < data.features.length; i++) {
+//       for (var key in data.features[i].properties) {
+//           if (col.indexOf(key) === -1) {
+//           col.push(key);
+//           }
+//       }
+//       }
+//       var table = document.createElement("table");
+//       table.setAttribute("class", "table table-bordered");
+//       table.setAttribute("id", "table");
+
+//       // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+//       var tr = table.insertRow(-1); // TABLE ROW.
+//       for (var i = 0; i < col.length; i++) {
+//       var th = document.createElement("th"); // TABLE HEADER.
+//       th.innerHTML = col[i];
+//       tr.appendChild(th);
+//       }
+
+//       // ADD JSON DATA TO THE TABLE AS ROWS.
+//       for (var i = 0; i < data.features.length; i++) {
+//           tr = table.insertRow(-1);
+//           for (var j = 0; j < col.length; j++) {
+//               var tabCell = tr.insertCell(-1);
+//               if (j == 0) {
+//               tabCell.innerHTML = data.features[i]["id"];
+//               } else {
+//                   tabCell.innerHTML = data.features[i].properties[col[j]];
+//                   //alert(tabCell.innerHTML);
+//               }
+//           }
+//       }
+//       // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+//       var divContainer = document.getElementById("table_data");
+//       divContainer.innerHTML = "";
+//       divContainer.appendChild(table);
+//       addRowHandlers();
+          
+//       document.getElementById('map').style.height='75%';
+//       document.getElementById('table_data').style.height='25%';
+//       map.updateSize();
+//   });
+// map.on('click', highlight);
+//   addRowHandlers();
+// }
+// function clear_all() {
+//   document.querySelector("#map").style.height = "100%";
+//   document.querySelector("#table_data").style.height = "0%";
+//   map.updateSize();
+//   var table = document.querySelector("#table");
+//   table.innerHTML = "";
+//   if (geojson) {
+//       geojson.getSource().clear();
+//       map.removeLayer(geojson);
+//   }
+//   if (featureOverlay) {
+//       featureOverlay.getSource().clear();
+//       map.removeLayer(featureOverlay);
+//   }
+//   map.removeEventListener("singleclick", getinfo);
+//   overlay.setPosition(undefined);
+//   closer.blur();
+//   map.removeEventListener("click", highlight);
+// }
+
 // Function for creating content for multipolygon feature
 function multipolyPopupContent(feature) {
   var geometry = feature.getGeometry();
@@ -473,8 +842,10 @@ function multipolyPopupContent(feature) {
   content_element.innerHTML = content;
   overlay.setPosition(poly_coord);
 
-  // console.info(feature.getProperties());
+  //console.info(feature.getProperties());
 }
+
+
 
 // map.on('pointermove', function(e) {
 //     if (e.dragging) return;
@@ -624,6 +995,7 @@ const groupItems = document.querySelector('#groups');
 const regionItems = document.querySelectorAll('.regions > a > span');
 const listItems = document.querySelectorAll('.business');
 
+// toggles regional business list open/closed
 toggle_businessList();
 function toggle_businessList() {
   groupItems.addEventListener('click', (e) => 
@@ -649,6 +1021,7 @@ function toggle_businessList() {
   });
 };
 
+// opens business attribute pane and zooms to business
 listClick();
 function listClick() {
   // click event listener for groups headings/regions
@@ -695,6 +1068,7 @@ function listClick() {
   });
 };
 
+// slides left panel closed or toggles panel open
 function hideList() {
     // Update container size, timeout must match or exceed css transition for list pane closing
     setTimeout(function () {
@@ -703,6 +1077,7 @@ function hideList() {
     wrapper.classList.toggle('no-list');
 };
 
+// hides feature attribute list and shows main business list and zooms back out to previous position
 function showList() {
   FeatureList.style.display = "none";
   List.style.display = "flex"; 
@@ -736,6 +1111,144 @@ function regionCLick() {
   }
 };
 
+/* **** Filter functions **** */
+// function to open filter pane
+let filter_pane = document.getElementById("filter-pane");
+let filter_button = document.getElementById("filter-button");
+let filter_closer = document.getElementById('filter-closer');
+//let filter_submit_btn = document.getElementById('filter-submit-btn');
+
+filter_button.addEventListener('click', openFilterPane);
+filter_closer.addEventListener('click', closeFilterPane);
+
+
+function openFilterPane() {  
+  FeatureList.style.display = "none";
+  List.style.display = "none";
+  filter_pane.style.display = "block"; 
+};
+// function to close filter pane
+function closeFilterPane() {
+  List.style.display = "flex"; 
+  filter_pane.style.display = "none";
+}
+
+/* *single property filter */
+// Get the property select and value select elements
+var propertySelect = document.getElementById("property");
+var valueSelect = document.getElementById("value");
+var filter_submit_btn = document.getElementById("filter-submit-btn");
+
+
+// Extract unique properties from GeoJSON object
+let properties = new Set();
+const filterArray = ['zone_name', 'zone_admin', 'area_acres', 'ms_building', 'current_use', 'services_score_sum', 'utilization_score_weighted'];
+
+geojsonObjWFS.features.forEach(feature => {
+  Object.keys(feature.properties).forEach(property => {
+    //if(filterArray.includes(property)) {
+      properties.add(property);
+    //} 
+  });
+});
+
+// Add options to the property select
+properties.forEach(property => {
+    var option = document.createElement("option");
+    option.value = property;
+    option.innerHTML = property;
+    propertySelect.appendChild(option);
+});
+
+// Add event listener to the property select to update the value select
+propertySelect.addEventListener("change", function() {
+  // Get the selected property
+  var selectedProperty = propertySelect.value;
+  // Clear the value select
+  valueSelect.innerHTML = "";
+  
+  //   // operator combo
+// properties_select.addEventListener("change", function() {
+//   while (operator_select.options.length > 0) {
+//       operator.options.remove(0);
+//   }
+
+//   var value_type = type(this.value);
+//   console.log(value_type)
+//   var value_attribute = this.options[this.selectedIndex].text;
+//   operator.options.add(new Option("Select operator", ""));
+
+//   if (value_type == "xsd:short" || value_type == "xsd:int" || value_type == "xsd:double") {
+//       operator.options.add(new Option("Greater than", ">"));
+//       operator.options.add(new Option("Less than", "<"));
+//       operator.options.add(new Option("Equal to", "="));
+//   } else if (value_type == "xsd:string") {
+//       operator.options.add(new Option("Like", "ILike"));
+//   }
+// });
+
+  // Extract unique values for selected property from GeoJSON object
+  let values = new Set();
+  geojsonObjWFS.features.forEach(feature => {
+    if(feature.properties[selectedProperty]) values.add(feature.properties[selectedProperty]);
+  });
+  
+  // Add options to the value select
+  values.forEach(value => {
+    var option = document.createElement("option");
+    option.value = value;
+    option.innerHTML = value;
+    valueSelect.appendChild(option);
+  });
+
+  function submitFilter() {
+    var property = propertySelect.value;
+    var value = valueSelect.value;
+    console.log(property, value)
+  }
+  filter_submit_btn.addEventListener("click", submitFilter)
+  // var selectedValue = valueSelect.value;
+  // console.log(selectedValue)
+  // var filter = new ol.format.Filter({
+  //   property: selectedProperty,
+  //   value: selectedValue
+  // });
+  // return filter
+  // // Apply filter to WFS layer
+  //landInvLayer_1.getSource().updateParams({'filter': filter});
+});
+
+  
+// function updateValues() {
+  
+//     var valueSelect = document.getElementById("value");
+//     valueSelect.innerHTML = "";
+//     if (property === "color") {
+//       valueSelect.innerHTML += "<option value='red'>Red</option>";
+//       valueSelect.innerHTML += "<option value='green'>Green</option>";
+//       valueSelect.innerHTML += "<option value='blue'>Blue</option>";
+//     } else if (property === "size") {
+//       valueSelect.innerHTML += "<option value='small'>Small</option>";
+//       valueSelect.innerHTML += "<option value='medium'>Medium</option>";
+//       valueSelect.innerHTML += "<option value='large'>Large</option>";
+//     } else if (property === "material") {
+//       valueSelect.innerHTML += "<option value='cotton'>Cotton</option>";
+//       valueSelect.innerHTML += "<option value='polyester'>Polyester</option>";
+//       valueSelect.innerHTML += "<option value='wool'>Wool</option>";
+//     }
+//   }
+
+// // var filterValues = [];
+//   function submitForm() {
+//     var filterValues = []
+//     var property = document.getElementById("property").value;
+//     var value = document.getElementById("value").value;
+//     filterValues.push(property, value)
+//     console.log("Property: " + property);
+//     console.log("Value: " + value);
+//     return filterValues
+//   }
+
 // function to get current mapview values
 function getValues() {
   let currentCenter = view.getCenter();
@@ -750,8 +1263,7 @@ function getValues() {
   return viewValues;
 };
 
-/* **** Filter functions **** */
-
+/* *** utilization button and pane *** */
 const utilization = document.getElementById("utilization");
 const uti_button = document.getElementById("uti-button");
 

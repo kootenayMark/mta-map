@@ -10,33 +10,7 @@
   <body> 
     <div id="wrapper" class="">
       <div id="list-container">
-        <!--single property filter-->
-        <!-- <div class="tab-content">
-          <div id="form" class="tab-pane fade in active">
-            <label class="bs-styles" for="layer">Select Layer</label>
-            <select class="form-control" id="layer" name="layer">
-              <option value="">Select Layer</option>
-            </select>
-            <br>
-            <label class="bs-styles" for="attributes">Select attribute</label>
-            <select class="form-control" id="attributes" name="attributes">
-              <option value="">Select Attributes</option>
-            </select>
-            <br>
-            <label class="bs-styles" for="operator">Select operator</label>
-            <select class="form-control" id="operator" name="operator">
-              <option value="">Select operator</option>
-            </select>
-            <br>
-            <label class="bs-styles" for="value">Enter Value</label>
-            <input type="text" class="form-control" id="value" name="value">
-            <br>
-            <button class="bs-styles-btn bs-styles-btn-success" onclick="query()">Load Query</button>
-          </div>
-        </div>
-        <div id = "table_data"> </div> -->
-        <!--<div id="wms_layers_window" title="Available WMS Layers" style="display:none"></div>
-	      <table id="table_wms_layers" class = "table-bordered"></table> -->
+        
         <nav id="list" >
           <div id="mta_logo">
             <img src="https://metaltechalley.com/wp-content/uploads/2021/08/MTA_Logo_NoTagLine-1024x140.png">
@@ -47,11 +21,42 @@
         <nav id="feature-list">
           <div id="feature-content">
             <img id="companyIcon" src="" alt="" width="60px" height="auto">
-            <span id="feature-closer" class="close">&times;</span>
+            <button id="feature-closer" class="close">&times;</button>
             <h1 id="business" class="title"></h1>
             <div id="attributes"></div>          
           </div>
         </nav>
+        <!--single property filter-->
+        <div id=filter-pane class="">
+          <button id="filter-closer" class="close">&times;</button>
+          <div id="form" class="">
+            <!-- <label class="" for="layer">Select Layer</label>
+            <select class="" id="layer-select" name="layer">
+              <option value="">Select Layer</option>
+            </select>
+            <br> -->
+            <label class="" for="Property">Select attribute</label>
+            <select class="" id="property" name="Property" >
+              <option value="">Select Attributes</option>
+            </select>
+            <br>
+            <label class="" for="operator">Select operator</label>
+            <select class="" id="operator-select" name="operator">
+              <option value="">Select operator</option>
+            </select>
+            <br>
+            <label class="" for="value">Select value</label>
+            <select class="" id="value" name="value">
+              <!-- <option value="">Select value</option> -->
+            </select>
+            <br>
+            <!-- <label class="" for="value">Enter Value</label>
+            <input type="text" class="" id="value" name="value">
+            <br> -->
+            <button id="filter-submit-btn" class="" >Load Query</button>
+            </div>
+          
+        </div>
       </div>
       <div id='list-toggle'>
         <div>&#8942;</div>
@@ -61,7 +66,8 @@
     </div>
     <div id="legend"></div>
     <div id="utilization"></div>
-    <button id="uti-button">i</button>
+    <button id="uti-button" class="right-panel-btn">i</button>
+    <button id="filter-button" class="right-panel-btn">f</button>
     
     <!-- <div id="filter-container">
       <label for="property-select">Filter by:</label>
@@ -91,6 +97,12 @@
       <a href="#" id="popup-closer" class="ol-popup-closer"></a>
       <ul id="popup-content"></ul>
     </div>
+    <!-- <div id="popup2" class="ol-popup">
+      <a href="#" id="popup-closer2" class="ol-popup-closer"></a>
+      <ul id="popup-content2"></ul>
+    </div>
+    <div id="info">&nbsp;</div> -->
+    <div id = "table_data"> </div>
     <script type="module" src="./main.js"></script>
   </body>
 </html>
