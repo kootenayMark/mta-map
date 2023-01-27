@@ -68,28 +68,15 @@ const regions = [
   {region:'Rossland and Area', id: 5, coords: rosslandandarea, zoom: 15}
 ]
 
-var geojson, layer_name, featureOverlay;
-
 /* **** data **** */
-const jsonObj = await getData();
 
+/** Business data */
+const jsonObj = await getData();
 async function getData() {
   return fetch(businessLayerURL)
   .then(res => res.json())
 } 
-
-// fetch(featureLayerWFS).then(function(response) {
-//   return response.json();
-// }).then(function(geojsonObjWFS) {
-
-const geojsonObjWFS = await getData1();
-
-async function getData1() {
-  return fetch(featureLayerWFS)
-  .then(res => res.json())
-}
-
-// to GeoJSON.Point array
+// to GeoJSON Point array
 const geoJSONPointArr = jsonObj.map(row => {
   return {
     "type": "Feature",
@@ -100,15 +87,55 @@ const geoJSONPointArr = jsonObj.map(row => {
     "properties": row
   }
 });
-
 // to GeoJSON.FeatureCollection
 const pointArrFeatureCollection = {
   "type": "FeatureCollection",
   "features": geoJSONPointArr
 }
-
 const geojsonString = JSON.stringify(pointArrFeatureCollection)
-  
+
+// fetch(featureLayerWFS).then(function(response) {
+//   return response.json();
+// }).then(function(geojsonObjWFS) {
+
+/** Land Inventory Data */
+const geojsonObjWFS = await getData1();
+
+async function getData1() {
+  return fetch(featureLayerWFS)
+  .then(res => res.json())
+}
+var geojsonObjWFS_filtered = geojsonObjWFS;
+//   // operator combo
+// properties_select.addEventListener("change", function() {
+//   while (operator_select.options.length > 0) {
+//       operator.options.remove(0);
+//   }
+
+//   var value_type = type(this.value);
+//   console.log(value_type)
+//   var value_attribute = this.options[this.selectedIndex].text;
+//   operator.options.add(new Option("Select operator", ""));
+
+//   if (value_type == "xsd:short" || value_type == "xsd:int" || value_type == "xsd:double") {
+//       operator.options.add(new Option("Greater than", ">"));
+//       operator.options.add(new Option("Less than", "<"));
+//       operator.options.add(new Option("Equal to", "="));
+//   } else if (value_type == "xsd:string") {
+//       operator.options.add(new Option("Like", "ILike"));
+//   }
+// });
+
+// var selectedValue = valueSelect.value;
+  // console.log(selectedValue)
+  // var filter = new ol.format.Filter({
+  //   property: selectedProperty,
+  //   value: selectedValue
+  // });
+  // return filter
+  // // Apply filter to WFS layer
+  //landInvLayer_1.getSource().updateParams({'filter': filter});
+
 
 /* ***map Variables*** */
 const vectorSource = new VectorSource({
@@ -136,9 +163,8 @@ const vectorSourceWFS = new VectorSource({
   features: new GeoJSON().readFeatures(geojsonObjWFS)
 });
 // console.log(vectorSourceWFS);
-// const vectorSourceWFS_filtered = new VectorSource({
-//   features: new GeoJSON().readFeatures(filtered_geojsonObjWFS)
-// });
+
+//console.log(vectorSourceWFS_filtered);
 
 // const styles = [
 //   'RoadOnDemand',
@@ -184,32 +210,27 @@ const businessLayer = new VectorLayer({
   
 });
 
-const landInvLayerWMS = new ImageLayer({
-  title: 'Land Inventory WMS',
-  visible: true,
-  source: vectorSourceWMS_1,
-  // style: styleFunction2
-});
+// const landInvLayerWMS = new ImageLayer({
+//   title: 'Land Inventory WMS',
+//   visible: true,
+//   source: vectorSourceWMS_1,
+//   // style: styleFunction2
+// });
 
 const landInvLayerWFS = new VectorLayer({
   title: 'Land Inventory',
   style: styleFunction2, 
-  visible: false,
+  visible: true,
   source: vectorSourceWFS,
+  
 });
-// const landInvLayer_filtered = new VectorLayer({
-//   title: 'Land Inventory Filtered',
-//   style: styleFunction2, 
-//   visible: false,
-//   source: vectorSourceWFS_filtered,
-// });
 
 const view = new View({
   center: trailandarea, //initialView,
   zoom: 11, //8.5,
   minZoom: 2,
   maxZoom: 20,
-  //constrainResolution: true,
+  constrainResolution: true,
 });
 
 const baseMaps = new LayerGroup({
@@ -219,7 +240,7 @@ const baseMaps = new LayerGroup({
 
 var overlays = new LayerGroup({
   title: 'Overlays',
-  layers: [landInvLayerWFS,/* landInvLayer_filtered, landInvLayerWMS, */businessLayer]
+  layers: [landInvLayerWFS, businessLayer]
 })
 
 const map = new Map({
@@ -227,7 +248,7 @@ const map = new Map({
   target: 'map',
   layers: [baseMaps, overlays],
   view: view,
-  //interactions: defaults({ zoomDuration: 0 })
+  interactions: defaults({ zoomDuration: 0 })
 });
 
 var layerSwitcher = new LayerSwitcher({
@@ -236,6 +257,103 @@ var layerSwitcher = new LayerSwitcher({
 });
 map.addControl(layerSwitcher);
 // sync(map); need to import ol-hashed if using
+
+/* *single property filter */
+// Get the property select and value select elements
+var propertySelect = document.getElementById("property");
+var valueSelect = document.getElementById("value");
+var filter_submit_btn = document.getElementById("filter-submit-btn");
+var filter_clear_btn = document.getElementById("filter-clear-btn");
+
+
+// Extract unique properties from GeoJSON object
+let properties = new Set();
+geojsonObjWFS.features.forEach(feature => {
+  const filterArray = ['zone_name', 'zone_admin', 'area_acres', 'ms_building', 'current_use', 'services_score_sum', 'utilization_score_weighted'];
+
+  Object.keys(feature.properties).forEach(property => {
+    if(filterArray.includes(property)) {
+      properties.add(property);
+    } 
+  });
+});
+
+// Add options to the property select
+    // var option = document.createElement("option");
+    // option.value = "none";
+    // option.innerHTML = "no filter";
+    // propertySelect.appendChild(option);
+properties.forEach(property => {
+  var option = document.createElement("option");
+  option.value = property;
+  option.innerHTML = property;
+  propertySelect.appendChild(option);
+});
+
+// Add event listener to the property select to update the value select
+propertySelect.addEventListener("change", function() {
+  // Get the selected property
+  var selectedProperty = propertySelect.value;
+  // Clear the value select
+  valueSelect.innerHTML = "";
+  
+  // Extract unique values for selected property from GeoJSON object
+  let values = new Set();
+  geojsonObjWFS.features.forEach(feature => {
+    if(feature.properties[selectedProperty]) 
+      values.add(feature.properties[selectedProperty]);
+  });
+  
+  // Add options to the value select
+  values.forEach(value => {
+    var option = document.createElement("option");
+    option.value = value;
+    option.innerHTML = value;
+    valueSelect.appendChild(option);
+  });
+});
+function submitFilter() {
+    var property = propertySelect.value;
+    var value = valueSelect.value;
+    var filteredFeatures =  geojsonObjWFS.features.filter(function(feature) {
+      return feature.properties[property] === value;
+    });
+    return {
+      "type": "FeatureCollection",
+      "features": filteredFeatures,
+      "crs": {
+        "type": "name",
+        "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
+      }
+    }
+}
+filter_submit_btn.addEventListener("click", function() {
+  // if(propertySelect.value !== "none") {
+  //   geojsonObjWFS_filtered = geojsonObjWFS;
+    geojsonObjWFS_filtered = submitFilter();
+  //}
+  //console.log(geojsonObjWFS_filtered)
+  
+  let vectorSourceWFS_filtered = new VectorSource({
+    features: new GeoJSON().readFeatures(geojsonObjWFS_filtered)
+  });
+  let landInvLayer_filtered = new VectorLayer({
+    title: 'Land Inventory Filtered',
+    style: styleFunction2, 
+    visible: true,
+    source: vectorSourceWFS_filtered,
+  });
+ 
+  overlays.getLayers().push(landInvLayer_filtered)
+  overlays.getLayers().remove(landInvLayerWFS)  
+  
+  filter_clear_btn.addEventListener("click", function() {
+    overlays.getLayers().push(landInvLayerWFS)
+    overlays.getLayers().remove(landInvLayer_filtered)  
+});
+
+});
+
 
 function legend() {
     document.querySelector("#legend").innerHTML = "";
@@ -374,23 +492,8 @@ var overlay = new Overlay({
     autoPan: true,
     offset: [0, -10]
 });
-// var container2 = document.getElementById('popup2'),
-//     content_element2 = document.getElementById('popup-content2'),
-//     closer2 = document.getElementById('popup-closer2');
-
-// closer2.onclick = function() {
-//     overlay2.setPosition(undefined);
-//     closer2.blur();
-//     return false;
-// };
-// var overlay2 = new Overlay({
-//     element: container2,
-//     autoPan: true,
-//     offset: [0, -10]
-// });
 
 map.addOverlay(overlay);
-// map.addOverlay(overlay2);
 
 map.on('click', function(evt){
   var feature = map.forEachFeatureAtPixel(evt.pixel,
@@ -845,8 +948,6 @@ function multipolyPopupContent(feature) {
   //console.info(feature.getProperties());
 }
 
-
-
 // map.on('pointermove', function(e) {
 //     if (e.dragging) return;
        
@@ -1133,90 +1234,7 @@ function closeFilterPane() {
   filter_pane.style.display = "none";
 }
 
-/* *single property filter */
-// Get the property select and value select elements
-var propertySelect = document.getElementById("property");
-var valueSelect = document.getElementById("value");
-var filter_submit_btn = document.getElementById("filter-submit-btn");
 
-
-// Extract unique properties from GeoJSON object
-let properties = new Set();
-const filterArray = ['zone_name', 'zone_admin', 'area_acres', 'ms_building', 'current_use', 'services_score_sum', 'utilization_score_weighted'];
-
-geojsonObjWFS.features.forEach(feature => {
-  Object.keys(feature.properties).forEach(property => {
-    //if(filterArray.includes(property)) {
-      properties.add(property);
-    //} 
-  });
-});
-
-// Add options to the property select
-properties.forEach(property => {
-    var option = document.createElement("option");
-    option.value = property;
-    option.innerHTML = property;
-    propertySelect.appendChild(option);
-});
-
-// Add event listener to the property select to update the value select
-propertySelect.addEventListener("change", function() {
-  // Get the selected property
-  var selectedProperty = propertySelect.value;
-  // Clear the value select
-  valueSelect.innerHTML = "";
-  
-  //   // operator combo
-// properties_select.addEventListener("change", function() {
-//   while (operator_select.options.length > 0) {
-//       operator.options.remove(0);
-//   }
-
-//   var value_type = type(this.value);
-//   console.log(value_type)
-//   var value_attribute = this.options[this.selectedIndex].text;
-//   operator.options.add(new Option("Select operator", ""));
-
-//   if (value_type == "xsd:short" || value_type == "xsd:int" || value_type == "xsd:double") {
-//       operator.options.add(new Option("Greater than", ">"));
-//       operator.options.add(new Option("Less than", "<"));
-//       operator.options.add(new Option("Equal to", "="));
-//   } else if (value_type == "xsd:string") {
-//       operator.options.add(new Option("Like", "ILike"));
-//   }
-// });
-
-  // Extract unique values for selected property from GeoJSON object
-  let values = new Set();
-  geojsonObjWFS.features.forEach(feature => {
-    if(feature.properties[selectedProperty]) values.add(feature.properties[selectedProperty]);
-  });
-  
-  // Add options to the value select
-  values.forEach(value => {
-    var option = document.createElement("option");
-    option.value = value;
-    option.innerHTML = value;
-    valueSelect.appendChild(option);
-  });
-
-  function submitFilter() {
-    var property = propertySelect.value;
-    var value = valueSelect.value;
-    console.log(property, value)
-  }
-  filter_submit_btn.addEventListener("click", submitFilter)
-  // var selectedValue = valueSelect.value;
-  // console.log(selectedValue)
-  // var filter = new ol.format.Filter({
-  //   property: selectedProperty,
-  //   value: selectedValue
-  // });
-  // return filter
-  // // Apply filter to WFS layer
-  //landInvLayer_1.getSource().updateParams({'filter': filter});
-});
 
   
 // function updateValues() {

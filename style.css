@@ -431,7 +431,7 @@ select {
   color: #8e8d8d;
   background-color: black;
 }
-#filter-submit-btn {
+.filter-btn {
   color: black;
   background-color: #8e8d8d;
   border: none;
