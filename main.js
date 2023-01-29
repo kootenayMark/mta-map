@@ -411,42 +411,7 @@ function submitFilter() {
 //   serverType: 'geoserver',
 // });
 
-function legend() {
-    var src = document.getElementById("legend");
-    let getLegendWMS = "https://geoserver.marktrueman.ca/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=10&LAYER=LCICLandInventory:Development Potential&legend_options=fontName:Comfortaa;fontAntiAliasing:true;fontColor:0x000033;fontSize:8;bgColor:0x8e8d8d;dpi:180;";
-    var img = new Image();
-    img.src = getLegendWMS;
-    src.appendChild(img);
-}
-// function legend() {
-//     document.querySelector("#legend").innerHTML = "";
-//     var no_layers = overlays.getLayers().get("length");
-//     var head = document.createElement("h4");
-//     var txt = document.createTextNode("Legend");
-//     head.appendChild(txt);
-//     var element = document.getElementById("legend");
-//     element.appendChild(head);
-//     var ar = [];
-//     for (var i = 0; i < no_layers; i++) {
-//         ar.push(
-//             "http://51.79.71.43:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=10&LAYER=" +
-//             'LCICLandInventory:Land Inventory WMS' + 
-//                 "&legend_options=fontName:Comfortaa;fontAntiAliasing:true;fontColor:0x000033;fontSize:8;bgColor:0x8e8d8d;dpi:180;"
-//         );
-//     }
-//     for (var i = 0; i < no_layers; i++) {
-//         var head = document.createElement("p");
-//         var txt = document.createTextNode(overlays.getLayers().item(i).get("title"));
-//         head.appendChild(txt);
-//         var element = document.getElementById("legend");
-//         element.appendChild(head);
-//         var img = new Image();
-//         img.src = ar[i];
-//         var src = document.getElementById("legend");
-//         src.appendChild(img);
-//     }
-// }
-legend();
+
 
 // var newRes =""
 // var currRes = map.getView().getResolution();
@@ -597,380 +562,7 @@ function pointPopupContent(feature) {
   overlay.setPosition(point_coord);
 }
 
-//   // Function for retrieving popup content from WMS service
-// function WMSPopup(evt) {
-//   var coordinate = evt.coordinate;
-//   var viewResolution = view.getResolution();
 
-//   document.getElementById("popup-content2").innerHTML = "";
-//   document.getElementById("info").innerHTML = "";
-//   var no_layers = overlays.getLayers().get("length");
-//   var url = new Array();
-//   var wmsSource = new Array();
-//   var layer_title = new Array();
-
-//   for (var i = 0; i < no_layers; i++) {
-//       var visibility = overlays.getLayers().item(i).getVisible();
-//       if (visibility == true) {
-//           layer_title[i] = overlays.getLayers().item(i).get("title");
-//           wmsSource[i] = new ImageWMS({
-//               url: "http://51.79.71.43:8080/geoserver/wms",
-//               params: { LAYERS: layer_title[i] },
-//               serverType: "geoserver",
-//               crossOrigin: "anonymous",
-//           });
-//           url[i] = wmsSource[i].getFeatureInfoUrl(
-//               evt.coordinate,
-//               viewResolution,
-//               "EPSG:4326",
-//               { INFO_FORMAT: "text/html" }
-//           );
-
-//           //using fetch API
-//           fetch(url[i])
-//               .then((response) => response.text())
-//               .then((data) => {
-//                   document.querySelector("#popup-content2").innerHTML += data;
-//               });
-
-//           overlay.setPosition(coordinate);
-//           layerSwitcher.renderPanel();
-//       }
-//   }
-// };
-// map.on('singleclick', WMSPopup);	
-
-// attributes_dropdown
-// document.getElementById("layer").addEventListener("change", function() {
-//   var attributes = document.getElementById("attributes");
-//   while (attributes.options.length > 0) {
-//       attributes.options.remove(0);
-//   }
-
-//   var value_layer = this.value;
-//   attributes.options.add(new Option("Select attributes", ""));
-
-//   fetch("http://51.79.71.43:8080/geoserver/wfs?service=WFS&request=DescribeFeatureType&version=1.1.0&typeName=" + value_layer)
-//       .then(response => response.text())
-//       .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
-//       .then(data => {
-//           var select = document.querySelector("#attributes");
-//           var elements = data.getElementsByTagName("xsd:element");
-//           for (var i = 0, len = elements.length; i < len; i++) {
-//               var name = elements[i].getAttribute("name");
-//               var type = elements[i].getAttribute("type");
-//               if (name != 'geom' && name != 'the_geom') {
-//                   var option = document.createElement("option");
-//                   option.value = type;
-//                   option.innerHTML = name;
-//                   select.appendChild(option);
-//               }
-//           }
-//       });
-// });
-
-
-// // operator combo
-// document.getElementById("attributes").addEventListener("change", function() {
-//   var operator = document.getElementById("operator");
-//   while (operator.options.length > 0) {
-//       operator.options.remove(0);
-//   }
-
-//   var value_type = this.value;
-//   var value_attribute = this.options[this.selectedIndex].text;
-//   operator.options.add(new Option("Select operator", ""));
-
-//   if (value_type == "xsd:short" || value_type == "xsd:int" || value_type == "xsd:double") {
-//       operator.options.add(new Option("Greater than", ">"));
-//       operator.options.add(new Option("Less than", "<"));
-//       operator.options.add(new Option("Equal to", "="));
-//   } else if (value_type == "xsd:string") {
-//       operator.options.add(new Option("Like", "ILike"));
-//   }
-// });
-
-// var highlightStyle = new Style({
-//   fill: new Fill({
-//       color: 'rgba(255,255,255,0.7)',
-//   }),
-//   stroke: new Stroke({
-//       color: '#3399CC',
-//       width: 3,
-//   }),
-//   image: new Circle({
-//       radius: 10,
-//       fill: new Fill({
-//           color: '#3399CC'
-//       })
-//   })
-// });
-
-// featureOverlay = new VectorLayer({
-//   source: new VectorSource(),
-//   map: map,
-// style: highlightStyle
-// });
-  
-// function findRowNumber(cn1, v1){
-
-// var table = document.querySelector('#table');
-// var rows = table.querySelectorAll("tr");
-// var msg = "No such row exist"
-// for(i=1;i<rows.length;i++){
-//   var tableData = rows[i].querySelectorAll("td");
-//   if(tableData[cn1-1].textContent==v1){
-//     msg = i;
-//     break;
-//   }
-// }
-// return msg;
-// }
-// function addRowHandlers() {
-// var table = document.getElementById("table");
-// var rows = table.getElementsByTagName("tr");
-// var heads = table.getElementsByTagName("th");
-// var col_no;
-
-// // find the column number of the 'id' column
-// for (var i = 0; i < heads.length; i++) {
-//   var head = heads[i];
-//   if (head.innerHTML === "id") {
-//     col_no = i + 1;
-//   }
-// }
-
-// for (i = 0; i < rows.length; i++) {
-//   rows[i].onclick = function () {
-//     featureOverlay.getSource().clear();
-
-//     // reset all row background colors to white
-//     for (var j = 0; j < rows.length; j++) {
-//       rows[j].style.backgroundColor = "white";
-//     }
-
-//     var cell = this.cells[col_no - 1];
-//     var id = cell.innerHTML;
-
-//     // highlight the selected row
-//     this.style.backgroundColor = "grey";
-
-//     var features = geojson.getSource().getFeatures();
-
-//     for (var k = 0; k < features.length; k++) {
-//       if (features[k].getId() === id) {
-//         featureOverlay.getSource().addFeature(features[k]);
-//         featureOverlay.getSource().on("addfeature", function () {
-//           map.getView().fit(featureOverlay.getSource().getExtent(), {
-//             duration: 1590,
-//             size: map.getSize(),
-//           });
-//         });
-//       }
-//     }
-//   };
-// }
-// }
-
-// function highlight(evt) {
-// featureOverlay.getSource().clear();
-// var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-//   return feature;
-// });
-
-// if (feature) {
-//   var geometry = feature.getGeometry();
-//   var coord = geometry.getCoordinates();
-//   var coordinate = evt.coordinate;
-
-//   var table = document.getElementById("table");
-//   var rows = table.getElementsByTagName("tr");
-//   for (var i = 0; i < rows.length; i++) {
-//     rows[i].style.backgroundColor = "white";
-//   }
-
-//   featureOverlay.getSource().addFeature(feature);
-// }
-//   var table = document.getElementById('table');
-//   var cells = table.getElementsByTagName('td');
-// var rows = document.getElementById("table").rows;
-// var heads = table.getElementsByTagName('th');
-// var col_no;
-// for (var i = 0; i < heads.length; i++) {
-//       // Take each cell
-//       var head = heads[i];
-//   //alert(head.innerHTML);
-//   if (head.innerHTML == 'id') {
-//           col_no = i+1; 
-//           //alert(col_no);
-//   }
-//   }
-//   var row_no = findRowNumber(col_no, feature.getId());
-//   //alert(row_no);
-//   var rows = document.querySelectorAll('#table tr');
-
-//   rows[row_no].scrollIntoView({
-//       behavior: 'smooth',
-//       block: 'center'
-//   });
-//   var table = document.getElementById("table");
-//   var rows = table.getElementsByTagName("tr");
-//   for (var i = 0; i < rows.length; i++) {
-//       var cells = rows[i].getElementsByTagName("td");
-//       for (var j = 0; j < cells.length; j++) {
-//           if (j+1 == col_no && cells[j].textContent == feature.getId()) {
-//               rows[i].style.backgroundColor = "grey";
-//           }
-//       }
-//   }
-// };
-// function query(){
-//   //$('#table').empty();
-//   //document.getElementById("table").innerHTML = "";
-
-//   if(geojson){
-//     map.removeLayer(geojson);
-// }	
-// if(featureOverlay){
-//   featureOverlay.getSource().clear();
-//   map.removeLayer(featureOverlay);
-// }
-// //alert('jsbchdb');	
-//   var layer = document.getElementById("layer");
-//   var value_layer = layer.options[layer.selectedIndex].value;
-//   //alert(value_layer);
-
-//   var attribute = document.getElementById("attributes");
-//   var value_attribute = attribute.options[attribute.selectedIndex].text;
-//   //alert(value_attribute);
-
-//   var operator = document.getElementById("operator");
-//   var value_operator = operator.options[operator.selectedIndex].value;
-//   //alert(value_operator);
-
-//   var txt = document.getElementById("value");
-//   var value_txt = txt.value;
-
-//   if (value_operator == 'ILike'){
-//   value_txt = ""+value_txt+"%25";
-//   //alert(value_txt);
-//   //value_attribute = 'strToLowerCase('+value_attribute+')';
-// } else {
-//   value_txt = value_txt;
-//   //value_attribute = value_attribute;
-// }
-//   //alert(value_txt);
-
-//   var url = "http://51.79.71.43:8080/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName="+value_layer+"&CQL_FILTER="+value_attribute+"+"+value_operator+"+'"+value_txt+"'&outputFormat=application/json"
-//   //alert(url);
-
-//   var style = new Style({
-//       fill: new Fill({
-//           color: 'rgba(255, 255, 255, 0.7)'
-//       }),
-//       stroke: new Stroke({
-//           color: '#ffcc33',
-//           width: 3
-//       }),
-//       image: new Circle({
-//           radius: 7,
-//           fill: new Fill({
-//               color: '#ffcc33'
-//           })
-//       })
-//   });
-  
-// geojson = new VectorLayer({
-//       //title:'dfdfd',
-//     //title: '<h5>' + value_crop+' '+ value_param +' '+ value_seas+' '+value_level+'</h5>',
-//       source: new VectorSource({
-//       url: url,
-//           format: new GeoJSON()
-//       }),
-//   style: style,
-//   });
- 
-// geojson.getSource().on('addfeature', function(){
-//   //alert(geojson.getSource().getExtent());
-//       map.getView().fit(
-//           geojson.getSource().getExtent(),{ 
-//               duration: 1590, 
-//               size: map.getSize() 
-//           }
-//       );
-//   });
-
-//   //overlays.getLayers().push(geojson);
-// map.addLayer(geojson);
-//   fetch(url)
-//   .then(response => response.json())
-//   .then(data => {
-//       var col = [];
-//       col.push("id");
-//       for (var i = 0; i < data.features.length; i++) {
-//       for (var key in data.features[i].properties) {
-//           if (col.indexOf(key) === -1) {
-//           col.push(key);
-//           }
-//       }
-//       }
-//       var table = document.createElement("table");
-//       table.setAttribute("class", "table table-bordered");
-//       table.setAttribute("id", "table");
-
-//       // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
-//       var tr = table.insertRow(-1); // TABLE ROW.
-//       for (var i = 0; i < col.length; i++) {
-//       var th = document.createElement("th"); // TABLE HEADER.
-//       th.innerHTML = col[i];
-//       tr.appendChild(th);
-//       }
-
-//       // ADD JSON DATA TO THE TABLE AS ROWS.
-//       for (var i = 0; i < data.features.length; i++) {
-//           tr = table.insertRow(-1);
-//           for (var j = 0; j < col.length; j++) {
-//               var tabCell = tr.insertCell(-1);
-//               if (j == 0) {
-//               tabCell.innerHTML = data.features[i]["id"];
-//               } else {
-//                   tabCell.innerHTML = data.features[i].properties[col[j]];
-//                   //alert(tabCell.innerHTML);
-//               }
-//           }
-//       }
-//       // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
-//       var divContainer = document.getElementById("table_data");
-//       divContainer.innerHTML = "";
-//       divContainer.appendChild(table);
-//       addRowHandlers();
-          
-//       document.getElementById('map').style.height='75%';
-//       document.getElementById('table_data').style.height='25%';
-//       map.updateSize();
-//   });
-// map.on('click', highlight);
-//   addRowHandlers();
-// }
-// function clear_all() {
-//   document.querySelector("#map").style.height = "100%";
-//   document.querySelector("#table_data").style.height = "0%";
-//   map.updateSize();
-//   var table = document.querySelector("#table");
-//   table.innerHTML = "";
-//   if (geojson) {
-//       geojson.getSource().clear();
-//       map.removeLayer(geojson);
-//   }
-//   if (featureOverlay) {
-//       featureOverlay.getSource().clear();
-//       map.removeLayer(featureOverlay);
-//   }
-//   map.removeEventListener("singleclick", getinfo);
-//   overlay.setPosition(undefined);
-//   closer.blur();
-//   map.removeEventListener("click", highlight);
-// }
 
 // Function for creating content for multipolygon feature
 function multipolyPopupContent(feature) {
@@ -1330,6 +922,59 @@ uti_closer.addEventListener("click", function() {
   }
 });
 
+/* *** Legend button and pane *** */
+const legend_wrapper = document.getElementById("legend-wrapper");
+const legend_button = document.getElementById("legend-button");
+const legend_closer = document.getElementById("legend-closer");
+legend_button.addEventListener("click", function() {  
+  if (legend_wrapper.style.display === "block") {
+    legend_wrapper.style.display = "none";
+  } else {
+    legend_wrapper.style.display = "block";
+  }
+});
+legend_closer.addEventListener("click", function() {  
+  if (legend_wrapper.style.display === "block") {
+    legend_wrapper.style.display = "none";
+  } else {
+    legend_wrapper.style.display = "block";
+  }
+});
+
+function legend() {
+  var src = document.getElementById("legend");
+  let getLegendWMS = "https://geoserver.marktrueman.ca/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=10&LAYER=LCICLandInventory:Development Potential&legend_options=fontName:Comfortaa;fontAntiAliasing:true;fontColor:0x000033;fontSize:8;bgColor:0x8e8d8d;dpi:180;";
+  var img = new Image();
+  img.src = getLegendWMS;
+  src.appendChild(img);
+}
+// function legend() {
+//     document.querySelector("#legend").innerHTML = "";
+//     var no_layers = overlays.getLayers().get("length");
+//     var head = document.createElement("h4");
+//     var txt = document.createTextNode("Legend");
+//     head.appendChild(txt);
+//     var element = document.getElementById("legend");
+//     element.appendChild(head);
+//     var ar = [];
+//     for (var i = 0; i < no_layers; i++) {
+//         ar.push(
+//             "https://geoserver.marktrueman.ca/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=10&LAYER=LCICLandInventory:Development Potential&legend_options=fontName:Comfortaa;fontAntiAliasing:true;fontColor:0x000033;fontSize:8;bgColor:0x8e8d8d;dpi:180;"
+//         );
+//     }
+//     for (var i = 0; i < no_layers; i++) {
+//         var head = document.createElement("p");
+//         var txt = document.createTextNode(overlays.getLayers().item(i).get("title"));
+//         head.appendChild(txt);
+//         var element = document.getElementById("legend");
+//         element.appendChild(head);
+//         var img = new Image();
+//         img.src = ar[i];
+//         var src = document.getElementById("legend");
+//         src.appendChild(img);
+//     }
+// }
+legend();
 // window.onresize = function()
 // {
 //   setTimeout( function() { map.updateSize();}, 300);

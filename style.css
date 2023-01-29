@@ -476,23 +476,44 @@ select {
   color:black;
   background-color: #f6921b;
 }
-#legend {
+#legend-button {
+  right: 0.9em;
+  top: 10.5em;
+  color:black;
+  background-color: #f6921b;
+}
+#legend-wrapper {
   position:absolute;
-  padding: 0.7em;
-  /* right: 20em;
-  bottom: 20em; */
   right: 0.9em;
   bottom: 3em;
   color: black;
   background-color: #8e8d8d;
-  max-width: 5.5em;
+  max-width: 7.4em;
   max-height: 20em;
-  overflow-y: auto;
   border-radius: 4px;
 }
+#legend {
+  position: relative;
+  padding: 0.7em;
+  overflow-y: auto;
+}
 #legend > h5 {
-  margin: 0 0;
-  padding: 5px 0;
+  line-height: 1.5em;
+  margin: 0;
+  padding: 10px 0 5px 0;
+}
+#legend-closer {
+  font-size: 20px;
+  position: absolute;
+  top: -2px;
+  left: 75%;
+  background-color: #8e8d8d;
+}
+#a0e6d706-9129-4318-917b-a15705e83137:checked + .legend {
+  display: block;
+}
+#a0e6d706-9129-4318-917b-a15705e83137:not(:checked) + .legend {
+  display: none;
 }
 /* Style the scrollbar background */
 ::-webkit-scrollbar {
