@@ -242,15 +242,15 @@ var overlays = new LayerGroup({
   title: 'Overlays',
   layers: [landInvLayerWFS]
 })
-var points = new LayerGroup({
-  title: 'Businesses',
-  layers: [businessLayer]
-})
+// var points = new LayerGroup({
+//   title: 'Businesses',
+//   layers: [businessLayer]
+// })
 
 const map = new Map({
   //controls: defaultControls().extend([new UtilizationScore()]),
   target: 'map',
-  layers: [baseMaps, overlays, points],
+  layers: [baseMaps, overlays, businessLayer],
   view: view,
   //interactions: defaults({ zoomDuration: 0 })
 });
@@ -370,11 +370,8 @@ propertySelect.addEventListener("change", function() {
 });
 
 filter_submit_btn.addEventListener("click", function() {
-  // if(propertySelect.value !== "none") {
-  //   geojsonObjWFS_filtered = geojsonObjWFS;
-    geojsonObjWFS_filtered = submitFilter();
-  //}
-  //console.log(geojsonObjWFS_filtered)
+  geojsonObjWFS_filtered = submitFilter();
+
   view.animate({
     center: trailandarea,
     zoom: 11,
@@ -390,19 +387,20 @@ filter_submit_btn.addEventListener("click", function() {
     visible: true,
     source: vectorSourceWFS_filtered,
   });
- 
+
+  //overlays.getLayers().remove(landInvLayer_filtered)
+  overlays.getLayers().remove(landInvLayerWFS) 
   overlays.getLayers().push(landInvLayer_filtered)
-  overlays.getLayers().remove(landInvLayerWFS)  
-  
+
   filter_clear_btn.addEventListener("click", function() {
     propertySelect.value = "";
     string_value.value = "";
     string_label.style.display = "none"
     string_value.style.display = "none"
     range_input.style.display = "none"
-
+    
+    overlays.getLayers().remove(landInvLayer_filtered)
     overlays.getLayers().push(landInvLayerWFS)
-    overlays.getLayers().remove(landInvLayer_filtered) 
   });
 });
 
