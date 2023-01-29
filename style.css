@@ -360,13 +360,6 @@ input[type="radio"]:checked {
 input[type="checkbox"]:checked {
   accent-color: #f6921b;
 }
-/* .rotate-north {
-  top: 65px;
-  left: .5em;
-}
-.ol-touch .rotate-north {
-  top: 80px;
-} */
 
 ul li{
   cursor:pointer;
@@ -374,6 +367,9 @@ ul li{
 
 
 /* *** Filter Styles *** */
+.values {
+  display: none;
+}
 #form {
   width: 85%;
   margin: 0 auto;
@@ -403,6 +399,9 @@ select {
   color: #8e8d8d;
   background-color: black;
 }
+.numberInput {
+  margin-bottom: 1em
+}
 .filter-btn {
   color: black;
   background-color: #8e8d8d;
@@ -429,8 +428,6 @@ select {
   right: 0.9em;
   top: 5.5em;
 } 
-
-
 #filter-pane {
   display: none;
   padding-left: 10px;
@@ -443,7 +440,7 @@ select {
 }
 /* splash screen styles */
 #utilization {
-  padding: 1em;
+  padding: 0;
   display: none;
   position: absolute;
   color: black;
@@ -451,13 +448,14 @@ select {
   top: 50%;
   left: 50%;
   width: 500px;
-  height: 250px;
+  height: fit-content;
   overflow-y: auto;
   transform: translate(-50%, -50%);
   border-radius: 4px;
 }
 #uti-content {
   position:relative;
+  padding: 1em;
 }
 #uti-content > h4 {
   margin: 0 0 10px 0;
@@ -472,11 +470,14 @@ select {
 #uti-closer {
   position: absolute;
   top: 0;
-  right: calc(100%-2px);
+  left: 93%;
+  background-color: #8e8d8d;
 }
 #uti-button {
   right: 0.9em;
   top: 8em;
+  color:black;
+  background-color: #f6921b;
 }
 #legend {
   display:absolute;

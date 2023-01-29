@@ -28,6 +28,7 @@ import {and} from 'ol/format/filter';
 import ImageWMS from 'ol/source/ImageWMS.js';
 import ImageLayer from 'ol/layer/Image';
 
+
 const markerURL ='https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_xsm-1.png'
 const businessLayerURL = "https://opensheet.elk.sh/19o_WmjjKn1ZE1940Brh9VrD9gaTyStMTF-kwbz2LJm4/elements"
 
@@ -226,10 +227,10 @@ const landInvLayerWFS = new VectorLayer({
 });
 
 const view = new View({
-  center: trailandarea, //initialView,
-  zoom: 11, //8.5,
+  center: initialView, //trailandarea, 
+  zoom: 8.5,
   minZoom: 2,
-  maxZoom: 20,
+  maxZoom: 19,
   constrainResolution: true,
 });
 
@@ -251,7 +252,7 @@ const map = new Map({
   target: 'map',
   layers: [baseMaps, overlays, points],
   view: view,
-  interactions: defaults({ zoomDuration: 0 })
+  //interactions: defaults({ zoomDuration: 0 })
 });
 
 var layerSwitcher = new LayerSwitcher({
@@ -264,10 +265,16 @@ map.addControl(layerSwitcher);
 /* *single property filter */
 // Get the property select and value select elements
 var propertySelect = document.getElementById("property1");
-var valueSelect = document.getElementById("value1");
 var filter_submit_btn = document.getElementById("filter-submit-btn");
 var filter_clear_btn = document.getElementById("filter-clear-btn");
-
+var string_label = document.getElementById("string-label");
+var string_value = document.getElementById("string-value");
+var range_input = document.getElementById("range-input");
+var low_number_value = document.getElementById("low-number-value");
+var high_number_value = document.getElementById("high-number-value");
+var rangeValues = {low: 1, high: 1};
+var rangeArray;
+//var roundedNumbers;
 
 // Extract unique properties from GeoJSON object
 let properties = new Set();
@@ -297,46 +304,83 @@ properties.forEach(property => {
 propertySelect.addEventListener("change", function() {
   // Get the selected property
   var selectedProperty = propertySelect.value;
-  // Clear the value select
-  valueSelect.innerHTML = "";
-  
+  // Clear the user input values 
+  string_value.innerHTML = "";
+  low_number_value.innerHTML = "";
+  high_number_value.innerHTML = "";
+
   // Extract unique values for selected property from GeoJSON object
   let values = new Set();
   geojsonObjWFS.features.forEach(feature => {
     if(feature.properties[selectedProperty]) 
       values.add(feature.properties[selectedProperty]);
+      
   });
   
+ 
   // Add options to the value select
   values.forEach(value => {
-    var option = document.createElement("option");
-    option.value = value;
-    option.innerHTML = value;
-    valueSelect.appendChild(option);
+    if (typeof value === 'string') {
+      if (range_input.style.display === "block") {
+        range_input.style.display = "none"
+      }
+      var option = document.createElement("option");
+      option.value = value;
+      option.innerHTML = value;
+      string_label.style.display = "block"
+      string_value.style.display = "block"
+      string_value.appendChild(option);
+    } else if (typeof value === 'number') {
+        if (string_label.style.display === "block") {
+          string_label.style.display = "none"
+          string_value.style.display = "none"
+        }
+      rangeArray = values;
+      range_input.style.display = "block"
+      // sort array to extract low and high value
+      let sortedNumbers = [...values].slice().sort((a, b) => a - b);
+      // round decimal values to 4 places
+      let roundedNumbers = sortedNumbers.map(number => Math.round(number * 10000) / 10000);
+      //calculate decimal length to be used to change input increment
+      let decimalLength;
+      if(Number.isInteger(roundedNumbers[0])) {
+        decimalLength = 0;
+      } else {  
+        decimalLength = (roundedNumbers[0]).toString().split(".")[1].length;
+      } 
+      // convert decimal length to increment value
+      let placeholder = 1 
+      let incrementor = placeholder / Math.pow(10, decimalLength)
+      //set increment value for input arrows
+      low_number_value.step = incrementor;
+      high_number_value.step = incrementor;
+      //set low and high values of array
+      low_number_value.value = roundedNumbers[0];
+      high_number_value.value = roundedNumbers[sortedNumbers.length - 1];
+      rangeValues = {low: roundedNumbers[0], high: roundedNumbers[sortedNumbers.length - 1]}
+      //event listeners for retrieving low and high values
+      low_number_value.addEventListener("change", function() {
+        rangeValues.low = low_number_value.valueAsNumber;
+      });
+      high_number_value.addEventListener("change", function() {
+        rangeValues.high = high_number_value.valueAsNumber;
+      }); 
+    }
   });
 });
-function submitFilter() {
-    var property = propertySelect.value;
-    var value = valueSelect.value;
-    var filteredFeatures =  geojsonObjWFS.features.filter(function(feature) {
-      return feature.properties[property] === value;
-    });
-    return {
-      "type": "FeatureCollection",
-      "features": filteredFeatures,
-      "crs": {
-        "type": "name",
-        "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
-      }
-    }
-}
+
 filter_submit_btn.addEventListener("click", function() {
   // if(propertySelect.value !== "none") {
   //   geojsonObjWFS_filtered = geojsonObjWFS;
     geojsonObjWFS_filtered = submitFilter();
   //}
   //console.log(geojsonObjWFS_filtered)
-  
+  view.animate({
+    center: trailandarea,
+    zoom: 11,
+    duration: 3000,
+    constrainResolution: true
+  });
   let vectorSourceWFS_filtered = new VectorSource({
     features: new GeoJSON().readFeatures(geojsonObjWFS_filtered)
   });
@@ -351,13 +395,44 @@ filter_submit_btn.addEventListener("click", function() {
   overlays.getLayers().remove(landInvLayerWFS)  
   
   filter_clear_btn.addEventListener("click", function() {
+    propertySelect.value = "";
+    string_value.value = "";
+    string_label.style.display = "none"
+    string_value.style.display = "none"
+    range_input.style.display = "none"
+
     overlays.getLayers().push(landInvLayerWFS)
     overlays.getLayers().remove(landInvLayer_filtered) 
-
+  });
 });
 
-});
+function submitFilter() {
+    var property = propertySelect.value;
+    var valuesArray = Array.from(string_value.selectedOptions).map(option => option.value);
+    var filteredFeatures;
+    
+    console.log(filterValues)
+    if (typeof valuesArray[0] === 'string') {
+      filteredFeatures = geojsonObjWFS.features.filter(function(feature) {
+        return valuesArray.includes(feature.properties[property]);
+      });
+    } else {
+      var filterValues = Array.from(rangeArray).filter(val => val >= rangeValues.low && val <= rangeValues.high);
+      filteredFeatures = geojsonObjWFS.features.filter(function(feature) {
+        return filterValues.includes(feature.properties[property]);
+      });
 
+    }
+    console.log(filteredFeatures)
+    return {
+      "type": "FeatureCollection",
+      "features": filteredFeatures,
+      "crs": {
+        "type": "name",
+        "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
+      }
+    }  
+};
 
 function legend() {
     document.querySelector("#legend").innerHTML = "";
@@ -401,7 +476,7 @@ legend();
 //var newRes = map.getView().getResolution();
 //console.log('newRes1 ' + newRes)
 function styleFunction (feature, resolution) {
-  const resolutionThreshold_1 = 80;
+  const resolutionThreshold_1 = 20;
   const resolutionThreshold_2 = 1.1;
   const resolutionThreshold_3 = 0.55;
   const markerSource = markerURL; 
@@ -433,6 +508,7 @@ function styleFunction (feature, resolution) {
       scale: 0.4/Math.pow(resolution, 1/2)
     }) : undefined
   });
+  console.log(resolution)
 //   map.on('moveend', (function() {
 //       if (newRes != map.getView().getResolution()) {
 //           newRes = map.getView().getResolution();
@@ -1163,6 +1239,7 @@ function listClick() {
           center: coords,
           zoom: 17,
           duration:2000,
+          constrainResolution:true
         });
       }
       // If element has no id
@@ -1208,12 +1285,27 @@ function regionCLick() {
       center: regions[eleId].coords,
       zoom: regions[eleId].zoom,
       duration: 3000,
+      constrainResolution: true
     });
   }
   // If element has no id
   else { 
       console.log("An element without an id was hovered.");
   }
+};
+
+// function to get current mapview values
+function getValues() {
+  let currentCenter = view.getCenter();
+  //console.log(currentCenter);
+  let currentZoom = view.getZoom();
+  //console.log(currentZoom);
+  let viewValues = {
+    currentCenter: currentCenter,
+    currentZoom: currentZoom
+  }
+  console.log(viewValues);
+  return viewValues;
 };
 
 /* **** Filter functions **** */
@@ -1237,53 +1329,6 @@ function closeFilterPane() {
   List.style.display = "flex"; 
   filter_pane.style.display = "none";
 }
-
-
-
-  
-// function updateValues() {
-  
-//     var valueSelect = document.getElementById("value");
-//     valueSelect.innerHTML = "";
-//     if (property === "color") {
-//       valueSelect.innerHTML += "<option value='red'>Red</option>";
-//       valueSelect.innerHTML += "<option value='green'>Green</option>";
-//       valueSelect.innerHTML += "<option value='blue'>Blue</option>";
-//     } else if (property === "size") {
-//       valueSelect.innerHTML += "<option value='small'>Small</option>";
-//       valueSelect.innerHTML += "<option value='medium'>Medium</option>";
-//       valueSelect.innerHTML += "<option value='large'>Large</option>";
-//     } else if (property === "material") {
-//       valueSelect.innerHTML += "<option value='cotton'>Cotton</option>";
-//       valueSelect.innerHTML += "<option value='polyester'>Polyester</option>";
-//       valueSelect.innerHTML += "<option value='wool'>Wool</option>";
-//     }
-//   }
-
-// // var filterValues = [];
-//   function submitForm() {
-//     var filterValues = []
-//     var property = document.getElementById("property").value;
-//     var value = document.getElementById("value").value;
-//     filterValues.push(property, value)
-//     console.log("Property: " + property);
-//     console.log("Value: " + value);
-//     return filterValues
-//   }
-
-// function to get current mapview values
-function getValues() {
-  let currentCenter = view.getCenter();
-  //console.log(currentCenter);
-  let currentZoom = view.getZoom();
-  //console.log(currentZoom);
-  let viewValues = {
-    currentCenter: currentCenter,
-    currentZoom: currentZoom
-  }
-  console.log(viewValues);
-  return viewValues;
-};
 
 /* *** utilization button and pane *** */
 const utilization = document.getElementById("utilization");

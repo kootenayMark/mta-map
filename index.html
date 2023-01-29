@@ -30,48 +30,25 @@
         <div id=filter-pane class="">
           <button id="filter-closer" class="close">&times;</button>
           <div id="form" class="">
-            <!-- <label class="" for="layer">Select Layer</label>
-            <select class="" id="layer-select" name="layer">
-              <option value="">Select Layer</option>
-            </select>
-            <br> -->
-            <label class="" for="Property">Select 1st attribute</label>
+            <label class="" for="Property">Select attribute</label>
             <select class="" id="property1" name="Property" >
               <option value="">Select Attributes</option>
             </select>
             <br>
-            <label class="" for="operator">Select operator</label>
-            <select class="" id="operator-select1" name="operator">
-              <option value="">Select operator</option>
+            <label id="string-label" class="values" for="value" >Select value</label>
+            <select multiple class="values" id="string-value" name="value" > 
             </select>
             <br>
-            <label class="" for="value">Select 1st value</label>
-            <select class="" id="value1" name="value">
-              <!-- <option value="">Select value</option> -->
-            </select>
-            <br>
-            <!-- <label class="" for="Property">Select 2nd attribute</label>
-            <select class="" id="property2" name="Property" >
-              <option value="">Select Attributes</option>
-            </select>
-            <br>
-            <label class="" for="operator">Select operator</label>
-            <select class="" id="operator-select2" name="operator">
-              <option value="">Select operator</option>
-            </select>
-            <br>
-            <label class="" for="value">Select 2nd value</label>
-            <select class="" id="value2" name="value"> -->
-              <!-- <option value="">Select value</option> -->
-            <!--</select>
-            <br> -->
-            <!-- <label class="" for="value">Enter Value</label>
-            <input type="text" class="" id="value" name="value">
-            <br> -->
+            <div id="range-input" class="values">
+              <label id="low-number-label" class="" for="value" >Enter Lower Value</label>
+              <input type="number" id="low-number-value" class="numberInput" name="value" >
+              <br>
+              <label id="high-number-label" class="" for="value" >Enter Upper Value</label>
+              <input type="number" id="high-number-value" class="numberInput" name="value" >
+            </div>
             <button id="filter-submit-btn" class="filter-btn" >Apply Filter</button>
             <button id="filter-clear-btn" class="filter-btn" >Remove Filter</button>
-            </div>
-          
+          </div>
         </div>
       </div>
       <div id='list-toggle'>
@@ -98,41 +75,11 @@
     </div>
     <button id="filter-button" class="right-panel-btn">Filter</button>
     <button id="uti-button" class="right-panel-btn">i</button>
-    
-    
-    <!-- <div id="filter-container">
-      <label for="property-select">Filter by:</label>
-      <select id="property-select"></select>
-      <label for="value-select">Value:</label>
-      <select id="value-select"></select>
-    </div> -->
-
-<!-- multi property filter -->    
-    <!-- <div id="filter-inputs">
-      <div class="filter-input">
-          <label>Property:</label>
-          <select class="property-select">
-              <option value="category">Category</option>
-              <option value="name">Name</option> -->
-              <!-- Add more options for properties here -->
-          <!-- </select>
-          <label>Values:</label>
-          <input type="text" class="value-input" placeholder="Enter values, separated by commas">
-      </div> -->
-      <!-- Add more filter inputs here -->
-      <!-- <button id="add-filter-btn">Add Filter</button>
-      <button id="filter-btn">Filter</button>
-  </div> -->
-  
+    <button id="filter-btn">Filter</button>
     <div id="popup" class="ol-popup">
       <a href="#" id="popup-closer" class="ol-popup-closer"></a>
       <ul id="popup-content"></ul>
     </div>
-    <!-- <div id="popup2" class="ol-popup">
-      <a href="#" id="popup-closer2" class="ol-popup-closer"></a>
-      <ul id="popup-content2"></ul>
-    </div>
-    <div id="info">&nbsp;</div> -->
     <div id = "table_data"> </div>
     <script type="module" src="./main.js"></script>
   </body>
