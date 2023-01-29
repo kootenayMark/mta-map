@@ -24,7 +24,6 @@ import TileWMS from 'ol/source/TileWMS';
 import BingMaps from 'ol/source/BingMaps.js';
 import * as olExtent from 'ol/extent';
 import { defaults } from 'ol/interaction';
-import {and} from 'ol/format/filter';
 import ImageWMS from 'ol/source/ImageWMS.js';
 import ImageLayer from 'ol/layer/Image';
 
@@ -39,7 +38,8 @@ const nameSpace = 'LCICLandInventory'
 const service = 'WFS'
 const version = '2.0.0'
 const request = 'GetFeature'
-const layerName = 'LCICLandInv_Weighted'
+const layerName = 'Development Potential'
+//const layerName = 'LCICLandInv_Weighted'
 const typeName = `${nameSpace}%3A${layerName}`
 const count = '1434'
 
@@ -106,44 +106,22 @@ async function getData1() {
   return fetch(featureLayerWFS)
   .then(res => res.json())
 }
+// console.log(geojsonObjWFS)
+// const geojsonStringWFS = JSON.stringify(geojsonObjWFS)
 var geojsonObjWFS_filtered = geojsonObjWFS;
-//   // operator combo
-// properties_select.addEventListener("change", function() {
-//   while (operator_select.options.length > 0) {
-//       operator.options.remove(0);
-//   }
-
-//   var value_type = type(this.value);
-//   console.log(value_type)
-//   var value_attribute = this.options[this.selectedIndex].text;
-//   operator.options.add(new Option("Select operator", ""));
-
-//   if (value_type == "xsd:short" || value_type == "xsd:int" || value_type == "xsd:double") {
-//       operator.options.add(new Option("Greater than", ">"));
-//       operator.options.add(new Option("Less than", "<"));
-//       operator.options.add(new Option("Equal to", "="));
-//   } else if (value_type == "xsd:string") {
-//       operator.options.add(new Option("Like", "ILike"));
-//   }
-// });
-
-// var selectedValue = valueSelect.value;
-  // console.log(selectedValue)
-  // var filter = new ol.format.Filter({
-  //   property: selectedProperty,
-  //   value: selectedValue
-  // });
-  // return filter
-  // // Apply filter to WFS layer
-  //landInvLayer_1.getSource().updateParams({'filter': filter});
-
 
 /* ***map Variables*** */
 const vectorSource = new VectorSource({
   format: new GeoJSON(),
   url: 'data:,' + encodeURIComponent(geojsonString)
 });
-//console.log(vectorSource);
+console.log(vectorSource);
+
+const vectorSourceWFS = new VectorSource({
+  features: new GeoJSON().readFeatures(geojsonObjWFS)
+});
+console.log(vectorSourceWFS);
+
 const vectorSourceWMS_1 = new ImageWMS({
   //url: `${geoServerDomain1}${nameSpace}/wms?`,
   url: 'http://51.79.71.43:8080/geoserver/wms',
@@ -160,10 +138,7 @@ const vectorSourceWMS_1 = new ImageWMS({
 //   url: 'data:,' + encodeURIComponent(geojsonStringWFS)
 // });
 // console.log(vectorSourceWFS_1);
-const vectorSourceWFS = new VectorSource({
-  features: new GeoJSON().readFeatures(geojsonObjWFS)
-});
-// console.log(vectorSourceWFS);
+
 
 //console.log(vectorSourceWFS_filtered);
 
@@ -208,8 +183,8 @@ const businessLayer = new VectorLayer({
   visible: true,
   source: vectorSource,
   //declutterMode: 'obstacle',
-  
 });
+console.log(businessLayer)
 
 // const landInvLayerWMS = new ImageLayer({
 //   title: 'Land Inventory WMS',
@@ -223,8 +198,8 @@ const landInvLayerWFS = new VectorLayer({
   style: styleFunction2, 
   visible: true,
   source: vectorSourceWFS,
-  
 });
+console.log(landInvLayerWFS)
 
 const view = new View({
   center: initialView, //trailandarea, 
@@ -262,7 +237,7 @@ var layerSwitcher = new LayerSwitcher({
 map.addControl(layerSwitcher);
 // sync(map); need to import ol-hashed if using
 
-/* *single property filter */
+/* *Land Inventory property filters */
 // Get the property select and value select elements
 var propertySelect = document.getElementById("property1");
 var filter_submit_btn = document.getElementById("filter-submit-btn");
@@ -279,7 +254,7 @@ var rangeArray;
 // Extract unique properties from GeoJSON object
 let properties = new Set();
 geojsonObjWFS.features.forEach(feature => {
-  const filterArray = ['zone_name', 'zone_admin', 'area_acres', 'ms_building', 'current_use', 'services_score_sum', 'utilization_score_weighted'];
+  const filterArray = ['pid', 'area_acres', 'zone_name', 'zone_admin', 'services_score_sum', 'services', 'ms_building', 'current_use', 'avg_slope', 'utilization_score_weighted'];
 
   Object.keys(feature.properties).forEach(property => {
     if(filterArray.includes(property)) {
@@ -438,7 +413,7 @@ function submitFilter() {
 
 function legend() {
     var src = document.getElementById("legend");
-    let getLegendWMS = "http://51.79.71.43:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=10&LAYER=LCICLandInventory:Land Inventory WMS&legend_options=fontName:Comfortaa;fontAntiAliasing:true;fontColor:0x000033;fontSize:8;bgColor:0x8e8d8d;dpi:180;";
+    let getLegendWMS = "https://geoserver.marktrueman.ca/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=10&LAYER=LCICLandInventory:Development Potential&legend_options=fontName:Comfortaa;fontAntiAliasing:true;fontColor:0x000033;fontSize:8;bgColor:0x8e8d8d;dpi:180;";
     var img = new Image();
     img.src = getLegendWMS;
     src.appendChild(img);
@@ -544,7 +519,7 @@ function styleFunction2 (feature) {
 let symbolValue = feature.get('utilization_score_weighted');
 const transparency = 0.4;
 
-const fillColors = ['215, 25, 28,', '229, 79, 53,', '243, 133, 78,', '254, 182, 106,', '254, 211, 140,', '255, 241, 175,', '239, 249, 177,', '207, 235, 145,', '174, 221, 114,', '128, 199, 95,', '77, 175, 80,']
+const fillColors = ['215, 25, 28,', '229, 79, 53,', '243, 133, 78,', '253, 181, 106,', '254, 211, 140,', '255, 240, 175,', '239, 248, 176,', '206, 234, 145,', '174, 220, 114,', '128, 199, 95,', '77, 174, 80,', '26, 150, 65,']
 const stroke_blk = new Stroke({
   color: 'black',
   width: 0.5,
@@ -560,11 +535,10 @@ let styles = [];
     });
     styles.push(style);
   }
-  if (symbolValue >= 5 && symbolValue <= 15) {
-    return [styles[symbolValue-5]];
+  if (symbolValue >= 8 && symbolValue <= 19) {
+    return [styles[symbolValue - 8]];
   }
 };
-
 
 /* ***popup*** */
 var container = document.getElementById('popup'),
@@ -1003,33 +977,19 @@ function multipolyPopupContent(feature) {
   var geometry = feature.getGeometry();
   var extent = geometry.getExtent()
   var poly_coord = olExtent.getCenter(extent);
+  var area_acres = feature.get('area_acres');
+  var rounded_area_acres = area_acres.toFixed(4);
+  var avg_slope = feature.get('avg_slope');
+  var rounded_avg_slope = avg_slope.toFixed(2);
   var content = `
     <h2 id= popup-pid class= landInv>PID - ${feature.get('pid')}</h2>
-    <h5 id=popup-legal class= landInv>Legal Description - ${feature.get('legal_description')}</h5>
-    <h5 id=popup-stated-area class= landInv>Stated Area - ${feature.get('stated_area')} Acres</h5>
-    <h5 id=popup-zone-name class= landInv>Zone - ${feature.get('zone_name')}</h5>
-    <h5 id=popup-zone-admin class= landInv>Zone Administration - ${feature.get('zone_admin')}</h5>
-    <h5 id=popup-water-service class= landInv>Water Service - ${feature.get('water_service')}</h5>
-    <h5 id=popup-sanitary-service class= landInv>Sanitary Service - ${feature.get('sanitary_service')}</h5>
-    <h5 id=popup-connectivity class= landInv>Connectivity - ${feature.get('connectivity')}</h5>
-    <h5 id=popup-flood-risk class= landInv>Flood Risk - ${feature.get('flood_risk')}</h5>
-    <h5 id=popup-environmental-remediation class= landInv>Environmental Remediation - ${feature.get('environmental_remediation')}</h5>
-    <h5 id=popup-electric-service class= landInv>Electrical Service - ${feature.get('electric_service')}</h5>
-    <h5 id=popup-natural-gas-service class= landInv>Natural Gas Service - ${feature.get('natural_gas_service')}</h5>
-    <h5 id=popup-ms-building class= landInv>Building Present - ${feature.get('ms_building')}</h5>
-    <h5 id=popup-size-threshold class= landInv>Greater than 0.3 Acres - ${feature.get('size_threshold(greaterthan0.3)')}</h5>
-    <h5 id=popup-zone-priority class= landInv>Zone Priority - ${feature.get('zone_priority')}</h5>
-    <h5 id=popup-current-use class= landInv>Current Usage - ${feature.get('current_use')}</h5>
-    <h5 id=popup-services class= landInv>Services - ${feature.get('services')}</h5>
-    <h5 id=popup-avg-slope class= landInv>Average Slope - ${feature.get('avg_slope')}</h5>
-    <h5 id=popup-civic-id class= landInv>Civic Id - ${feature.get('civic_id')}</h5>
-    <h5 id=popup-full-addr class= landInv>Address - ${feature.get('full_addr')}</h5>
-    <h5 id=popup-name-alias class= landInv>Name Alias - ${feature.get('name_alias')}</h5>
-    <h5 id=popup-notes class= landInv>Property Notes - ${feature.get('notes')}</h5>
-    <h5 id=popup-services-score-sum class= landInv>Services Sum - ${feature.get('services_score_sum')}</h5>
-    <h5 id=popup-utilization-score-basic class= landInv>Utilization Score Basic - ${feature.get('utilization_score_basic')}</h5>
-    <h5 id=popup-utilization-score-services class= landInv>Utilization Score Services - ${feature.get('utilization_score_services')}</h5>
-    <h5 id=popup-utilization-score-weighted class= landInv>Utilization Score Weighted - ${feature.get('utilization_score_weighted')}</h5>  
+    <h5 id=popup-shape-area class= landInv>AREA (acres) - ${rounded_area_acres}</h5>
+    <h5 id=popup-zone-name class= landInv>ZONE - ${feature.get('zone_name')}</h5>
+    <h5 id=popup-zone-admin class= landInv>ZONE ADMINISTRATION - ${feature.get('zone_admin')}</h5>
+    <h5 id=popup-current-use class= landInv>CURRENT USAGE - ${feature.get('current_use')}</h5>
+    <h5 id=popup-services class= landInv>SERVICES - ${feature.get('services')}</h5>
+    <h5 id=popup-avg-slope class= landInv>AVERAGE SLOPE - ${rounded_avg_slope}</h5>
+    <h5 id=popup-utilization-score-weighted class= landInv>DEVELOPMENT SCORE (Weighted) - ${feature.get('utilization_score_weighted')}</h5>  
   `;
   content_element.innerHTML = content;
   overlay.setPosition(poly_coord);

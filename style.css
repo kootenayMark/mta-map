@@ -250,10 +250,11 @@ td {
   box-shadow: 0 1px 4px rgba(0,0,0,0.2);
   padding: 15px;
   border-radius: 10px;
-  border: 1px solid black;
+  border: 1px solid #8e8d8d;
   bottom: 12px;
   left: -50px;
   min-width: 280px;
+  box-shadow: 5px 5px 5px  #8e8d8d;
 }
 .ol-popup:after, .ol-popup:before {
   top: 100%;
@@ -410,9 +411,9 @@ select {
 .right-panel-btn {
   position: absolute;
   font-weight: bold;
-  color: #f6921b;
+  color: black;
   font-size: 1em;
-  background-color: #8e8d8d;
+  background-color: #f6921b;
   width:1.5em;
   height: 1.5em;
   border: none;
@@ -422,6 +423,7 @@ select {
   width: fit-content;
   right: 0.9em;
   top: 5.5em;
+  background-color: #8e8d8d;
 } 
 #filter-pane {
   display: none;
