@@ -360,11 +360,9 @@ input[type="radio"]:checked {
 input[type="checkbox"]:checked {
   accent-color: #f6921b;
 }
-
 ul li{
   cursor:pointer;
 }
-
 
 /* *** Filter Styles *** */
 .values {
@@ -383,7 +381,6 @@ label {
   display: block;
   margin-bottom: 10px;
 }
-
 /* Select styles */
 select {
   width: 100%;
@@ -410,7 +407,6 @@ select {
   padding: 0.5em;
   margin: 1em 0;
 }
-
 .right-panel-btn {
   position: absolute;
   font-weight: bold;
@@ -422,7 +418,6 @@ select {
   border: none;
   border-radius: 3px;
 }
-
 #filter-button {
   width: fit-content;
   right: 0.9em;
@@ -480,16 +475,22 @@ select {
   background-color: #f6921b;
 }
 #legend {
-  display:absolute;
-  padding: 1em;
-  right: 20em;
-  bottom: 20em;
+  position:absolute;
+  padding: 0.7em;
+  /* right: 20em;
+  bottom: 20em; */
+  right: 0.9em;
+  bottom: 3em;
   color: black;
   background-color: #8e8d8d;
-  max-width: 10em;
+  max-width: 5.5em;
   max-height: 20em;
   overflow-y: auto;
   border-radius: 4px;
+}
+#legend > h5 {
+  margin: 0 0;
+  padding: 5px 0;
 }
 /* Style the scrollbar background */
 ::-webkit-scrollbar {

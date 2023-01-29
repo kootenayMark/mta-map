@@ -314,10 +314,7 @@ propertySelect.addEventListener("change", function() {
   geojsonObjWFS.features.forEach(feature => {
     if(feature.properties[selectedProperty]) 
       values.add(feature.properties[selectedProperty]);
-      
   });
-  
- 
   // Add options to the value select
   values.forEach(value => {
     if (typeof value === 'string') {
@@ -432,34 +429,48 @@ function submitFilter() {
     }  
 };
 
+// const wmsSource = new ImageWMS({
+//   url: 'http://51.79.71.43:8080/geoserver/wms',
+//   params: {'LAYERS': 'LCICLandInventory:Land Inventory WMS'},
+//   ratio: 1,
+//   serverType: 'geoserver',
+// });
+
 function legend() {
-    document.querySelector("#legend").innerHTML = "";
-    var no_layers = overlays.getLayers().get("length");
-    var head = document.createElement("h4");
-    var txt = document.createTextNode("Legend");
-    head.appendChild(txt);
-    var element = document.getElementById("legend");
-    element.appendChild(head);
-    var ar = [];
-    for (var i = 0; i < no_layers; i++) {
-        ar.push(
-            "http://51.79.71.43:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=10&LAYER=" +
-                overlays.getLayers().item(i).get("title") + 
-                "&legend_options=fontName:Comfortaa;fontAntiAliasing:true;fontColor:0x000033;fontSize:8;bgColor:0x8e8d8d;dpi:180;"
-        );
-    }
-    for (var i = 0; i < no_layers; i++) {
-        var head = document.createElement("p");
-        var txt = document.createTextNode(overlays.getLayers().item(i).get("title"));
-        head.appendChild(txt);
-        var element = document.getElementById("legend");
-        element.appendChild(head);
-        var img = new Image();
-        img.src = ar[i];
-        var src = document.getElementById("legend");
-        src.appendChild(img);
-    }
+    var src = document.getElementById("legend");
+    let getLegendWMS = "http://51.79.71.43:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=10&LAYER=LCICLandInventory:Land Inventory WMS&legend_options=fontName:Comfortaa;fontAntiAliasing:true;fontColor:0x000033;fontSize:8;bgColor:0x8e8d8d;dpi:180;";
+    var img = new Image();
+    img.src = getLegendWMS;
+    src.appendChild(img);
 }
+// function legend() {
+//     document.querySelector("#legend").innerHTML = "";
+//     var no_layers = overlays.getLayers().get("length");
+//     var head = document.createElement("h4");
+//     var txt = document.createTextNode("Legend");
+//     head.appendChild(txt);
+//     var element = document.getElementById("legend");
+//     element.appendChild(head);
+//     var ar = [];
+//     for (var i = 0; i < no_layers; i++) {
+//         ar.push(
+//             "http://51.79.71.43:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=10&HEIGHT=10&LAYER=" +
+//             'LCICLandInventory:Land Inventory WMS' + 
+//                 "&legend_options=fontName:Comfortaa;fontAntiAliasing:true;fontColor:0x000033;fontSize:8;bgColor:0x8e8d8d;dpi:180;"
+//         );
+//     }
+//     for (var i = 0; i < no_layers; i++) {
+//         var head = document.createElement("p");
+//         var txt = document.createTextNode(overlays.getLayers().item(i).get("title"));
+//         head.appendChild(txt);
+//         var element = document.getElementById("legend");
+//         element.appendChild(head);
+//         var img = new Image();
+//         img.src = ar[i];
+//         var src = document.getElementById("legend");
+//         src.appendChild(img);
+//     }
+// }
 legend();
 
 // var newRes =""
