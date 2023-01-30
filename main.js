@@ -1054,6 +1054,16 @@ addEventListener("change", function() {
     legend_wrapper.classList.add("hidden");
   }
 });
+
+map.getView().on("change:resolution", function() {
+  var resolution = map.getView().getResolution();
+  if (resolution > 120) {
+    legend_wrapper.classList.add("hidden");
+  } else {
+    legend_wrapper.classList.remove("hidden");
+  }
+});
+
 // function legend() {
 //     document.querySelector("#legend").innerHTML = "";
 //     var no_layers = overlays.getLayers().get("length");
