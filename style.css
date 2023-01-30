@@ -468,6 +468,10 @@ select {
   left: 0px;
   overflow-y: auto;
 }
+#filter-pane > h1 {
+  color: #f6921b;
+  line-height: 1.5em;
+}
 /* splash screen styles */
 #utilization {
   padding: 0;
