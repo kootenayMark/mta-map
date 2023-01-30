@@ -361,7 +361,10 @@ div.ol-unselectable:nth-child(6) {
   background-image: url('https://marktrueman.ca/wp-content/uploads/2022/12/layerSwitcher_blk_sm.png') !important;
   background-position: center center !important;
   background-color: black !important;
-  border-radius: 5px;
+  border-radius: 5px !important;
+  border: 1px solid #8e8d8d !important;
+  background-size: 34px;
+  background-position: center; 
 }
 .layer-switcher .panel {
   position: relative !important;
@@ -438,17 +441,22 @@ select {
   color: black;
   font-size: 1em;
   background-color: #f6921b;
-  width:1.5em;
-  height: 1.5em;
+  width: 2em;
+  height: 2em;
   border: none;
-  border-radius: 3px;
+  border-radius: 5px;
   z-index: 0;
 }
 #filter-button {
+  color: #8e8d8d;
   width: fit-content;
+  height: 2em;
   right: 0.9em;
-  top: 5.5em;
-  background-color: #8e8d8d;
+  top: 4.8em;
+  background-color: black;
+  border: 1px solid #8e8d8d;
+  cursor: pointer;
+  font-weight: 500;
 } 
 #filter-pane {
   display: none;
@@ -497,11 +505,14 @@ select {
 }
 #uti-button {
   right: 0.9em;
-  top: 8em;
+  top: 7.7em;
   color:black;
-  background-color: #f6921b;
-  background-image: url(https://marktrueman.ca/wp-content/uploads/2023/01/icons8-info-67.png);
-  background-size: cover; 
+  background-color: black;
+  background-image: url(https://marktrueman.ca/wp-content/uploads/2023/01/info_icon_org.png);
+  background-size: 28px; 
+  background-position: center; 
+  border: 1px solid #8e8d8d;
+  cursor: pointer;
 }
 /* #uti-button img {
   width: 100%;
@@ -512,20 +523,25 @@ select {
 #legend-button {
   right: 0.9em;
   top: 10.5em;
-  color:black;
-  background-color: #f6921b;
-  background-image: url(https://marktrueman.ca/wp-content/uploads/2023/01/250121-200.png);
-  background-size: cover; 
+  background-color: black;
+  background-image: url(https://marktrueman.ca/wp-content/uploads/2023/01/legend_icon_red.png);
+  background-size: 24px; 
+  background-position: center; 
+  background-repeat: no-repeat;
+  border: 1px solid #8e8d8d;
+  cursor: pointer;
 }
 #legend-wrapper {
   position:absolute;
   right: 0.9em;
   bottom: 3em;
-  color: black;
-  background-color: #8e8d8d;
+  color: #8e8d8d;
+  background-color: black;
   max-width: 7.4em;
   max-height: 20em;
-  border-radius: 4px;
+  border-radius: 5px;
+  box-shadow: 3px 3px 3px  #8e8d8d;
+  border: 1px solid #8e8d8d;
 }
 #legend {
   position: relative;
@@ -536,13 +552,15 @@ select {
   line-height: 1.5em;
   margin: 0;
   padding: 10px 0 5px 0;
+  color:#f6921b;
 }
 #legend-closer {
+  color:#EC2034;
   font-size: 20px;
   position: absolute;
   top: -2px;
   left: 75%;
-  background-color: #8e8d8d;
+  background-color: black;
 }
 /* Style the scrollbar background */
 ::-webkit-scrollbar {
