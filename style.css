@@ -475,12 +475,22 @@ select {
   top: 8em;
   color:black;
   background-color: #f6921b;
+  background-image: url(https://marktrueman.ca/wp-content/uploads/2023/01/icons8-info-67.png);
+  background-size: cover; 
 }
+/* #uti-button img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  
+} */
 #legend-button {
   right: 0.9em;
   top: 10.5em;
   color:black;
   background-color: #f6921b;
+  background-image: url(https://marktrueman.ca/wp-content/uploads/2023/01/250121-200.png);
+  background-size: cover; 
 }
 #legend-wrapper {
   position:absolute;
@@ -509,12 +519,12 @@ select {
   left: 75%;
   background-color: #8e8d8d;
 }
-#a0e6d706-9129-4318-917b-a15705e83137:checked + .legend {
+/* #d2c5253c-2bed-4c8a-8097-1f7fd2502288:checked + .legend-checkbox {
   display: block;
 }
-#a0e6d706-9129-4318-917b-a15705e83137:not(:checked) + .legend {
+#d2c5253c-2bed-4c8a-8097-1f7fd2502288:not(:checked) + .legend-checkbox {
   display: none;
-}
+} */
 /* Style the scrollbar background */
 ::-webkit-scrollbar {
   background: black;

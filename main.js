@@ -29,6 +29,7 @@ import ImageLayer from 'ol/layer/Image';
 
 
 const markerURL ='https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_xsm-1.png'
+const infoIcon = 'https://marktrueman.ca/wp-content/uploads/2023/01/icons8-info-67.png'
 const businessLayerURL = "https://opensheet.elk.sh/19o_WmjjKn1ZE1940Brh9VrD9gaTyStMTF-kwbz2LJm4/elements"
 
 /* ****geoserver layer parameters**** */
@@ -926,6 +927,7 @@ uti_closer.addEventListener("click", function() {
 const legend_wrapper = document.getElementById("legend-wrapper");
 const legend_button = document.getElementById("legend-button");
 const legend_closer = document.getElementById("legend-closer");
+
 legend_button.addEventListener("click", function() {  
   if (legend_wrapper.style.display === "block") {
     legend_wrapper.style.display = "none";
@@ -948,6 +950,15 @@ function legend() {
   img.src = getLegendWMS;
   src.appendChild(img);
 }
+legend();
+
+addEventListener("change", function() {
+  if (landInvLayerWFS.getVisible() === true) {
+    legend_wrapper.classList.remove("hidden");
+  } else {
+    legend_wrapper.classList.add("hidden");
+  }
+});
 // function legend() {
 //     document.querySelector("#legend").innerHTML = "";
 //     var no_layers = overlays.getLayers().get("length");
@@ -974,7 +985,7 @@ function legend() {
 //         src.appendChild(img);
 //     }
 // }
-legend();
+
 // window.onresize = function()
 // {
 //   setTimeout( function() { map.updateSize();}, 300);
