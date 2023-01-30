@@ -929,18 +929,14 @@ const legend_button = document.getElementById("legend-button");
 const legend_closer = document.getElementById("legend-closer");
 
 legend_button.addEventListener("click", function() {  
-  if (legend_wrapper.style.display === "block") {
-    legend_wrapper.style.display = "none";
+  if (legend_wrapper.classList.contains("hidden")) {
+    legend_wrapper.classList.remove("hidden");
   } else {
-    legend_wrapper.style.display = "block";
+    legend_wrapper.classList.add("hidden");
   }
 });
 legend_closer.addEventListener("click", function() {  
-  if (legend_wrapper.style.display === "block") {
-    legend_wrapper.style.display = "none";
-  } else {
-    legend_wrapper.style.display = "block";
-  }
+    legend_wrapper.classList.add("hidden");
 });
 
 function legend() {
