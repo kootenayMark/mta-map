@@ -208,6 +208,11 @@ td {
   font-size: 1em;
   cursor: pointer;
 }
+.tags.active {
+  background-color: #f6921b;
+  color: black;
+  font-weight: bold;
+}
 /* styles for switching panes */
 .close {
   display: block;
@@ -539,12 +544,6 @@ select {
   left: 75%;
   background-color: #8e8d8d;
 }
-/* #d2c5253c-2bed-4c8a-8097-1f7fd2502288:checked + .legend-checkbox {
-  display: block;
-}
-#d2c5253c-2bed-4c8a-8097-1f7fd2502288:not(:checked) + .legend-checkbox {
-  display: none;
-} */
 /* Style the scrollbar background */
 ::-webkit-scrollbar {
   background: black;

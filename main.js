@@ -119,11 +119,12 @@ async function getData1() {
   return fetch(featureLayerWFS)
   .then(res => res.json())
 }
-console.log(geojsonObjWFS)
-// const geojsonStringWFS = JSON.stringify(geojsonObjWFS)
+//console.log(geojsonObjWFS)
+
 var geojsonObjWFS_filtered = geojsonObjWFS;
-// var pointArrFeatureCollection_filtered = pointArrFeatureCollection
-// console.log(pointArrFeatureCollection_filtered)
+var geojsonObj_filtered;
+console.log(geojsonObj_filtered)
+var businessLayer_filtered;
 
 /* ***map Variables*** */
 const vectorSource = new VectorSource({
@@ -198,7 +199,6 @@ const businessLayer = new VectorLayer({
   style: styleFunction,
   visible: true,
   source: vectorSource,
-  //declutterMode: 'obstacle',
 });
 // console.log(businessLayer)
 
@@ -439,7 +439,6 @@ function submitFilter() {
       filteredFeatures = geojsonObjWFS.features.filter(function(feature) {
         return filterValues.includes(feature.properties[property]);
       });
-
     }
     console.log(filteredFeatures)
     return {
@@ -461,7 +460,7 @@ function submitFilter() {
 
 let imageCache = {}
 function styleFunction (feature, resolution) {
-  console.log(resolution)
+  // console.log(resolution)
   const resolutionThreshold_1 = 30;
   const resolutionThreshold_2 = 1.1;
   const resolutionThreshold_3 = 0.9;
@@ -764,61 +763,65 @@ for (let i =0; i < filter_businessATT_jsonObj.length; i++) {
       };
       // create buttons from tags (add filter function later)
       if (th.id == 'tags') {
-        tags.forEach(function (t, index) {
+        tags.forEach(function (tag, index) {
           let tagButton = document.createElement('button');
-          tagButton.id = `tag_${t}_${index}`; 
+          tagButton.id = `tag_${tag}_${index}`; 
           tagButton.className = "tags";
-          tagButton.innerHTML = t;
+          tagButton.innerHTML = tag;
           td.appendChild(tagButton);
           
           /** Tag Filter */
-    //       tagButton.addEventListener("click", function() {
-    //         pointArrFeatureCollection_filtered = filterTag();
+          tagButton.addEventListener("click", function() {
+            if (tagButton.classList.contains("active")) {
+              tagButton.classList.remove("active");
+            } else {
+              tagButton.classList.add("active");
+            }
+            geojsonObj_filtered = filterTag();
             
-    //         function filterTag () {
-    //           var filteredTags = pointArrFeatureCollection.features.filter(function(feature) {
-    //             return t.includes(feature.properties.tags);
-    //             //console.log(tags)
-    //             //return re.test(tags);
-    //           });console.log(filteredTags)
-    //         return {
-    //             "type": "FeatureCollection",
-    //             "features": filteredTags
-    //         };
-    //         };
-    //         // view.animate({
-    //         //   center: westkootenay,
-    //         //   zoom: 9,
-    //         //   duration: 3000,
-    //         //   constrainResolution: true
-    //         // });
-    //         var geojsonString_filtered = JSON.stringify(pointArrFeatureCollection_filtered)
-    //         console.log(geojsonString_filtered)
-    //         const vectorSource_filtered = new VectorSource({
-    //           format: new GeoJSON(),
-    //           url: 'data:,' + encodeURIComponent(geojsonString_filtered)
-    //         });
-    //         let businessLayer_filtered = new VectorLayer({
-    //           title: 'Businesses Filtered',
-    //           style: styleFunction, 
-    //           visible: true,
-    //           source: vectorSource_filtered,
-    //         });
+            function filterTag () {
+              //console.log(tag)
+              var filteredTags;
+              filteredTags = geojsonObj.features.filter(function(feature) {
+                if (feature.properties.tags) {
+                  return feature.properties.tags.includes(tag);   
+                } else {
+                  console.error("Tags property is not defined in this feature.")
+                }          
+              });
+              return {
+                "type": "FeatureCollection",
+                "features": filteredTags,
+                "crs": {
+                  "type": "name",
+                  "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
+                }
+              };
+            };
+            view.animate({
+              center: westkootenay,
+              zoom: 9,
+              duration: 3000,
+            });
 
-    //         map.getLayers().remove(businessLayer) 
-    //         map.getLayers().push(businessLayer_filtered)
-
-    //         // filter_clear_btn.addEventListener("click", function() {
-    //         //   propertySelect.value = "";
-    //         //   string_value.value = "";
-    //         //   string_label.style.display = "none"
-    //         //   string_value.style.display = "none"
-    //         //   range_input.style.display = "none"
-              
-    //         //   getLayers().remove(businessLayer_filtered)
-    //         //   getLayers().push(businessLayer)
-    //         // });
-    //       });
+            const vectorSource_filtered = new VectorSource({
+              features: new GeoJSON().readFeatures(geojsonObj_filtered)
+            });
+            if (!businessLayer_filtered) {
+              businessLayer_filtered = new VectorLayer({
+              title: 'Businesses Filtered',
+              style: styleFunction, 
+              visible: true,
+              source: vectorSource_filtered,
+            });
+            map.addLayer(businessLayer_filtered)
+            map.removeLayer(businessLayer)
+            } else {
+              map.removeLayer(businessLayer_filtered)
+              businessLayer_filtered = null;
+              map.addLayer(businessLayer)
+            }
+          });
          });    
        };
      };
