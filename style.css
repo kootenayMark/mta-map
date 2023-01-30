@@ -206,6 +206,7 @@ td {
   padding: 0.2em 0.3em 0.3em 0.3em;
   margin: 0.1em;
   font-size: 1em;
+  cursor: pointer;
 }
 /* styles for switching panes */
 .close {
@@ -325,15 +326,30 @@ hr.rounded {
   text-align: left;
 }
 
-/* Layer Switcher Styles */
-div.ol-unselectable:nth-child(5) {
-  top:1.5em;
+/* ol controls styles */
+.search-bar{
+  top: 10px;
+  left: 3em;
+  border-radius: 5px;
 }
+.ol-touch .search-bar {
+  top: 10px;
+}
+div.ol-unselectable:nth-child(5) {
+  top: 0.5em !important;
+}
+
+/* Layer Switcher Styles */
+div.ol-unselectable:nth-child(6) {
+  top: 1.5em !important;
+  right: 0.9em;
+}
+/* div.ol-unselectable:nth-child(6) > button:nth-child(1)
 div.ol-unselectable:nth-child(6) {
   border-radius: 5px !important;
   /* padding: 2px 3px 2px 0px !important; */
-  background-color: black !important;
-}
+  /*background-color: black !important;
+} */
 .layer-switcher button {
   display: block;
   margin: auto;
@@ -343,9 +359,12 @@ div.ol-unselectable:nth-child(6) {
   border-radius: 5px;
 }
 .layer-switcher .panel {
+  position: relative !important;
   border-color: black !important;
   background-color: black !important;
   color: #8e8d8d !important;
+  z-index: 10 !important;
+  border-radius: 5px !important;
 }
 li.group:nth-child(1) > label:nth-child(2) {
   color: #f6921b;
@@ -418,6 +437,7 @@ select {
   height: 1.5em;
   border: none;
   border-radius: 3px;
+  z-index: 0;
 }
 #filter-button {
   width: fit-content;
