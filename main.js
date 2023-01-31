@@ -519,7 +519,7 @@ var rangeArray;
 // Extract unique properties from GeoJSON object
 let properties = new Set();
 geojsonObjWFS.features.forEach(feature => {
-  const filterArray = ['pid', 'area_acres', 'zone_name', 'zone_admin', 'services_score_sum', 'services', 'ms_building', 'current_use', 'avg_slope', 'utilization_score_weighted'];
+  const filterArray = ['pid', 'area_acres', 'zone_name', 'zone_admin', 'services', 'current_use', 'avg_slope', 'development_score_weighted'];
 
   Object.keys(feature.properties).forEach(property => {
     if(filterArray.includes(property)) {
@@ -744,7 +744,7 @@ function styleFunction (feature, resolution) {
    
 function styleFunction2 (feature) {
 
-let symbolValue = feature.get('utilization_score_weighted');
+let symbolValue = feature.get('development_score_weighted');
 const transparency = 0.4;
 
 const fillColors = ['215, 25, 28,', '229, 79, 53,', '243, 133, 78,', '253, 181, 106,', '254, 211, 140,', '255, 240, 175,', '239, 248, 176,', '206, 234, 145,', '174, 220, 114,', '128, 199, 95,', '77, 174, 80,', '26, 150, 65,']
@@ -842,7 +842,7 @@ function multipolyPopupContent(feature) {
     <h5 id=popup-current-use class= landInv>CURRENT USAGE - ${feature.get('current_use')}</h5>
     <h5 id=popup-services class= landInv>SERVICES - ${feature.get('services')}</h5>
     <h5 id=popup-avg-slope class= landInv>AVERAGE SLOPE - ${rounded_avg_slope}</h5>
-    <h5 id=popup-utilization-score-weighted class= landInv>DEVELOPMENT SCORE (Weighted) - ${feature.get('utilization_score_weighted')}</h5>  
+    <h5 id=popup-development-score-weighted class= landInv>DEVELOPMENT SCORE (Weighted) - ${feature.get('development_score_weighted')}</h5>  
   `;
   content_element.innerHTML = content;
   overlay.setPosition(poly_coord);
