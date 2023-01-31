@@ -1,19 +1,17 @@
 import './style.css';
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
-import Stroke from 'ol/style/Stroke.js';
 import {Map, View} from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
-import Vector from 'ol/source/OSM';
 import VectorLayer from 'ol/layer/Vector';
 import Overlay from 'ol/Overlay';
 import GeoJSON from 'ol/format/GeoJSON';
-import {Icon, Circle, Style, Fill} from 'ol/style';
+import {Icon, Circle, Style, Fill, Stroke} from 'ol/style';
 // import sync from 'ol-hashed'; // need to import if using sync
 import Feature from 'ol/feature';
 import { fromLonLat } from 'ol/proj';
+import {toLonLat} from 'ol/proj';
 import {Control, defaults as defaultControls} from 'ol/control';
-import FullScreen from 'ol/control/FullScreen';
 import {Vector as VectorSource, WMTS} from 'ol/source';
 import { clone, intersectsSegment } from 'ol/extent';
 import XYZ from 'ol/source/XYZ';
@@ -23,10 +21,11 @@ import { BaseLayerOptions, GroupLayerOptions } from 'ol-layerswitcher';
 import TileWMS from 'ol/source/TileWMS';
 import BingMaps from 'ol/source/BingMaps.js';
 import * as olExtent from 'ol/extent';
-import { defaults } from 'ol/interaction';
 import ImageWMS from 'ol/source/ImageWMS.js';
 import ImageLayer from 'ol/layer/Image';
-import IconImageCache from 'ol/style/IconImageCache'; 
+import LineString from 'ol/geom/LineString.js';
+import {getCenter} from 'ol/extent';
+
 
 const markerURL ='https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_xsm-1.png'
 const infoIcon = 'https://marktrueman.ca/wp-content/uploads/2023/01/icons8-info-67.png'
@@ -69,7 +68,7 @@ const rosslandandarea = fromLonLat([-117.80493087932007, 49.078833201701485])
 const regions = [
   {region:'British Columbia', id: 0, coords: britishcolumbia, zoom: 7.5},
   {region:'West Kootenay', id: 1, coords: westkootenay, zoom: 9},
-  {region:'Trail and Area', id: 2, coords: trailandarea, zoom: 12.6},
+  {region:'Trail and Area', id: 2, coords: trailandarea, zoom: 12.4},
   {region:'Castlegar and Area', id: 3, coords: castlegarandarea, zoom: 12},
   {region:'Nelson and Area', id: 4, coords: nelsonandarea, zoom: 13.5},
   {region:'Rossland and Area', id: 5, coords: rosslandandarea, zoom: 15}
@@ -238,40 +237,258 @@ var overlays = new LayerGroup({
 //   layers: [businessLayer]
 // })
 
-class Search extends Control {
-  /**
-   * @param {Object} [opt_options] Control options.
-   */
-  constructor(opt_options) {
-    const options = opt_options || {};
+// class Search extends Control {
+//   /**
+//    * @param {Object} [opt_options] Control options.
+//    */
+//   constructor(opt_options) {
+//     const options = opt_options || {};
     
-    const element = document.createElement('div');
-    const searchInput = document.createElement('input');
-    searchInput.setAttribute("type", "text");
-    searchInput.setAttribute("id", "search-input");
-    searchInput.setAttribute("placeholder", "Search...");
-    searchInput.classList.add("search-bar");
+//     const element = document.createElement('div');
+//     const searchInput = document.createElement('input');
+//     searchInput.setAttribute("type", "text");
+//     searchInput.setAttribute("id", "search-input");
+//     searchInput.setAttribute("placeholder", "Search...name, tag, keyword");
+//     searchInput.classList.add("search-bar");
     
-    element.className = 'search-bar ol-unselectable ol-control';
-    element.appendChild(searchInput);
+//     element.className = 'search-bar ol-unselectable ol-control';
+//     element.appendChild(searchInput);
 
-    super({
-      element: element,
-      target: options.target,
+//     super({
+//       element: element,
+//       target: options.target,
+//     });
+//     searchInput.addEventListener("change", function(event) {
+//       console.log("The input value has changed: " + event.target.value);
+//     });
+//     //button.addEventListener('click', this.handleRotateNorth.bind(this), false);
+//   }
+
+//   Search() {
+//     //this.getMap().getView().setRotation(0);
+//   }
+// }
+// var maptag;
+// class TagSearch extends Control {
+//   /**
+//    * @param {Object} [opt_options] Control options.
+//    */
+//   constructor(opt_options) {
+//     const options = opt_options || {};
+    
+//     const element = document.createElement('div');
+//     const tag_dropdown_select = document.createElement('select');    
+//     let defaultOption = document.createElement('option');
+//     let option = document.createElement('option');
+
+//     const tagsArray = []
+//     jsonObj.forEach(item => {
+//       if (item.hasOwnProperty("tags")) {
+//         let tags = item.tags.split("|");
+//         tagsArray.push(...tags);
+//       }
+//     });
+//     let uniqueTags = [...new Set(tagsArray)]; // use Set to store unique values and convert it to array
+
+//     tag_dropdown_select.setAttribute("id", "tag-dropdown-select");
+//     tag_dropdown_select.classList.add("tag-dropdown-select");
+
+//     defaultOption.id = "default-text"
+//     defaultOption.value = ""
+//     defaultOption.text = "Select tag to filter by"
+//     defaultOption.disabled = true;
+//     defaultOption.selected = true;
+//     tag_dropdown_select.add(defaultOption);
+
+//     element.className = 'tag-dropdown-toggle ol-unselectable ol-control';
+    
+//     uniqueTags.forEach(tag => {
+//       option = document.createElement("option");
+//       option.value = tag;
+//       option.innerHTML = tag;
+//       tag_dropdown_select.appendChild(option);
+//     });
+    
+//     element.appendChild(tag_dropdown_select);
+
+//     super({
+//       element: element,
+//       target: options.target,
+//     });
+//     tag_dropdown_select.addEventListener("change", function(event) {
+//       console.log("The input value has changed: " + event.target.value);
+//       maptag = event.target.value;
+
+//       geojsonObj_filtered = new TagSearch();
+
+//       const vectorSource_filtered = new VectorSource({
+//         features: new GeoJSON().readFeatures(geojsonObj_filtered)
+//       });
+//       // let mapSize = map.getSize()
+//       // let filtered_extent = vectorSource_filtered.getExtent()
+//       // let filtered_center = getCenter(filtered_extent)
+//       // let filtered_res = getResolutionForExtent(filtered_extent, mapSize)
+//       // let filtered_zoom = getZoomForResolution(filtered_res)
+//       // console.log(filtered_res)
+//       // console.log(filtered_extent)
+//       // console.log(filtered_center)
+//         businessLayer_filtered = new VectorLayer({
+//         title: 'Businesses Filtered',
+//         style: styleFunction, 
+//         visible: true,
+//         source: vectorSource_filtered,
+//       });
+//       view.animate({
+//         center: trailandarea, //filtered_center,
+//         zoom: 9,
+//         duration: 3000,
+//       });
+//       map.addLayer(businessLayer_filtered)
+//       map.removeLayer(businessLayer)
+//     });
+//   }
+
+//   TagSearch() {
+//     console.log(maptag)
+//     var filteredTags;
+//     filteredTags = geojsonObj.features.filter(function(feature) {
+//       if (feature.properties.tags) {
+//         return feature.properties.tags.includes(maptag);   
+//       } else {
+//         console.error("Tags property is not defined in this feature.")
+//       }          
+//     });
+//     return {
+//       "type": "FeatureCollection",
+//       "features": filteredTags,
+//       "crs": {
+//         "type": "name",
+//         "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
+//       }
+//     };
+//   }
+// }
+var maptag;
+    //const element = document.createElement('div');
+    const tag_filter_wrapper = document.getElementById('tag-filter-wrapper')
+    const tag_dropdown_select = document.createElement('select');    
+    let defaultOption = document.createElement('option');
+    let option = document.createElement('option');
+
+    const tagsArray = []
+    jsonObj.forEach(item => {
+      if (item.hasOwnProperty("tags")) {
+        let tags = item.tags.split("|");
+        tagsArray.push(...tags);
+      }
     });
-    searchInput.addEventListener("change", function(event) {
+    let uniqueTags = [...new Set(tagsArray)]; // use Set to store unique values and convert it to array
+
+    tag_dropdown_select.setAttribute("id", "tag-dropdown-select");
+    tag_dropdown_select.classList.add("tag-dropdown-select");
+
+    defaultOption.id = "default-text"
+    defaultOption.value = ""
+    defaultOption.text = "Select tag to filter by"
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    tag_dropdown_select.add(defaultOption);
+
+    //element.className = 'tag-dropdown-toggle ol-unselectable ol-control';
+    
+    uniqueTags.forEach(tag => {
+      option = document.createElement("option");
+      option.value = tag;
+      option.innerHTML = tag;
+      tag_dropdown_select.appendChild(option);
+    });
+    tag_filter_wrapper.appendChild(tag_dropdown_select)
+    //element.appendChild(tag_dropdown_select);
+
+    tag_dropdown_select.addEventListener("change", function(event) {
       console.log("The input value has changed: " + event.target.value);
+      maptag = event.target.value;
+
+      geojsonObj_filtered = new TagSearch();
+
+      const vectorSource_filtered = new VectorSource({
+        features: new GeoJSON().readFeatures(geojsonObj_filtered)
+      });
+        businessLayer_filtered = new VectorLayer({
+        title: 'Businesses Filtered',
+        style: styleFunction, 
+        visible: true,
+        source: vectorSource_filtered,
+      });
+      view.animate({
+        center: trailandarea, //filtered_center,
+        zoom: 9,
+        duration: 3000,
+      });
+      map.addLayer(businessLayer_filtered)
+      map.removeLayer(businessLayer)
     });
-    //button.addEventListener('click', this.handleRotateNorth.bind(this), false);
+
+function TagSearch() {
+    console.log(maptag)
+    var filteredTags;
+    filteredTags = geojsonObj.features.filter(function(feature) {
+      if (feature.properties.tags) {
+        return feature.properties.tags.includes(maptag);   
+      } else {
+        console.error("Tags property is not defined in this feature.")
+      }          
+    });
+    return {
+      "type": "FeatureCollection",
+      "features": filteredTags,
+      "crs": {
+        "type": "name",
+        "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
+      }
+    };
   }
 
-  Search() {
-    //this.getMap().getView().setRotation(0);
-  }
-}
+var tag_filter_closer = document.getElementById('tag-filter-closer');
+tag_filter_closer.addEventListener("click", function() {
+  map.removeLayer(businessLayer_filtered)
+  map.addLayer(businessLayer)
+  map.removeLayer(businessLayer_filtered)
+})
+
+// class TagClose extends Control {
+//   /**
+//    * @param {Object} [opt_options] Control options.
+//    */
+//   constructor(opt_options) {
+//     const options = opt_options || {};
+    
+//     const element = document.createElement('div');
+//     const tag_btn = document.createElement('button');
+//     tag_btn.setAttribute("id", "tag-clear");
+//     tag_btn.innerHTML = "Clear";
+//     tag_btn.classList.add("tag-clear");
+    
+//     element.className = 'tag-clear ol-unselectable ol-control';
+//     element.appendChild(tag_btn);
+
+//     super({
+//       element: element,
+//       target: options.target,
+//     });
+//     tag_btn.addEventListener("click", function(event) {
+//       console.log("The tag clear button has been clicked: " + event.target.value);
+
+//     });
+//   }
+
+//   TagClose() {
+//     //this.getMap().getView().setRotation(0);
+//   }
+// }
 
 const map = new Map({
-  controls: defaultControls().extend([new Search()]),
+  controls: defaultControls().extend([/*new TagSearch(), new TagClose(), new Search()*/ ]),
   target: 'map',
   layers: [baseMaps, overlays, businessLayer],
   view: view,
@@ -798,21 +1015,30 @@ for (let i =0; i < filter_businessATT_jsonObj.length; i++) {
                 }
               };
             };
-            view.animate({
-              center: westkootenay,
-              zoom: 9,
-              duration: 3000,
-            });
+            
 
             const vectorSource_filtered = new VectorSource({
               features: new GeoJSON().readFeatures(geojsonObj_filtered)
             });
+            let mapSize = map.getSize()
+            let filtered_extent = vectorSource_filtered.getExtent()
+            let filtered_center = getCenter(filtered_extent)
+            // let filtered_res = getResolutionForExtent(filtered_extent, mapSize)
+            // let filtered_zoom = getZoomForResolution(filtered_res)
+            // console.log(filtered_res)
+            // console.log(filtered_extent)
+            console.log(filtered_center)
             if (!businessLayer_filtered) {
               businessLayer_filtered = new VectorLayer({
               title: 'Businesses Filtered',
               style: styleFunction, 
               visible: true,
               source: vectorSource_filtered,
+            });
+            view.animate({
+              center: filtered_center,
+              zoom: 9,
+              duration: 3000,
             });
             map.addLayer(businessLayer_filtered)
             map.removeLayer(businessLayer)
@@ -955,19 +1181,7 @@ function regionCLick() {
   }
 };
 
-// function to get current mapview values
-function getValues() {
-  let currentCenter = view.getCenter();
-  //console.log(currentCenter);
-  let currentZoom = view.getZoom();
-  //console.log(currentZoom);
-  let viewValues = {
-    currentCenter: currentCenter,
-    currentZoom: currentZoom
-  }
-  // console.log(viewValues);
-  return viewValues;
-};
+
 
 /* **** Filter functions **** */
 
@@ -1050,14 +1264,37 @@ addEventListener("change", function() {
 });
 
 map.getView().on("change:resolution", function() {
-  var resolution = map.getView().getResolution();
-  if (resolution > 120) {
+  let resolution = map.getView().getResolution();
+  let coordinates = map.getView().getCenter()
+  let inventoryCenter = [-117.66993534984215, 49.100971359691975]
+  let latLong = toLonLat(coordinates)
+  // console.log(coordinates)
+  // console.log(inventoryCenter)
+  // console.log(latLong)
+  // const line = new LineString(latLong, inventoryCenter);
+  // console.log(line)
+  // const distance = line.getLength()
+  // console.log(distance)
+  if (resolution > 80) {
     legend_wrapper.classList.add("hidden");
   } else {
     legend_wrapper.classList.remove("hidden");
   }
 });
 
+// function to get current mapview values
+function getValues() {
+  let currentCenter = view.getCenter();
+  //console.log(currentCenter);
+  let currentZoom = view.getZoom();
+  //console.log(currentZoom);
+  let viewValues = {
+    currentCenter: currentCenter,
+    currentZoom: currentZoom
+  }
+  // console.log(viewValues);
+  return viewValues;
+};
 // window.onresize = function()
 // {
 //   setTimeout( function() { map.updateSize();}, 300);
