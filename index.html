@@ -11,9 +11,11 @@
     <div id="wrapper" class="">
       <div id="list-container">
         <nav id="list" >
-          <div id="mta_logo">
-            <img src="https://metaltechalley.com/wp-content/uploads/2021/08/MTA_Logo_NoTagLine-1024x140.png">
-          </div>
+          <a href="https://metaltechalley.com">
+            <div id="mta_logo">
+              <img src="https://metaltechalley.com/wp-content/uploads/2021/08/MTA_Logo_NoTagLine-1024x140.png">
+            </div>
+          </a>
           <dl id="groups" ></dl>
         </nav>
         <nav id="feature-list">
@@ -26,8 +28,7 @@
         </nav>
         <!--single property filter-->
         <div id=filter-pane class="">
-          <h1>Land Inventory Filter</h1>
-
+          <h1>Land Parcel Filter</h1>
           <button id="filter-closer" class="close">&times;</button>
           <div id="form" class="">
             <label class="" for="Property">Select attribute</label>
@@ -56,8 +57,9 @@
       </div>
       <div id="map" class="map">
         <div id="tag-filter-wrapper">
-        <button id="tag-filter-closer" class="close right-panel-btn">Clear Filter</button>
+          <button id="tag-filter-closer" class="close right-panel-btn"><p>Clear Business</p><p>Filter</p></button>
         </div>
+        
       </div>
     </div>
     <div id="legend-wrapper" class="legend-checkbox hidden">
@@ -83,10 +85,12 @@
         <p>Data accurate as of April 2022.</p>
       </div>
     </div>
-    <button id="filter-button" class="right-panel-btn">Filter</button>
+    <button id="filter-button" class="right-panel-btn">Land Parcel Filter</button>
     <button id="uti-button" class="right-panel-btn"></button>
     <button id="legend-button" class="right-panel-btn"></button>
     <button id="filter-btn">Filter</button>
+    <!-- <label for="transparency-slider">Land Parcel Transparency</label>
+    <input id="transparency-slider" type="range" min="0" max="1" step="0.1" value="0.4"/>  -->
     
     <div id="popup" class="ol-popup">
       <a href="#" id="popup-closer" class="ol-popup-closer"></a>
