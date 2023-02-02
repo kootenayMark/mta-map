@@ -1302,16 +1302,14 @@ map.getView().on("change:resolution", function() {
     legend_wrapper.classList.remove("hidden");
   }
 
-addEventListener("change", function() {
+  document.addEventListener("change", function() {
   console.log(landInvLayerWFS.getVisible())
-  if (landInvLayerWFS.getVisible() === true) {
-    legend_wrapper.classList.remove("hidden");
-  } else {
+  if (landInvLayerWFS.getVisible() === false && resolution > 80 ){
     legend_wrapper.classList.add("hidden");
+  } else if (landInvLayerWFS.getVisible() === true && resolution < 80){
+    legend_wrapper.classList.remove("hidden");
   }
-});
-
-
+  });
 });
 
 // function to get current mapview values
