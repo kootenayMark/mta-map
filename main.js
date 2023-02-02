@@ -586,6 +586,9 @@ propertySelect.addEventListener("change", function() {
   });
 });
 let filter_title;
+let landInvLayer_filtered;
+let vectorSourceWFS_filtered;
+
 filter_submit_btn.addEventListener("click", function() {
   geojsonObjWFS_filtered = submitFilter();
 
@@ -595,18 +598,18 @@ filter_submit_btn.addEventListener("click", function() {
     duration: 3000,
     constrainResolution: true
   });
-  createFilteredSource(geojsonObjWFS_filtered)
-  createFilteredLayer(vectorSource_filtered, filter_title)
+  createFilteredSourceInv(geojsonObjWFS_filtered)
+  createFilteredLayerInv(vectorSourceWFS_filtered, filter_title)
 
-  let vectorSourceWFS_filtered = new VectorSource({
-    features: new GeoJSON().readFeatures(geojsonObjWFS_filtered)
-  });
-  let landInvLayer_filtered = new VectorLayer({
-    title: filter_title,
-    style: styleFunction2, 
-    visible: true,
-    source: vectorSourceWFS_filtered,
-  });
+  // let vectorSourceWFS_filtered = new VectorSource({
+  //   features: new GeoJSON().readFeatures(geojsonObjWFS_filtered)
+  // });
+  // let landInvLayer_filtered = new VectorLayer({
+  //   title: filter_title,
+  //   style: styleFunction2, 
+  //   visible: true,
+  //   source: vectorSourceWFS_filtered,
+  // });
 
   //overlays.getLayers().remove(landInvLayer_filtered)
   overlays.getLayers().remove(landInvLayerWFS) 
@@ -1062,6 +1065,21 @@ function removeFilterLayer(filteredLayer) {
     zoom: current_view_values.currentZoom,
     duration: 1000,
   });
+}
+function createFilteredLayerInv(source, title) {
+  landInvLayer_filtered = new VectorLayer({
+    title: title,
+    style: styleFunction2, 
+    visible: true,
+    source: source,
+  });
+  return landInvLayer_filtered;
+}
+function createFilteredSourceInv(filteredSource) {
+  vectorSourceWFS_filtered = new VectorSource({
+    features: new GeoJSON().readFeatures(filteredSource)
+  });
+  return vectorSourceWFS_filtered;
 }
 function createFilteredLayer(source, title) {
   businessLayer_filtered = new VectorLayer({
