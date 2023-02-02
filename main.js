@@ -138,8 +138,8 @@ geojsonObjWFS.features.forEach((feature) => {
 // instantiate variables to hold filtered layers
 var geojsonObjWFS_filtered = geojsonObjWFS;
 var geojsonObj_filtered;
-console.log(geojsonObj_filtered)
-//var businessLayer_filtered;
+let businessLayer_filtered;
+let vectorSource_filtered;
 
 /* ***map Variables*** */
 const vectorSource = new VectorSource({
@@ -384,101 +384,60 @@ var overlays = new LayerGroup({
 //     };
 //   }
 // }
-    var business_tag;
-    //const element = document.createElement('div');
-    const tag_filter_wrapper = document.getElementById('tag-filter-wrapper')
-    const tag_dropdown_select = document.createElement('select');    
-    let defaultOption = document.createElement('option');
-    let option = document.createElement('option');
+var business_tag;
 
-    const tagsArray = []
-    jsonObj.forEach(item => {
-      if (item.hasOwnProperty("tags")) {
-        let tags = item.tags.split("|");
-        tagsArray.push(...tags);
-      }
-    });
-    let uniqueTags = [...new Set(tagsArray)]; // use Set to store unique values and convert it to array
+//const element = document.createElement('div');
+const tag_filter_wrapper = document.getElementById('tag-filter-wrapper')
+const tag_dropdown_select = document.createElement('select');    
+let defaultOption = document.createElement('option');
+let option = document.createElement('option');
 
-    tag_dropdown_select.setAttribute("id", "tag-dropdown-select");
-    tag_dropdown_select.classList.add("tag-dropdown-select");
-
-    defaultOption.id = "default-text"
-    defaultOption.value = ""
-    defaultOption.text = "Filter businesses by tag"
-    defaultOption.disabled = true;
-    defaultOption.selected = true;
-    tag_dropdown_select.add(defaultOption);
-
-    //element.className = 'tag-dropdown-toggle ol-unselectable ol-control';
-    
-    uniqueTags.forEach(tag => {
-      option = document.createElement("option");
-      option.value = tag;
-      option.innerHTML = tag;
-      tag_dropdown_select.appendChild(option);
-    });
-    tag_filter_wrapper.appendChild(tag_dropdown_select)
-    //element.appendChild(tag_dropdown_select);
-
-    tag_dropdown_select.addEventListener("change", function(event) {
-      console.log("The input value has changed: " + event.target.value);
-      business_tag = event.target.value;
-      current_view_values = getValues();
-      geojsonObj_filtered = new TagSearch();
-      let filter_layer = business_tag + " Businesses"
-      
-      const vectorSource_filtered = new VectorSource({
-        features: new GeoJSON().readFeatures(geojsonObj_filtered)
-      });
-        let businessLayer_filtered = new VectorLayer({
-        title: filter_layer,
-        style: styleFunction, 
-        visible: true,
-        source: vectorSource_filtered,
-      });
-      
-      businessLayer.setVisible(false)
-      map.getLayers().push(businessLayer_filtered)
-      view.animate({
-        center: trailandarea, //filtered_center,
-        zoom: 9,
-        duration: 3000,
-      });
-
-      var tag_filter_closer = document.getElementById('tag-filter-closer');
-      tag_filter_closer.addEventListener("click", function() {
-        document.getElementById("tag-dropdown-select").selectedIndex = 0;
-        map.getLayers().remove(businessLayer_filtered)
-        businessLayer.setVisible(true)
-        view.animate({
-          center: current_view_values.currentCenter, 
-          zoom: current_view_values.currentZoom,
-          duration: 1000,
-        });
-      })
-    });
-
-function TagSearch() {
-    console.log(business_tag)
-    var filteredTags;
-    filteredTags = geojsonObj.features.filter(function(feature) {
-      if (feature.properties.tags) {
-        return feature.properties.tags.includes(business_tag);   
-      } else {
-        console.error("Tags property is not defined in this feature.")
-      }          
-    });
-    return {
-      "type": "FeatureCollection",
-      "features": filteredTags,
-      "crs": {
-        "type": "name",
-        "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
-      }
-    };
+const tagsArray = []
+jsonObj.forEach(item => {
+  if (item.hasOwnProperty("tags")) {
+    let tags = item.tags.split("|");
+    tagsArray.push(...tags);
   }
+});
+let uniqueTags = [...new Set(tagsArray)]; // use Set to store unique values and convert it to array
 
+tag_dropdown_select.setAttribute("id", "tag-dropdown-select");
+tag_dropdown_select.classList.add("tag-dropdown-select");
+
+defaultOption.id = "default-text"
+defaultOption.value = ""
+defaultOption.text = "Filter businesses by tag"
+defaultOption.disabled = true;
+defaultOption.selected = true;
+tag_dropdown_select.add(defaultOption);
+
+//element.className = 'tag-dropdown-toggle ol-unselectable ol-control';
+
+uniqueTags.forEach(tag => {
+  option = document.createElement("option");
+  option.value = tag;
+  option.innerHTML = tag;
+  tag_dropdown_select.appendChild(option);
+});
+tag_filter_wrapper.appendChild(tag_dropdown_select)
+//element.appendChild(tag_dropdown_select);
+
+tag_dropdown_select.addEventListener("change", function(event) {
+  console.log("The input value has changed: " + event.target.value);
+  business_tag = event.target.value;
+  current_view_values = getValues();
+  geojsonObj_filtered = new TagSearch(business_tag);
+  let filter_layer = business_tag + " Businesses"
+  
+  createFilteredSource(geojsonObj_filtered)
+  createFilteredLayer(vectorSource_filtered, filter_layer)
+  let filtered_extent = vectorSource_filtered.getExtent()
+  filtered_center = getCenter(filtered_extent)
+
+  addFilterLayer(businessLayer_filtered, filtered_center)
+  filterCloser(businessLayer_filtered);
+  // buttonFilterCloser(businessLayer_filtered);
+});
 
 
 // class TagClose extends Control {
@@ -554,10 +513,6 @@ geojsonObjWFS.features.forEach(feature => {
 });
 
 // Add options to the property select
-    // var option = document.createElement("option");
-    // option.value = "none";
-    // option.innerHTML = "no filter";
-    // propertySelect.appendChild(option);
 properties.forEach(property => {
   var option = document.createElement("option");
   option.value = property;
@@ -956,7 +911,8 @@ jsonObj.forEach((item)=>{
 //console.log(filter_businessATT_jsonObj); 
 
 /* ****function to create and populate business feature**** */
-
+var filter_toggle = false;
+let filtered_center;
 for (let i =0; i < filter_businessATT_jsonObj.length; i++) {  
   // replace character delimiters
   let tags = filter_businessATT_jsonObj[i].tags; tags = tags.split("|");
@@ -1013,69 +969,38 @@ for (let i =0; i < filter_businessATT_jsonObj.length; i++) {
           tagButton.id = `tag_${tag}_${index}`; 
           tagButton.className = "tags";
           tagButton.innerHTML = tag;
+          tagButton.value = tag;
           td.appendChild(tagButton);
           
-          // /** Tag Filter */
-          // tagButton.addEventListener("click", function() {
-          //   if (tagButton.classList.contains("active")) {
-          //     tagButton.classList.remove("active");
-          //   } else {
-          //     tagButton.classList.add("active");
-          //   }
-          //   geojsonObj_filtered = filterTag();
+          /** Tag Filter */
+          tagButton.addEventListener("click", function(event) {
+            console.log("A tag value has changed: " + event.target.value);
+            business_tag = event.target.value;
+            let buttonId = event.target.id;
+            geojsonObj_filtered = TagSearch(business_tag);
+            let filter_layer = business_tag + " Businesses"
+            // toggleTagFilter()
+            createFilteredSource(geojsonObj_filtered)
+            createFilteredLayer(vectorSource_filtered, filter_layer)
+            let mapSize = map.getSize()
+            let filtered_extent = vectorSource_filtered.getExtent()
+            filtered_center = getCenter(filtered_extent)
+            // let filtered_res = getResolutionForExtent(filtered_extent, mapSize)
+            // let filtered_zoom = getZoomForResolution(filtered_res)
+            // console.log(filtered_res)
+            console.log(filter_toggle)
+            // console.log(filtered_center)
+            // if (filter_toggle === false) {
+            //   addTagFilter(tagButton, businessLayer_filtered)
+            // } else {
+            //   removeTagFilter(tagButton)
+            // }
+            // toggleTagFilter(tagButton, businessLayer_filtered)
             
-          //   function filterTag () {
-          //     //console.log(tag)
-          //     var filteredTags;
-          //     filteredTags = geojsonObj.features.filter(function(feature) {
-          //       if (feature.properties.tags) {
-          //         return feature.properties.tags.includes(tag);   
-          //       } else {
-          //         console.error("Tags property is not defined in this feature.")
-          //       }          
-          //     });
-          //     return {
-          //       "type": "FeatureCollection",
-          //       "features": filteredTags,
-          //       "crs": {
-          //         "type": "name",
-          //         "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
-          //       }
-          //     };
-          //   };
+            // buttonFilterCloser(tagButton, businessLayer_filtered)
             
-
-          //   const vectorSource_filtered = new VectorSource({
-          //     features: new GeoJSON().readFeatures(geojsonObj_filtered)
-          //   });
-          //   let mapSize = map.getSize()
-          //   let filtered_extent = vectorSource_filtered.getExtent()
-          //   let filtered_center = getCenter(filtered_extent)
-          //   // let filtered_res = getResolutionForExtent(filtered_extent, mapSize)
-          //   // let filtered_zoom = getZoomForResolution(filtered_res)
-          //   // console.log(filtered_res)
-          //   // console.log(filtered_extent)
-          //   console.log(filtered_center)
-          //   if (!businessLayer_filtered) {
-          //     businessLayer_filtered = new VectorLayer({
-          //     title: 'Businesses Filtered',
-          //     style: styleFunction, 
-          //     visible: true,
-          //     source: vectorSource_filtered,
-          //   });
-          //   view.animate({
-          //     center: filtered_center,
-          //     zoom: 9,
-          //     duration: 3000,
-          //   });
-          //   map.addLayer(businessLayer_filtered)
-          //   map.removeLayer(businessLayer)
-          //   } else {
-          //     map.removeLayer(businessLayer_filtered)
-          //     businessLayer_filtered = null;
-          //     map.addLayer(businessLayer)
-          //   }
-          // });
+            
+          });
          });    
        };
      };
@@ -1085,6 +1010,86 @@ for (let i =0; i < filter_businessATT_jsonObj.length; i++) {
   };
 };
 
+// function addTagFilter (id) {
+//   id.classList.add("active");
+//   addFilterLayer(businessLayer_filtered, filtered_center)
+//   filter_toggle = true;
+// }  
+// function removeTagFilter (id) {
+//   id.classList.remove("active");
+//   removeFilterLayer(businessLayer_filtered)
+//   filter_toggle = false;
+// }
+// function toggleTagFilter(id, layer) {
+//   filter_toggle ? removeTagFilter(id, layer) : addTagFilter(id, layer)
+// }
+
+function TagSearch(tag) {
+  var filteredTags;
+  filteredTags = geojsonObj.features.filter(function(feature) {
+    if (feature.properties.tags) {
+      return feature.properties.tags.includes(tag);   
+    } else {
+      console.error("Tags property is not defined in this feature.")
+    }          
+  });
+  return {
+    "type": "FeatureCollection",
+    "features": filteredTags,
+    "crs": {
+      "type": "name",
+      "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
+    }
+  };
+}
+// function buttonFilterCloser (id, layer) {
+//   var tag_filter_closer = document.getElementById('tag-filter-closer');
+//   tag_filter_closer.addEventListener("click", function() {
+//     removeTagFilter(id, layer)
+//   });
+// }
+function filterCloser (layer) {
+  var tag_filter_closer = document.getElementById('tag-filter-closer');
+  tag_filter_closer.addEventListener("click", function() {
+    document.getElementById("tag-dropdown-select").selectedIndex = 0;
+    removeFilterLayer(layer)
+  });
+}
+function addFilterLayer (filteredLayer, center) {
+  console.log(filteredLayer)
+  businessLayer.setVisible(false)
+  map.getLayers().push(filteredLayer)
+  view.animate({
+    center: center, 
+    zoom: 9,
+    duration: 3000,
+  });
+}
+function removeFilterLayer(filteredLayer) {
+  console.log(filteredLayer)
+  map.getLayers().remove(filteredLayer)
+  businessLayer.setVisible(true)
+  view.animate({
+    center: current_view_values.currentCenter, 
+    zoom: current_view_values.currentZoom,
+    duration: 1000,
+  });
+}
+function createFilteredLayer(source, title) {
+  businessLayer_filtered = new VectorLayer({
+    title: title,
+    style: styleFunction, 
+    visible: true,
+    source: source,
+  });
+  return businessLayer_filtered;
+}
+function createFilteredSource(filteredSource) {
+  vectorSource_filtered = new VectorSource({
+    features: new GeoJSON().readFeatures(filteredSource)
+  });
+  return vectorSource_filtered;
+}
 
 /* dynamically created DOM element selections */
 const groupItems = document.querySelector('#groups');
@@ -1211,7 +1216,7 @@ function regionCLick() {
 
 
 
-/* **** Filter functions **** */
+/* **** Filter land inventory functions **** */
 
 // function to open filter pane
 let filter_pane = document.getElementById("filter-pane");
@@ -1282,15 +1287,6 @@ function legend() {
   src.appendChild(img);
 }
 legend();
-
-addEventListener("change", function() {
-  if (landInvLayerWFS.getVisible() === true) {
-    legend_wrapper.classList.remove("hidden");
-  } else {
-    legend_wrapper.classList.add("hidden");
-  }
-});
-
 map.getView().on("change:resolution", function() {
   let resolution = map.getView().getResolution();
   let coordinates = map.getView().getCenter()
@@ -1308,6 +1304,17 @@ map.getView().on("change:resolution", function() {
   } else {
     legend_wrapper.classList.remove("hidden");
   }
+
+addEventListener("change", function() {
+  console.log(landInvLayerWFS.getVisible())
+  if (landInvLayerWFS.getVisible() === true) {
+    legend_wrapper.classList.remove("hidden");
+  } else {
+    legend_wrapper.classList.add("hidden");
+  }
+});
+
+
 });
 
 // function to get current mapview values

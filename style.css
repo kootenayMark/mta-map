@@ -220,6 +220,7 @@ td {
   background-color: #f6921b;
   color: black;
   font-weight: bold;
+  border-color: #f6921b;
 }
 /* styles for switching panes */
 .close {
