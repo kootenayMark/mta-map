@@ -596,6 +596,7 @@ filter_submit_btn.addEventListener("click", function() {
   createFilteredLayerInv(vectorSourceWFS_filtered, filter_title)
 
   let extent = vectorSourceWFS_filtered.getExtent()
+  console.log(extent)
   let mapSize = map.getSize()
   view.fit(extent, {
     size: mapSize, 
@@ -1284,33 +1285,66 @@ function legend() {
   src.appendChild(img);
 }
 legend();
+// map.getView().on("change:resolution", function() {
+//   let resolution = map.getView().getResolution();
+//   if (resolution > 80) {
+//     legend_wrapper.classList.add("hidden");
+//   } else {
+//     legend_wrapper.classList.remove("hidden");
+//   }
+//   document.addEventListener("change", function() {
+//   console.log(landInvLayerWFS.getVisible())
+//   if (landInvLayerWFS.getVisible() === false && resolution > 80 ){
+//     legend_wrapper.classList.add("hidden");
+//   } else {
+//     legend_wrapper.classList.remove("hidden");
+//   }
+//   });
+//   map.getView().on("change:center", function() {
+//   let source = vectorSourceWFS;
+//   let landInvExtent = source.getExtent();
+//   let extent = view.calculateExtent(map.getSize()); 
+//   if (isWithoutExtent(landInvExtent, extent) === true) {
+//     legend_wrapper.classList.add("hidden");
+//   } else {
+//     legend_wrapper.classList.remove("hidden");
+//   }
+// });
+// });
+
 map.getView().on("change:resolution", function() {
   let resolution = map.getView().getResolution();
-  let coordinates = map.getView().getCenter()
-  let inventoryCenter = [-117.66993534984215, 49.100971359691975]
-  let latLong = toLonLat(coordinates)
-  // console.log(coordinates)
-  // console.log(inventoryCenter)
-  // console.log(latLong)
-  // const line = new LineString(latLong, inventoryCenter);
-  // console.log(line)
-  // const distance = line.getLength()
-  // console.log(distance)
-  if (resolution > 80) {
-    legend_wrapper.classList.add("hidden");
-  } else {
-    legend_wrapper.classList.remove("hidden");
-  }
-
-  document.addEventListener("change", function() {
-  console.log(landInvLayerWFS.getVisible())
-  if (landInvLayerWFS.getVisible() === false && resolution > 80 ){
-    legend_wrapper.classList.add("hidden");
-  } else if (landInvLayerWFS.getVisible() === true && resolution < 80){
-    legend_wrapper.classList.remove("hidden");
-  }
-  });
+  let source = vectorSourceWFS;
+  let landInvExtent = source.getExtent();
+  let viewExtent = map.getView().calculateExtent(map.getSize()); 
+  let legendVisibility = resolution > 80 || !landInvLayerWFS.getVisible() || isWithoutExtent(landInvExtent, viewExtent);
+  legend_wrapper.classList.toggle("hidden", legendVisibility);
 });
+
+document.addEventListener("change", function() {
+  let resolution = map.getView().getResolution();
+  let source = vectorSourceWFS;
+  let landInvExtent = source.getExtent();
+  let viewExtent = map.getView().calculateExtent(map.getSize()); 
+  let legendVisibility = resolution > 80 || !landInvLayerWFS.getVisible() || isWithoutExtent(landInvExtent, viewExtent);
+  legend_wrapper.classList.toggle("hidden", legendVisibility);
+});
+
+map.getView().on("change:center", function() {
+  let resolution = map.getView().getResolution();
+  let source = vectorSourceWFS;
+  let landInvExtent = source.getExtent();
+  let viewExtent = map.getView().calculateExtent(map.getSize()); 
+  let legendVisibility = resolution > 80 || !landInvLayerWFS.getVisible() || isWithoutExtent(landInvExtent, viewExtent);;
+  legend_wrapper.classList.toggle("hidden", legendVisibility);
+});
+
+function isWithoutExtent(testExtent, extent) {
+  return testExtent[0] > extent[2] ||
+         testExtent[1] > extent[3] ||
+         testExtent[2] < extent[0] ||
+         testExtent[3] < extent[1];
+}
 
 // function to get current mapview values
 function getValues() {
