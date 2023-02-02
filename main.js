@@ -592,26 +592,17 @@ let vectorSourceWFS_filtered;
 filter_submit_btn.addEventListener("click", function() {
   geojsonObjWFS_filtered = submitFilter();
 
-  view.animate({
-    center: trailandarea,
-    zoom: 11,
-    duration: 3000,
-    constrainResolution: true
-  });
   createFilteredSourceInv(geojsonObjWFS_filtered)
   createFilteredLayerInv(vectorSourceWFS_filtered, filter_title)
 
-  // let vectorSourceWFS_filtered = new VectorSource({
-  //   features: new GeoJSON().readFeatures(geojsonObjWFS_filtered)
-  // });
-  // let landInvLayer_filtered = new VectorLayer({
-  //   title: filter_title,
-  //   style: styleFunction2, 
-  //   visible: true,
-  //   source: vectorSourceWFS_filtered,
-  // });
+  let extent = vectorSourceWFS_filtered.getExtent()
+  let mapSize = map.getSize()
+  view.fit(extent, {
+    size: mapSize, 
+    padding: [50, 50, 50, 50],
+    duration: 3000,
+  });
 
-  //overlays.getLayers().remove(landInvLayer_filtered)
   overlays.getLayers().remove(landInvLayerWFS) 
   overlays.getLayers().push(landInvLayer_filtered)
 
