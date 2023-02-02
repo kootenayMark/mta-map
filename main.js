@@ -432,9 +432,9 @@ tag_dropdown_select.addEventListener("change", function(event) {
   createFilteredSource(geojsonObj_filtered)
   createFilteredLayer(vectorSource_filtered, filter_layer)
   let filtered_extent = vectorSource_filtered.getExtent()
-  filtered_center = getCenter(filtered_extent)
+  //filtered_center = getCenter(filtered_extent)
 
-  addFilterLayer(businessLayer_filtered, filtered_center)
+  addFilterLayer(businessLayer_filtered, filtered_extent)
   filterCloser(businessLayer_filtered);
   // buttonFilterCloser(businessLayer_filtered);
 });
@@ -588,14 +588,15 @@ propertySelect.addEventListener("change", function() {
 let filter_title;
 filter_submit_btn.addEventListener("click", function() {
   geojsonObjWFS_filtered = submitFilter();
-console.log(rangeValues.low)
+
   view.animate({
     center: trailandarea,
     zoom: 11,
     duration: 3000,
     constrainResolution: true
   });
-  
+  createFilteredSource(geojsonObjWFS_filtered)
+  createFilteredLayer(vectorSource_filtered, filter_title)
 
   let vectorSourceWFS_filtered = new VectorSource({
     features: new GeoJSON().readFeatures(geojsonObjWFS_filtered)
@@ -630,12 +631,12 @@ function submitFilter() {
     // console.log(filterValues)
     
     if (typeof string_values_array[0] === 'string') {
-      filter_title = `Filtered ${propertySelect.value}<br>  = ${string_values_array}`
+      filter_title = `Filtered ${propertySelect.value}<br> = ${string_values_array}`
       filteredFeatures = geojsonObjWFS.features.filter(function(feature) {
         return string_values_array.includes(feature.properties[property]);
       });
     } else {
-      filter_title = `Filtered ${propertySelect.value}<br>  >= ${rangeValues.low} <= ${rangeValues.high}`
+      filter_title = `Filtered ${propertySelect.value}<br> >= ${rangeValues.low} <= ${rangeValues.high}`
       var filterValues = Array.from(rangeArray).filter(val => val >= rangeValues.low && val <= rangeValues.high);
       filteredFeatures = geojsonObjWFS.features.filter(function(feature) {
         return filterValues.includes(feature.properties[property]);
@@ -982,24 +983,10 @@ for (let i =0; i < filter_businessATT_jsonObj.length; i++) {
             // toggleTagFilter()
             createFilteredSource(geojsonObj_filtered)
             createFilteredLayer(vectorSource_filtered, filter_layer)
-            let mapSize = map.getSize()
+            
             let filtered_extent = vectorSource_filtered.getExtent()
             filtered_center = getCenter(filtered_extent)
-            // let filtered_res = getResolutionForExtent(filtered_extent, mapSize)
-            // let filtered_zoom = getZoomForResolution(filtered_res)
-            // console.log(filtered_res)
             console.log(filter_toggle)
-            // console.log(filtered_center)
-            // if (filter_toggle === false) {
-            //   addTagFilter(tagButton, businessLayer_filtered)
-            // } else {
-            //   removeTagFilter(tagButton)
-            // }
-            // toggleTagFilter(tagButton, businessLayer_filtered)
-            
-            // buttonFilterCloser(tagButton, businessLayer_filtered)
-            
-            
           });
          });    
        };
@@ -1055,13 +1042,14 @@ function filterCloser (layer) {
     removeFilterLayer(layer)
   });
 }
-function addFilterLayer (filteredLayer, center) {
-  console.log(filteredLayer)
+function addFilterLayer (filteredLayer, extent) {
+  //console.log(filteredLayer)
   businessLayer.setVisible(false)
   map.getLayers().push(filteredLayer)
-  view.animate({
-    center: center, 
-    zoom: 9,
+  let mapSize = map.getSize()
+  view.fit(extent, {
+    size: mapSize, 
+    padding: [50, 50, 50, 50],
     duration: 3000,
   });
 }
