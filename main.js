@@ -844,7 +844,15 @@ tag_dropdown_select.addEventListener("change", function(event) {
   current_view_values = getValues();
   geojsonObj_filtered = TagSearch(business_tag);
   let filter_layer = business_tag + " Businesses"
+  let selectedOption = tag_dropdown_select.options[tag_dropdown_select.selectedIndex];
+  selectedOption.style.color = "#f6921b";
   
+  if (tag_dropdown_select.selectedIndex !== -1) {
+    tag_filter_clear.style.color = "#f6921b";
+    //console.log("An option is selected");
+  } else {
+    //console.log("No option is selected");
+  }
   createFilteredSource(geojsonObj_filtered)
   createFilteredLayer(vectorSource_filtered, filter_layer)
   let filtered_extent = vectorSource_filtered.getExtent()
@@ -1047,11 +1055,12 @@ function invFilterCloser (filteredLayer, layer) {
     removeFilterLayer(filteredLayer, layer)
   });
 }
+var tag_filter_clear = document.getElementById('tag-filter-clear');
 function filterCloser (filteredLayer, layer) {
-  var tag_filter_clear = document.getElementById('tag-filter-clear');
   tag_filter_clear.addEventListener("click", function() {
-    document.getElementById("tag-dropdown-select").selectedIndex = 0;
-    removeFilterLayer(filteredLayer, layer)
+  document.getElementById("tag-dropdown-select").selectedIndex = 0;
+  removeFilterLayer(filteredLayer, layer)
+  tag_filter_clear.style.color = "#8e8d8d";
   });
 }
 function addFilterLayer (filteredLayer, layer, extent) {
