@@ -135,11 +135,7 @@ geojsonObjWFS.features.forEach((feature) => {
   feature.properties.pid = Number(feature.properties.pid)
 })
 
-// instantiate variables to hold filtered layers
-var geojsonObjWFS_filtered = geojsonObjWFS;
-var geojsonObj_filtered;
-let businessLayer_filtered;
-let vectorSource_filtered;
+
 
 /* ***map Variables*** */
 const vectorSource = new VectorSource({
@@ -384,60 +380,7 @@ var overlays = new LayerGroup({
 //     };
 //   }
 // }
-var business_tag;
 
-//const element = document.createElement('div');
-const tag_filter_wrapper = document.getElementById('tag-filter-wrapper')
-const tag_dropdown_select = document.createElement('select');    
-let defaultOption = document.createElement('option');
-let option = document.createElement('option');
-
-const tagsArray = []
-jsonObj.forEach(item => {
-  if (item.hasOwnProperty("tags")) {
-    let tags = item.tags.split("|");
-    tagsArray.push(...tags);
-  }
-});
-let uniqueTags = [...new Set(tagsArray)]; // use Set to store unique values and convert it to array
-
-tag_dropdown_select.setAttribute("id", "tag-dropdown-select");
-tag_dropdown_select.classList.add("tag-dropdown-select");
-
-defaultOption.id = "default-text"
-defaultOption.value = ""
-defaultOption.text = "Filter businesses by tag"
-defaultOption.disabled = true;
-defaultOption.selected = true;
-tag_dropdown_select.add(defaultOption);
-
-//element.className = 'tag-dropdown-toggle ol-unselectable ol-control';
-
-uniqueTags.forEach(tag => {
-  option = document.createElement("option");
-  option.value = tag;
-  option.innerHTML = tag;
-  tag_dropdown_select.appendChild(option);
-});
-tag_filter_wrapper.appendChild(tag_dropdown_select)
-//element.appendChild(tag_dropdown_select);
-
-tag_dropdown_select.addEventListener("change", function(event) {
-  console.log("The input value has changed: " + event.target.value);
-  business_tag = event.target.value;
-  current_view_values = getValues();
-  geojsonObj_filtered = new TagSearch(business_tag);
-  let filter_layer = business_tag + " Businesses"
-  
-  createFilteredSource(geojsonObj_filtered)
-  createFilteredLayer(vectorSource_filtered, filter_layer)
-  let filtered_extent = vectorSource_filtered.getExtent()
-  //filtered_center = getCenter(filtered_extent)
-
-  addFilterLayer(businessLayer_filtered, filtered_extent)
-  filterCloser(businessLayer_filtered);
-  // buttonFilterCloser(businessLayer_filtered);
-});
 
 
 // class TagClose extends Control {
@@ -486,167 +429,7 @@ var layerSwitcher = new LayerSwitcher({
 map.addControl(layerSwitcher);
 // sync(map); need to import ol-hashed if using
 
-/* *Land Inventory property filters */
-// Get the property select and value select elements
-var propertySelect = document.getElementById("property1");
-var filter_submit_btn = document.getElementById("filter-submit-btn");
-var filter_clear_btn = document.getElementById("filter-clear-btn");
-var string_label = document.getElementById("string-label");
-var string_value = document.getElementById("string-value");
-var range_input = document.getElementById("range-input");
-var low_number_value = document.getElementById("low-number-value");
-var high_number_value = document.getElementById("high-number-value");
-var rangeValues = {low: '', high: ''};
-var rangeArray;
-var string_values_array;
 
-// Extract unique properties from GeoJSON object
-let properties = new Set();
-geojsonObjWFS.features.forEach(feature => {
-  const filterArray = ['pid', 'area_acres', 'zone_name', 'zone_admin', 'services', 'current_use', 'avg_slope', 'development_score_weighted'];
-
-  Object.keys(feature.properties).forEach(property => {
-    if(filterArray.includes(property)) {
-      properties.add(property);
-    } 
-  });
-});
-
-// Add options to the property select
-properties.forEach(property => {
-  var option = document.createElement("option");
-  option.value = property;
-  option.innerHTML = property;
-  propertySelect.appendChild(option);
-});
-
-// Add event listener to the property select to update the value select
-propertySelect.addEventListener("change", function() {
-  // Get the selected property
-  var selectedProperty = propertySelect.value;
-  // Clear the user input values 
-  string_value.innerHTML = "";
-  low_number_value.innerHTML = "";
-  high_number_value.innerHTML = "";
-
-  // Extract unique values for selected property from GeoJSON object
-  let values = new Set();
-  geojsonObjWFS.features.forEach(feature => {
-    if(feature.properties[selectedProperty]) 
-      values.add(feature.properties[selectedProperty]);
-  });
-  // Add options to the value select
-  values.forEach(value => {
-    if (typeof value === 'string') {
-      if (range_input.style.display === "block") {
-        range_input.style.display = "none"
-      }
-      var option = document.createElement("option");
-      option.value = value;
-      option.innerHTML = value;
-      string_label.style.display = "block"
-      string_value.style.display = "block"
-      string_value.appendChild(option);
-    } else if (typeof value === 'number') {
-        if (string_label.style.display === "block") {
-          string_label.style.display = "none"
-          string_value.style.display = "none"
-        }
-      rangeArray = values;
-      range_input.style.display = "block"
-      // sort array to extract low and high value
-      let sortedNumbers = [...values].slice().sort((a, b) => a - b);
-      // round decimal values to 4 places
-      let roundedNumbers = sortedNumbers.map(number => Math.round(number * 10000) / 10000);
-      //calculate decimal length to be used to change input increment
-      let decimalLength;
-      if(Number.isInteger(roundedNumbers[0])) {
-        decimalLength = 0;
-      } else {  
-        decimalLength = (roundedNumbers[0]).toString().split(".")[1].length;
-      } 
-      // convert decimal length to increment value
-      let placeholder = 1 
-      let incrementor = placeholder / Math.pow(10, decimalLength)
-      //set increment value for input arrows
-      low_number_value.step = incrementor;
-      high_number_value.step = incrementor;
-      //set low and high values of array
-      low_number_value.value = roundedNumbers[0];
-      high_number_value.value = roundedNumbers[sortedNumbers.length - 1];
-      rangeValues = {low: roundedNumbers[0], high: roundedNumbers[sortedNumbers.length - 1]}
-      //event listeners for retrieving low and high values
-      low_number_value.addEventListener("change", function() {
-        rangeValues.low = low_number_value.valueAsNumber;
-      });
-      high_number_value.addEventListener("change", function() {
-        rangeValues.high = high_number_value.valueAsNumber;
-      }); 
-    }
-  });
-});
-let filter_title;
-let landInvLayer_filtered;
-let vectorSourceWFS_filtered;
-
-filter_submit_btn.addEventListener("click", function() {
-  geojsonObjWFS_filtered = submitFilter();
-
-  createFilteredSourceInv(geojsonObjWFS_filtered)
-  createFilteredLayerInv(vectorSourceWFS_filtered, filter_title)
-
-  let extent = vectorSourceWFS_filtered.getExtent()
-  console.log(extent)
-  let mapSize = map.getSize()
-  view.fit(extent, {
-    size: mapSize, 
-    padding: [50, 50, 50, 50],
-    duration: 3000,
-  });
-
-  overlays.getLayers().remove(landInvLayerWFS) 
-  overlays.getLayers().push(landInvLayer_filtered)
-
-  filter_clear_btn.addEventListener("click", function() {
-    propertySelect.value = "";
-    string_value.value = "";
-    string_label.style.display = "none"
-    string_value.style.display = "none"
-    range_input.style.display = "none"
-    
-    overlays.getLayers().remove(landInvLayer_filtered)
-    overlays.getLayers().push(landInvLayerWFS)
-  });
-});
-
-function submitFilter() {
-    var property = propertySelect.value;
-    string_values_array = Array.from(string_value.selectedOptions).map(option => option.value);
-    var filteredFeatures;
-    // console.log(filterValues)
-    
-    if (typeof string_values_array[0] === 'string') {
-      filter_title = `Filtered ${propertySelect.value}<br> = ${string_values_array}`
-      filteredFeatures = geojsonObjWFS.features.filter(function(feature) {
-        return string_values_array.includes(feature.properties[property]);
-      });
-    } else {
-      filter_title = `Filtered ${propertySelect.value}<br> >= ${rangeValues.low} <= ${rangeValues.high}`
-      var filterValues = Array.from(rangeArray).filter(val => val >= rangeValues.low && val <= rangeValues.high);
-      filteredFeatures = geojsonObjWFS.features.filter(function(feature) {
-        return filterValues.includes(feature.properties[property]);
-      });
-    }
-    console.log(filteredFeatures)
-    return {
-      "type": "FeatureCollection",
-      "features": filteredFeatures,
-      "crs": {
-        "type": "name",
-        "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
-      }  
-    }  
-};
 
 // const wmsSource = new ImageWMS({
 //   url: 'http://51.79.71.43:8080/geoserver/wms',
@@ -969,20 +752,20 @@ for (let i =0; i < filter_businessATT_jsonObj.length; i++) {
           td.appendChild(tagButton);
           
           /** Tag Filter */
-          tagButton.addEventListener("click", function(event) {
-            console.log("A tag value has changed: " + event.target.value);
-            business_tag = event.target.value;
-            let buttonId = event.target.id;
-            geojsonObj_filtered = TagSearch(business_tag);
-            let filter_layer = business_tag + " Businesses"
-            // toggleTagFilter()
-            createFilteredSource(geojsonObj_filtered)
-            createFilteredLayer(vectorSource_filtered, filter_layer)
+          // tagButton.addEventListener("click", function(event) {
+          //   console.log("A tag value has changed: " + event.target.value);
+          //   business_tag = event.target.value;
+          //   let buttonId = event.target.id;
+          //   geojsonObj_filtered = TagSearch(business_tag);
+          //   let filter_layer = business_tag + " Businesses"
+          //   // toggleTagFilter()
+          //   createFilteredSource(geojsonObj_filtered)
+          //   createFilteredLayer(vectorSource_filtered, filter_layer)
             
-            let filtered_extent = vectorSource_filtered.getExtent()
-            filtered_center = getCenter(filtered_extent)
-            console.log(filter_toggle)
-          });
+          //   let filtered_extent = vectorSource_filtered.getExtent()
+          //   filtered_center = getCenter(filtered_extent)
+          //   console.log(filter_toggle)
+          // });
          });    
        };
      };
@@ -1006,6 +789,228 @@ for (let i =0; i < filter_businessATT_jsonObj.length; i++) {
 //   filter_toggle ? removeTagFilter(id, layer) : addTagFilter(id, layer)
 // }
 
+// instantiate variables to hold filtered layers
+
+let geojsonObj_filtered;
+let geojsonObjWFS_filtered;
+let vectorSource_filtered;
+let vectorSourceWFS_filtered;
+let businessLayer_filtered;
+let landInvLayer_filtered;
+
+
+/* ****Business Tag filters**** */
+var business_tag;
+
+//const element = document.createElement('div');
+const tag_filter_wrapper = document.getElementById('tag-filter-wrapper')
+const tag_dropdown_select = document.createElement('select');    
+let defaultOption = document.createElement('option');
+let option = document.createElement('option');
+
+const tagsArray = []
+jsonObj.forEach(item => {
+  if (item.hasOwnProperty("tags")) {
+    let tags = item.tags.split("|");
+    tagsArray.push(...tags);
+  }
+});
+let uniqueTags = [...new Set(tagsArray)]; // use Set to store unique values and convert it to array
+
+tag_dropdown_select.setAttribute("id", "tag-dropdown-select");
+tag_dropdown_select.classList.add("tag-dropdown-select");
+
+defaultOption.id = "default-text"
+defaultOption.value = ""
+defaultOption.text = "Business Tag Filter(s)"
+defaultOption.disabled = true;
+defaultOption.selected = true;
+tag_dropdown_select.add(defaultOption);
+
+//element.className = 'tag-dropdown-toggle ol-unselectable ol-control';
+
+uniqueTags.forEach(tag => {
+  option = document.createElement("option");
+  option.value = tag;
+  option.innerHTML = tag;
+  tag_dropdown_select.appendChild(option);
+});
+tag_filter_wrapper.appendChild(tag_dropdown_select)
+//element.appendChild(tag_dropdown_select);
+
+tag_dropdown_select.addEventListener("change", function(event) {
+  console.log("The input value has changed: " + event.target.value);
+  business_tag = event.target.value;
+  current_view_values = getValues();
+  geojsonObj_filtered = TagSearch(business_tag);
+  let filter_layer = business_tag + " Businesses"
+  
+  createFilteredSource(geojsonObj_filtered)
+  createFilteredLayer(vectorSource_filtered, filter_layer)
+  let filtered_extent = vectorSource_filtered.getExtent()
+  //filtered_center = getCenter(filtered_extent)
+
+  addFilterLayer(businessLayer_filtered, businessLayer, filtered_extent)
+  filterCloser(businessLayer_filtered, businessLayer);
+  // buttonFilterCloser(businessLayer_filtered);
+});
+
+/* ****Land Inventory property filters**** */
+// Get the property select and value select elements
+var propertySelect = document.getElementById("property1");
+var filter_submit_btn = document.getElementById("filter-submit-btn");
+//var filter_clear_btn = document.getElementById("filter-clear-btn");
+var string_label = document.getElementById("string-label");
+var string_value = document.getElementById("string-value");
+var range_input = document.getElementById("range-input");
+var low_number_value = document.getElementById("low-number-value");
+var high_number_value = document.getElementById("high-number-value");
+var rangeValues = {low: '', high: ''};
+var rangeArray;
+var string_values_array;
+
+// Extract unique properties from GeoJSON object
+let properties = new Set();
+geojsonObjWFS.features.forEach(feature => {
+  const filterArray = ['pid', 'area_acres', 'zone_name', 'zone_admin', 'services', 'current_use', 'avg_slope', 'development_score_weighted'];
+
+  Object.keys(feature.properties).forEach(property => {
+    if(filterArray.includes(property)) {
+      properties.add(property);
+    } 
+  });
+});
+
+// Add options to the property select
+properties.forEach(property => {
+  var option = document.createElement("option");
+  option.value = property;
+  option.innerHTML = property;
+  propertySelect.appendChild(option);
+});
+
+// Add event listener to the property select to update the value select
+propertySelect.addEventListener("change", function() {
+  // Get the selected property
+  var selectedProperty = propertySelect.value;
+  // Clear the user input values 
+  string_value.innerHTML = "";
+  low_number_value.innerHTML = "";
+  high_number_value.innerHTML = "";
+
+  // Extract unique values for selected property from GeoJSON object
+  let values = new Set();
+  geojsonObjWFS.features.forEach(feature => {
+    if(feature.properties[selectedProperty]) 
+      values.add(feature.properties[selectedProperty]);
+  });
+  // Add options to the value select
+  values.forEach(value => {
+    if (typeof value === 'string') {
+      if (range_input.style.display === "block") {
+        range_input.style.display = "none"
+      }
+      var option = document.createElement("option");
+      option.value = value;
+      option.innerHTML = value;
+      string_label.style.display = "block"
+      string_value.style.display = "block"
+      string_value.appendChild(option);
+    } else if (typeof value === 'number') {
+        if (string_label.style.display === "block") {
+          string_label.style.display = "none"
+          string_value.style.display = "none"
+        }
+      rangeArray = values;
+      range_input.style.display = "block"
+      // sort array to extract low and high value
+      let sortedNumbers = [...values].slice().sort((a, b) => a - b);
+      // round decimal values to 4 places
+      let roundedNumbers = sortedNumbers.map(number => Math.round(number * 10000) / 10000);
+      //calculate decimal length to be used to change input increment
+      let decimalLength;
+      if(Number.isInteger(roundedNumbers[0])) {
+        decimalLength = 0;
+      } else {  
+        decimalLength = (roundedNumbers[0]).toString().split(".")[1].length;
+      } 
+      // convert decimal length to increment value
+      let placeholder = 1 
+      let incrementor = placeholder / Math.pow(10, decimalLength)
+      //set increment value for input arrows
+      low_number_value.step = incrementor;
+      high_number_value.step = incrementor;
+      //set low and high values of array
+      low_number_value.value = roundedNumbers[0];
+      high_number_value.value = roundedNumbers[sortedNumbers.length - 1];
+      rangeValues = {low: roundedNumbers[0], high: roundedNumbers[sortedNumbers.length - 1]}
+      //event listeners for retrieving low and high values
+      low_number_value.addEventListener("change", function() {
+        rangeValues.low = low_number_value.valueAsNumber;
+      });
+      high_number_value.addEventListener("change", function() {
+        rangeValues.high = high_number_value.valueAsNumber;
+      }); 
+    }
+  });
+});
+
+filter_submit_btn.addEventListener("click", function() {
+  current_view_values = {
+    currentCenter: regions[2].coords,
+    currentZoom: 11
+  }
+ 
+  console.log(current_view_values)
+ 
+  geojsonObjWFS_filtered = submitFilter(propertySelect.value, string_value.selectedOptions);
+  
+  let filter_title;
+  if (typeof string_values_array[0] === 'string') {
+    filter_title = `Filtered ${propertySelect.value}<br> = ${string_values_array}`
+  } else {
+    filter_title = `Filtered ${propertySelect.value}<br> >= ${rangeValues.low} <= ${rangeValues.high}`
+  }
+  
+  createFilteredSourceInv(geojsonObjWFS_filtered)
+  createFilteredLayerInv(vectorSourceWFS_filtered, filter_title)
+  let extent = vectorSourceWFS_filtered.getExtent()
+  //console.log(extent)
+  
+  addFilterLayer (landInvLayer_filtered, landInvLayerWFS, extent)  
+  invFilterCloser (landInvLayer_filtered, landInvLayerWFS)
+});
+
+// filter_clear_btn.addEventListener("click", function() {
+//     removeFilterLayer(landInvLayer_filtered, landInvLayerWFS)
+    
+//   });
+function submitFilter(property, values) {
+    string_values_array = Array.from(values).map(option => option.value);
+    var filteredFeatures;
+    // console.log(filterValues)
+    
+    if (typeof string_values_array[0] === 'string') {
+      filteredFeatures = geojsonObjWFS.features.filter(function(feature) {
+        return string_values_array.includes(feature.properties[property]);
+      });
+    } else {
+      var filterValues = Array.from(rangeArray).filter(val => val >= rangeValues.low && val <= rangeValues.high);
+      filteredFeatures = geojsonObjWFS.features.filter(function(feature) {
+        return filterValues.includes(feature.properties[property]);
+      });
+    }
+    //console.log(filteredFeatures)
+    return {
+      "type": "FeatureCollection",
+      "features": filteredFeatures,
+      "crs": {
+        "type": "name",
+        "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
+      }  
+    }  
+};
+
 function TagSearch(tag) {
   var filteredTags;
   filteredTags = geojsonObj.features.filter(function(feature) {
@@ -1025,21 +1030,33 @@ function TagSearch(tag) {
   };
 }
 // function buttonFilterCloser (id, layer) {
-//   var tag_filter_closer = document.getElementById('tag-filter-closer');
-//   tag_filter_closer.addEventListener("click", function() {
+//   var tag_filter_clear = document.getElementById('tag-filter-closer');
+//   tag_filter_clear.addEventListener("click", function() {
 //     removeTagFilter(id, layer)
 //   });
 // }
-function filterCloser (layer) {
-  var tag_filter_closer = document.getElementById('tag-filter-closer');
-  tag_filter_closer.addEventListener("click", function() {
-    document.getElementById("tag-dropdown-select").selectedIndex = 0;
-    removeFilterLayer(layer)
+
+function invFilterCloser (filteredLayer, layer) {
+  var filter_clear_btn = document.getElementById('filter-clear-btn');
+  filter_clear_btn.addEventListener("click", function() {
+    propertySelect.value = "";
+    string_value.value = "";
+    string_label.style.display = "none"
+    string_value.style.display = "none"
+    range_input.style.display = "none"
+    removeFilterLayer(filteredLayer, layer)
   });
 }
-function addFilterLayer (filteredLayer, extent) {
+function filterCloser (filteredLayer, layer) {
+  var tag_filter_clear = document.getElementById('tag-filter-clear');
+  tag_filter_clear.addEventListener("click", function() {
+    document.getElementById("tag-dropdown-select").selectedIndex = 0;
+    removeFilterLayer(filteredLayer, layer)
+  });
+}
+function addFilterLayer (filteredLayer, layer, extent) {
   //console.log(filteredLayer)
-  businessLayer.setVisible(false)
+  layer.setVisible(false)
   map.getLayers().push(filteredLayer)
   let mapSize = map.getSize()
   view.fit(extent, {
@@ -1048,10 +1065,10 @@ function addFilterLayer (filteredLayer, extent) {
     duration: 3000,
   });
 }
-function removeFilterLayer(filteredLayer) {
-  console.log(filteredLayer)
+function removeFilterLayer(filteredLayer, layer) {
+  //console.log(filteredLayer)
   map.getLayers().remove(filteredLayer)
-  businessLayer.setVisible(true)
+  layer.setVisible(true)
   view.animate({
     center: current_view_values.currentCenter, 
     zoom: current_view_values.currentZoom,

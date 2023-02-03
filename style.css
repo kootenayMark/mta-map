@@ -45,6 +45,7 @@ select:focus {
 
 .button {
  margin: auto;
+ border-radius: 5px;
 }
 /* STyles */
 html, body {
@@ -354,38 +355,53 @@ hr.rounded {
   width: 10em;
   border-radius: 5px;
 } */
+/* #filter-butns-wrapper {
+  
+} */
 #tag-filter-wrapper {
   position: absolute;
+  display: flex;
+  justify-content: center;
+  /* flex-wrap: wrap; */
+  align-items: stretch;
+  gap: 0.5em;
+  left: 0;
+  right: 0;
+  height: 2.3em;
+  width: 26em; 
   top: 0.5em;
-  right: 48%;
-  z-index: 10;
+  margin: auto;
+  z-index: 9;
   
 }
 #tag-dropdown-select {
-  position: relative;
-  padding: 0.3em;
-  border-radius: 5px;
+  order: 2;
   margin: 0;
   border: #f6921b solid 1px;
-  left: 0em;
-  top: -2.4em;
-  height: 2.6em;
+  border-radius: 5px;
+  padding: 0 0 0 0.4em;
+  /* flex-grow: 1; */
+  width: 20em;
 }
-#tag-filter-closer {
-  text-align: center;
-  position: relative;
-  display: block;
+.top-buttons {
+  z-index: 6;
   color: #8e8d8d;
-  width: 7.9em;
-  height: fit-content;
-  left: 14em;
-  top: 0.2em;
+  /* flex-grow: 1; */
+  width: 15em;
   background-color: black;
   border: 1px solid #8e8d8d;
   cursor: pointer;
   font-weight: 500;
-  font-size: 13px;
-  z-index: 10;
+  font-size: 0.8em;
+  border-radius: 5px;
+
+}
+#filter-button {
+  order: 1;
+  border: #EC2034 solid 1px;
+} 
+#tag-filter-clear {
+  order: 3;
 }
 /* select option[value=""][disabled] {
   color: #f6921b; 
@@ -480,30 +496,6 @@ select {
   padding: 0.5em;
   margin: 1em 0;
 }
-.right-panel-btn {
-  position: absolute;
-  font-weight: bold;
-  color: black;
-  font-size: 1em;
-  background-color: #f6921b;
-  width: 2em;
-  height: 2em;
-  border: none;
-  border-radius: 5px;
-  z-index: 0;
-}
-#filter-button {
-  color: #8e8d8d;
-  width: 7em;
-  height: fit-content;
-  right: 0.9em;
-  top: 5.6em;
-  background-color: black;
-  border: 1px solid #8e8d8d;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 14px;
-} 
 #filter-pane {
   display: none;
   padding-left: 10px;
@@ -553,16 +545,35 @@ select {
   left: 93%;
   background-color: #8e8d8d;
 }
-#uti-button {
+#right-button-wrapper {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  width: 38px;
+  height: 94px;
   right: 0.9em;
-  top: 8.2em;
-  color:black;
+  top: 5em;
+  gap: 18px;
+}
+.right-panel-btn {
   background-color: black;
-  background-image: url(https://marktrueman.ca/wp-content/uploads/2023/01/info_icon_org.png);
-  background-size: 28px; 
   background-position: center; 
   border: 1px solid #8e8d8d;
   cursor: pointer;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 5px;
+  z-index: 6;
+}
+#uti-button {
+  border: 1px solid #8e8d8d;
+
+  background-image: url(https://marktrueman.ca/wp-content/uploads/2023/01/info_icon_org.png);
+  background-size: 32px; 
+  background-repeat: no-repeat;
 }
 /* #uti-button img {
   width: 100%;
@@ -571,15 +582,12 @@ select {
   
 } */
 #legend-button {
-  right: 0.9em;
-  top: 11.1em;
-  background-color: black;
-  background-image: url(https://marktrueman.ca/wp-content/uploads/2023/01/legend_icon_red.png);
-  background-size: 24px; 
-  background-position: center; 
-  background-repeat: no-repeat;
   border: 1px solid #8e8d8d;
-  cursor: pointer;
+  background-image: url(https://marktrueman.ca/wp-content/uploads/2023/01/legend_icon_red.png);
+  background-size: 28px; 
+ 
+  background-repeat: no-repeat;
+
 }
 #legend-wrapper {
   position:absolute;
@@ -626,3 +634,16 @@ select {
 ::-webkit-scrollbar-thumb {
   background: #8e8d8d;
 }
+
+/* ************* Media Queries ************** */
+
+/* @media screen and (max-width: 767px) { */  
+  /* styles to be applied when the screen width is 767px or less */
+  /*body {
+    font-size: 16px;
+  }
+
+  header {
+    display: none;
+  }
+} */
