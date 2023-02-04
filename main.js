@@ -224,9 +224,14 @@ const landInvLayerWFS = new VectorLayer({
   title: 'Land Inventory',
   style: styleFunction2, 
   visible: true,
+  opacity: 0.4,
   source: vectorSourceWFS,
 });
 // console.log(landInvLayerWFS)
+
+
+
+
 
 const view = new View({
   center: initialView, //trailandarea, 
@@ -429,8 +434,6 @@ var layerSwitcher = new LayerSwitcher({
 map.addControl(layerSwitcher);
 // sync(map); need to import ol-hashed if using
 
-
-
 // const wmsSource = new ImageWMS({
 //   url: 'http://51.79.71.43:8080/geoserver/wms',
 //   params: {'LAYERS': 'LCICLandInventory:Land Inventory WMS'},
@@ -506,29 +509,30 @@ function styleFunction (feature, resolution) {
 };
 
 function styleFunction2 (feature) {
-let symbolValue = feature.get('development_score_weighted');
-const transparency = 0.4;
-// use RampGen https://www.rampgenerator.com/
-const fillColors = ['215, 25, 28,', '229, 79, 53,', '243, 133, 78,', '253, 181, 106,', '254, 211, 140,', '255, 240, 175,', '239, 248, 176,', '206, 234, 145,', '174, 220, 114,', '128, 199, 95,', '77, 174, 80,', '26, 150, 65,']
-const stroke_blk = new Stroke({
-  color: 'black',
-  width: 0.5,
-})
+  let symbolValue = feature.get('development_score_weighted');
 
-let styles = [];
+  // use RampGen https://www.rampgenerator.com/
+  const fillColors = ['215, 25, 28', '229, 79, 53', '243, 133, 78', '253, 181, 106', '254, 211, 140', '255, 240, 175', '239, 248, 176', '206, 234, 145', '174, 220, 114', '128, 199, 95', '77, 174, 80', '26, 150, 65']
+  const stroke_blk = new Stroke({
+    color: 'black',
+    width: 0.5,
+  })
+
+  let styles = [];
   for(let i = 0; i < fillColors.length; i++) {
     let style = new Style({
       stroke: stroke_blk,
       fill: new Fill({
-        color: `rgb(${fillColors[i]} ${transparency})`,
+        color: `rgb(${fillColors[i]} )`,
       }),
     });
     styles.push(style);
   }
   if (symbolValue >= 8 && symbolValue <= 19) {
     return [styles[symbolValue - 8]];
-  }
+    }
 };
+
 
 /* ***popup*** */
 var container = document.getElementById('popup'),
@@ -1115,6 +1119,26 @@ function createFilteredSource(filteredSource) {
   return vectorSource_filtered;
 }
 
+// function to open filter pane
+let filter_pane = document.getElementById("filter-pane");
+let filter_button = document.getElementById("filter-button");
+let filter_closer = document.getElementById('filter-closer');
+//let filter_submit_btn = document.getElementById('filter-submit-btn');
+
+filter_button.addEventListener('click', openFilterPane);
+filter_closer.addEventListener('click', closeFilterPane);
+
+function openFilterPane() {  
+  FeatureList.style.display = "none";
+  List.style.display = "none";
+  filter_pane.style.display = "block"; 
+};
+// function to close filter pane
+function closeFilterPane() {
+  List.style.display = "flex"; 
+  filter_pane.style.display = "none";
+}
+
 /* dynamically created DOM element selections */
 const groupItems = document.querySelector('#groups');
 const regionItems = document.querySelectorAll('.regions > a > span');
@@ -1238,30 +1262,6 @@ function regionCLick() {
   }
 };
 
-
-
-/* **** Filter land inventory functions **** */
-
-// function to open filter pane
-let filter_pane = document.getElementById("filter-pane");
-let filter_button = document.getElementById("filter-button");
-let filter_closer = document.getElementById('filter-closer');
-//let filter_submit_btn = document.getElementById('filter-submit-btn');
-
-filter_button.addEventListener('click', openFilterPane);
-filter_closer.addEventListener('click', closeFilterPane);
-
-function openFilterPane() {  
-  FeatureList.style.display = "none";
-  List.style.display = "none";
-  filter_pane.style.display = "block"; 
-};
-// function to close filter pane
-function closeFilterPane() {
-  List.style.display = "flex"; 
-  filter_pane.style.display = "none";
-}
-
 /* *** utilization button and pane *** */
 const utilization = document.getElementById("utilization");
 const uti_button = document.getElementById("uti-button");
@@ -1345,6 +1345,7 @@ map.getView().on("change:resolution", function() {
   let viewExtent = map.getView().calculateExtent(map.getSize()); 
   let legendVisibility = resolution > 80 || !landInvLayerWFS.getVisible() || isWithoutExtent(landInvExtent, viewExtent);
   legend_wrapper.classList.toggle("hidden", legendVisibility);
+  slider.classList.toggle("hidden", legendVisibility);
 });
 
 document.addEventListener("change", function() {
@@ -1354,6 +1355,7 @@ document.addEventListener("change", function() {
   let viewExtent = map.getView().calculateExtent(map.getSize()); 
   let legendVisibility = resolution > 80 || !landInvLayerWFS.getVisible() || isWithoutExtent(landInvExtent, viewExtent);
   legend_wrapper.classList.toggle("hidden", legendVisibility);
+  slider.classList.toggle("hidden", legendVisibility);
 });
 
 map.getView().on("change:center", function() {
@@ -1363,6 +1365,7 @@ map.getView().on("change:center", function() {
   let viewExtent = map.getView().calculateExtent(map.getSize()); 
   let legendVisibility = resolution > 80 || !landInvLayerWFS.getVisible() || isWithoutExtent(landInvExtent, viewExtent);;
   legend_wrapper.classList.toggle("hidden", legendVisibility);
+  slider.classList.toggle("hidden", legendVisibility);
 });
 
 function isWithoutExtent(testExtent, extent) {
@@ -1371,6 +1374,18 @@ function isWithoutExtent(testExtent, extent) {
          testExtent[2] < extent[0] ||
          testExtent[3] < extent[1];
 }
+
+// /* *** Slider *** */
+let slider = document.getElementById('slider');
+slider.min = 0
+slider.max = 100
+slider.value = 40
+slider.step = 1
+
+slider.addEventListener('input',function (event) {
+  landInvLayerWFS.setOpacity(event.target.value / 100)
+  console.log(event.target.value / 100);
+ });
 
 // function to get current mapview values
 function getValues() {
