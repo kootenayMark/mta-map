@@ -477,11 +477,11 @@ map.on('click', function(evt){
         //Select Feature Layer
         let selectFeature = feature;
         landInvLayer_select = new VectorLayer({
-          title: 'Select',
+          //title: 'Select',
           style: new Style ({
             stroke: new Stroke({
             color: '#EC2034',
-            width: 5,
+            width: 2,
             })
           }), 
           visible: true,
