@@ -222,20 +222,16 @@ const businessLayer = new VectorLayer({
 
 const landInvLayerWFS = new VectorLayer({
   title: 'Land Inventory',
-  style: styleFunction2, 
+  style: styleFunction_12, 
   visible: true,
   opacity: 0.4,
   source: vectorSourceWFS,
 });
 // console.log(landInvLayerWFS)
 
-
-
-
-
 const view = new View({
-  center: initialView, //trailandarea, 
-  zoom: 8.5,
+  center: initialView,// trailandarea, 
+  zoom: 8.5, //12,
   minZoom: 2,
   maxZoom: 19,
   constrainResolution: false,
@@ -431,6 +427,7 @@ var layerSwitcher = new LayerSwitcher({
   tipLabel: 'Layer Switcher', // Optional label for button
   groupSelectStyle: 'children' // Can be 'children' [default], 'group' or 'none'
 });
+
 map.addControl(layerSwitcher);
 // sync(map); need to import ol-hashed if using
 
@@ -440,6 +437,67 @@ map.addControl(layerSwitcher);
 //   ratio: 1,
 //   serverType: 'geoserver',
 // });
+
+/* ***popup*** */
+let landInvLayer_select;
+var container = document.getElementById('popup'),
+    content_element = document.getElementById('popup-content'),
+    closer = document.getElementById('popup-closer');
+
+closer.onclick = function() {
+    overlay.setPosition(undefined);
+    map.removeLayer(landInvLayer_select);
+    //selectFeature.setStyle(styleFunction_12(selectFeature))
+    closer.blur();
+    return false;
+};
+var overlay = new Overlay({
+    element: container,
+    autoPan: true,
+    offset: [0, -10]
+});
+
+map.addOverlay(overlay);
+
+map.on('click', function(evt){
+  var feature = map.forEachFeatureAtPixel(evt.pixel,
+    function(feature) {
+      return feature;
+    });
+    if (feature) {
+      var geometry = feature.getGeometry();
+      var geometryType = geometry.getType();
+
+      if (geometryType === 'Point'){
+        pointPopupContent(feature);
+      } 
+      else if (geometryType === 'MultiPolygon') {     
+        multipolyPopupContent(feature);
+        
+        //Select Feature Layer
+        let selectFeature = feature;
+        landInvLayer_select = new VectorLayer({
+          title: 'Select',
+          style: new Style ({
+            stroke: new Stroke({
+            color: '#EC2034',
+            width: 5,
+            })
+          }), 
+          visible: true,
+          opacity: 1,
+          source: new VectorSource({
+            features: [selectFeature]
+          }),
+        });
+        map.addLayer(landInvLayer_select);
+        //feature.setStyle(styleFunctionSelect_12(feature));
+      //} 
+      // else if (geometryType === 'MultiPolygon') {
+      //   WMSPopup (evt);
+      }
+    }
+});
 
 let imageCache = {}
 function styleFunction (feature, resolution) {
@@ -507,71 +565,109 @@ function styleFunction (feature, resolution) {
       return [iconStyle3];
   }
 };
+// use RampGen https://www.rampgenerator.com/
+// const fillColors_12 = ['215, 25, 28', '229, 79, 53', '243, 133, 78', '253, 181, 106', '254, 211, 140', '255, 240, 175', '239, 248, 176', '206, 234, 145', '174, 220, 114', '128, 199, 95', '77, 174, 80', '26, 150, 65']
 
-function styleFunction2 (feature) {
+const fillColors_12 = [
+    {
+        "values": 8,
+        "color": '215, 25, 28',
+    },
+    {
+        "value": 9,
+        "color": '229, 79, 53'
+    },
+    {
+        "value": 10,
+        "color": '243, 133, 78'
+    },
+    {
+        "value": 11,
+        "color": '253, 181, 106'
+    },
+    {
+        "value": 12,
+        "color": '254, 211, 140'
+    },
+    {
+        "value": 13,
+        "color": '255, 240, 175'
+    },
+    {
+        "value": 14,
+        "color": '239, 248, 176'
+    },
+    {
+        "value": 15,
+        "color": '206, 234, 145'
+    },
+    {
+        "value": 16,
+        "color": '174, 220, 114'
+    },
+    {
+        "value": 17,
+        "color": '128, 199, 95'
+    },
+    {
+        "value": 18,
+        "color": '77, 174, 80'
+    },
+    {
+        "value": 19,
+        "color": '26, 150, 65'
+    }
+  ]
+
+function styleFunction_12 (feature) {
   let symbolValue = feature.get('development_score_weighted');
-
-  // use RampGen https://www.rampgenerator.com/
-  const fillColors = ['215, 25, 28', '229, 79, 53', '243, 133, 78', '253, 181, 106', '254, 211, 140', '255, 240, 175', '239, 248, 176', '206, 234, 145', '174, 220, 114', '128, 199, 95', '77, 174, 80', '26, 150, 65']
+  
   const stroke_blk = new Stroke({
     color: 'black',
-    width: 0.5,
+    width: 0.4,
   })
 
-  let styles = [];
-  for(let i = 0; i < fillColors.length; i++) {
-    let style = new Style({
-      stroke: stroke_blk,
-      fill: new Fill({
-        color: `rgb(${fillColors[i]} )`,
-      }),
-    });
-    styles.push(style);
+  let color;
+  for (let i = 0; i < fillColors_12.length; i++) {
+    if (fillColors_12[i].value === symbolValue) {
+      color = `rgb(${fillColors_12[i].color})`;
+      break;
+    }
   }
-  if (symbolValue >= 8 && symbolValue <= 19) {
-    return [styles[symbolValue - 8]];
-    }
-};
 
+  let style = new Style({
+    stroke: stroke_blk,
+    fill: new Fill({
+      color: color,
+    }),
+  });
+  return [style];
+  };
 
-/* ***popup*** */
-var container = document.getElementById('popup'),
-    content_element = document.getElementById('popup-content'),
-    closer = document.getElementById('popup-closer');
+function styleSelect () {
+  // let symbolValue = feature.get('development_score_weighted');
+  
+  const stroke_red = new Stroke({
+    color: 'blue',
+    width: 5,
+  })
 
-closer.onclick = function() {
-    overlay.setPosition(undefined);
-    closer.blur();
-    return false;
-};
-var overlay = new Overlay({
-    element: container,
-    autoPan: true,
-    offset: [0, -10]
-});
+//  let color;
+//   for (let i = 0; i < fillColors_12.length; i++) {
+//     if (fillColors_12[i].value === symbolValue) {
+//       color = `rgb(${fillColors_12[i].color})`;
+//       break;
+//     }
+//   }
 
-map.addOverlay(overlay);
-
-map.on('click', function(evt){
-  var feature = map.forEachFeatureAtPixel(evt.pixel,
-    function(feature) {
-      return feature;
-    });
-    if (feature) {
-      var geometry = feature.getGeometry();
-      var geometryType = geometry.getType();
-
-      if (geometryType === 'Point'){
-        pointPopupContent(feature);
-      } 
-      else if (geometryType === 'MultiPolygon') {
-        multipolyPopupContent(feature);
-      } 
-      // else if (geometryType === 'MultiPolygon') {
-      //   WMSPopup (evt);
-      // }
-    }
-});
+  let style = new Style({
+    stroke: stroke_red,
+    // fill: new Fill({
+    //   color: color,
+    // }),
+  });
+  return [style];
+  };
 
 // Function for creating content for point feature
 function pointPopupContent(feature) {
@@ -802,7 +898,6 @@ let vectorSourceWFS_filtered;
 let businessLayer_filtered;
 let landInvLayer_filtered;
 
-
 /* ****Business Tag filters**** */
 var business_tag;
 
@@ -997,6 +1092,7 @@ filter_submit_btn.addEventListener("click", function() {
 //     removeFilterLayer(landInvLayer_filtered, landInvLayerWFS)
     
 //   });
+
 function submitFilter(property, values) {
     string_values_array = Array.from(values).map(option => option.value);
     var filteredFeatures;
@@ -1384,7 +1480,6 @@ slider.step = 1
 
 slider.addEventListener('input',function (event) {
   landInvLayerWFS.setOpacity(event.target.value / 100)
-  console.log(event.target.value / 100);
  });
 
 // function to get current mapview values
