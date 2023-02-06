@@ -10,22 +10,22 @@
   <body> 
     <div id="wrapper" class="">
       <div id="list-container">
-        <nav id="list" >
+        <div id="list" >
           <a href="https://metaltechalley.com">
             <div id="mta_logo">
               <img src="https://metaltechalley.com/wp-content/uploads/2021/08/MTA_Logo_NoTagLine-1024x140.png">
             </div>
           </a>
           <dl id="groups" ></dl>
-        </nav>
-        <nav id="feature-list">
+        </div>
+        <div id="feature-list">
           <div id="feature-content">
             <img id="companyIcon" src="" alt="" width="60px" height="auto">
             <button id="feature-closer" class="close">&times;</button>
             <h1 id="business" class="title"></h1>
             <div id="attributes"></div>   
           </div>
-        </nav>
+        </div>
         <!--single property filter-->
         <div id=filter-pane class="">
           <h1>Land Parcel Filter</h1>
@@ -96,13 +96,16 @@
       <button id="legend-button" class="right-panel-btn"></button>
     </div>
     <button id="filter-btn">Filter</button>
-    
-    
+    <div id="test">
+      <!-- <label for="browser-input">Choose your browser</label> -->
+      <input placeholder="search" name="browser" id="browser-input" autofocus value=""/>
+    </div>
     <div id="popup" class="ol-popup">
       <a href="#" id="popup-closer" class="ol-popup-closer"></a>
       <ul id="popup-content"></ul>
     </div>
     <div id = "table_data"> </div>
     <script type="module" src="./main.js"></script>
+    <!-- <script type="module" src="main.mjs" async defer></script> -->
   </body>
 </html>
