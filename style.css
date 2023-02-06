@@ -656,7 +656,7 @@ select {
 }
 
 input[type=range] {
-  /* -webkit-appearance: none; */
+  -webkit-appearance: none;
   margin:  0;
   width: 100%;
   background: transparent;

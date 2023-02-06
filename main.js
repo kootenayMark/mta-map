@@ -1,5 +1,4 @@
 import './style.css';
-// import './style1.css';
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import {Map, View} from 'ol';
 import TileLayer from 'ol/layer/Tile';
@@ -18,8 +17,6 @@ import BingMaps from 'ol/source/BingMaps.js';
 import * as olExtent from 'ol/extent';
 import ImageWMS from 'ol/source/ImageWMS.js';
 import {getCenter} from 'ol/extent';
-//import Fuse from 'fuse.js'
-//import './main.mjs';
 import {
   BROWSER_INPUT_ELEMENT_ID,
   BROWSER_SUGGESTIONS_ELEMENT_ID,
@@ -307,6 +304,7 @@ var overlay = new Overlay({
 
 map.addOverlay(overlay);
 
+// function to display popup content
 map.on('click', function(evt){
   var feature = map.forEachFeatureAtPixel(evt.pixel,
     function(feature) {
@@ -321,7 +319,7 @@ map.on('click', function(evt){
       } 
       else if (geometryType === 'MultiPolygon') {     
         multipolyPopupContent(feature);
-        
+        map.removeLayer(landInvLayer_select);
         //Select Feature Layer
         let selectFeature = feature;
         landInvLayer_select = new VectorLayer({
@@ -338,6 +336,7 @@ map.on('click', function(evt){
             features: [selectFeature]
           }),
         });
+        
         map.addLayer(landInvLayer_select);
         //feature.setStyle(styleFunctionSelect_12(feature));
       //} 
