@@ -21,17 +21,12 @@ import {getCenter} from 'ol/extent';
 //import Fuse from 'fuse.js'
 //import './main.mjs';
 import {
-  BROWSERS_LIST,
   BROWSER_INPUT_ELEMENT_ID,
   BROWSER_SUGGESTIONS_ELEMENT_ID,
   BROWSER_SUGGESTIONS_MAX_SIZE,
 } from './config.mjs';
 import { AppDropdownElement } from './dropdown-element.mjs';
 import { fuzzySearch } from './fuzzy-search.mjs';
-// import Search from 'ol-ext/control/Search';
-// import SearchFeature from 'ol-ext/control/SearchFeature';
-//q: how to remove npm package from package.json?
-//a: npm uninstall ol-ext --save
 
 const markerURL ='https://marktrueman.ca/wp-content/uploads/2022/12/mtaMarker_blk_xsm-1.png'
 const infoIcon = 'https://marktrueman.ca/wp-content/uploads/2023/01/icons8-info-67.png'
@@ -91,6 +86,7 @@ const geoJSONPointArr = jsonObj.map((row, index) => {
     "properties": row
   }
 });
+
 // to GeoJSON.FeatureCollection
 const geojsonObj = {
  "type": "FeatureCollection",
@@ -1294,7 +1290,7 @@ function getValues() {
   return viewValues;
 };
 
-const fuzzySearchBrowsersList = fuzzySearch(BROWSERS_LIST, ['properties.label', 'properties.tag', 'properties.description', 'properties.category', 'properties.region']);
+const fuzzySearchBrowsersList = fuzzySearch(geoJSONPointArr, ['properties.label', 'properties.tag', 'properties.description', 'properties.category', 'properties.region']);
   
 /** @type {HTMLInputElement} */
 const browserInputElement = document.getElementById(BROWSER_INPUT_ELEMENT_ID);

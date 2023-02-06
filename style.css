@@ -651,7 +651,7 @@ select {
 #test {
   position: absolute;
   top: 0.6em;
-  left: 27em;
+  left: 3em;
   z-index: 10;
 }
 
