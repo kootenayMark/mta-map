@@ -160,7 +160,7 @@ a:visited {
 }
 #feature-content > h1 {
   margin-bottom: 0.2em;
-  line-height: 1em;
+  line-height: 1.2em;
   color: #f6921b;
   height:fit-content;
   text-align: center;
@@ -318,6 +318,7 @@ td {
   margin-top: 4px;
   margin-bottom: 0.5em;
   margin-right: 4px;
+  line-height: 1.3em;
 }
 #popup-content > h5 {
   margin-top: 0.5em;
@@ -345,12 +346,21 @@ hr.rounded {
 }
 
 /* ol controls styles */
-.search-bar{
+/* .search-bar{
   top: 0.5em !important;
   left: 2em;
   height: 1.7em;
   width : 10em;
   border-radius: 5px;
+} */
+.ol-zoom-extent {
+  top: 4.5em !important;
+  background-image: url(https://marktrueman.ca/wp-content/uploads/2023/02/home_icon.png) !important;
+  border-radius: 5px;
+  background-position: center center !important;
+  background-size: 20px !important;
+  background-repeat: no-repeat !important;
+  background-color: none !important;
 }
 /* .feature {
   left: 2em;
@@ -427,7 +437,7 @@ hr.rounded {
 }*/
 
 /* Layer Switcher Styles */
-div.ol-unselectable:nth-child(5) {
+div.ol-unselectable:nth-child(6) {
   top: 1.5em !important;
   right: 0.9em;
 }
@@ -440,7 +450,6 @@ div.ol-unselectable:nth-child(5) {
   border-radius: 5px !important;
   border: 1px solid #8e8d8d !important;
   background-size: 34px;
-  background-position: center; 
 }
 .layer-switcher .panel {
   position: relative !important;
@@ -639,22 +648,25 @@ select {
   left: 75%;
   background-color: black;
 }
-#transparency {
-  position: absolute;
-  bottom: 1em;
-  left: 1em;
-  z-index: 10;
-}
-/* #transparency > label {
-  font-size: 0.8em;
-} */
-#test {
+#search-container {
   position: absolute;
   top: 0.6em;
   left: 3em;
   z-index: 10;
 }
-
+#transparency {
+  position: absolute;
+  bottom: 1em;
+  left: 43%;
+  right: 43%;
+  z-index: 10;
+  max-width: fit-content;
+  min-width: fit-content;
+}
+#transparency > label {
+  font-size: 0.9em;
+  margin: 0;
+}
 input[type=range] {
   -webkit-appearance: none;
   margin:  0;

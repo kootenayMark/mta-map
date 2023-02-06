@@ -9,13 +9,12 @@ import GeoJSON from 'ol/format/GeoJSON';
 import {Icon, Style, Fill, Stroke} from 'ol/style';
 // import sync from 'ol-hashed'; // need to import if using sync
 import { fromLonLat } from 'ol/proj';
-import {Control, defaults as defaultControls} from 'ol/control';
+import {Control, ZoomToExtent, defaults as defaultControls} from 'ol/control';
 import {Vector as VectorSource} from 'ol/source';
 import LayerGroup from 'ol/layer/Group';
 import LayerSwitcher from 'ol-layerswitcher';
 import BingMaps from 'ol/source/BingMaps.js';
 import * as olExtent from 'ol/extent';
-import ImageWMS from 'ol/source/ImageWMS.js';
 import {getCenter} from 'ol/extent';
 import {
   BROWSER_INPUT_ELEMENT_ID,
@@ -51,6 +50,7 @@ const trailandarea = fromLonLat([-117.66993534984215, 49.100971359691975])
 const castlegarandarea = fromLonLat([-117.69479454290793, 49.295732630900695])
 const nelsonandarea = fromLonLat([-117.2900500026088, 49.477387788103334])
 const rosslandandarea = fromLonLat([-117.80493087932007, 49.078833201701485])
+const initialExtent = [ -13413442.63240057, 6233305.097799245, -12853493.531286297, 6504847.982355047 ]
 
 const regions = [
   {region:'British Columbia', id: 0, coords: britishcolumbia, zoom: 7.5},
@@ -238,7 +238,11 @@ var overlays = new LayerGroup({
 // }
 
 const map = new Map({
-  controls: defaultControls().extend([/*new TagSearch(), new TagClose(),new Search()*/ ]),
+  controls: defaultControls().extend([new ZoomToExtent({
+    extent: initialExtent,
+    label: 'H',
+    duration: 2000,
+  })  /* new TagSearch(), new TagClose(),new Search()*/ ]),
   target: 'map',
   layers: [baseMaps, overlays, businessLayer],
   view: view,
@@ -283,7 +287,7 @@ var layerSwitcher = new LayerSwitcher({
 map.addControl(layerSwitcher);
 // sync(map); need to import ol-hashed if using
 
-/* ***popup*** */
+/* ********************bEGIN POPUPS********************* */
 let landInvLayer_select;
 var container = document.getElementById('popup'),
     content_element = document.getElementById('popup-content'),
@@ -324,28 +328,21 @@ map.on('click', function(evt){
         let selectFeature = feature;
         landInvLayer_select = new VectorLayer({
           //title: 'Select',
-          style: new Style ({
-            stroke: new Stroke({
-            color: '#EC2034',
-            width: 2,
-            })
-          }), 
+          style: styleSelect,
           visible: true,
           opacity: 1,
           source: new VectorSource({
             features: [selectFeature]
           }),
-        });
-        
+        });      
         map.addLayer(landInvLayer_select);
-        //feature.setStyle(styleFunctionSelect_12(feature));
-      //} 
-      // else if (geometryType === 'MultiPolygon') {
-      //   WMSPopup (evt);
+     
       }
     }
 });
+/* ********************END POPUPS********************* */
 
+/* ***************BEGIN STYLE FUNCTIONS**************** */
 let imageCache = {}
 function styleFunction (feature, resolution) {
   // console.log(resolution)
@@ -489,31 +486,19 @@ function styleFunction_12 (feature) {
   return [style];
   };
 
-function styleSelect () {
-  // let symbolValue = feature.get('development_score_weighted');
-  
-  const stroke_red = new Stroke({
+function styleSelect () {  
+  const stroke_blu = new Stroke({
     color: 'blue',
-    width: 5,
-  })
-
-//  let color;
-//   for (let i = 0; i < fillColors_12.length; i++) {
-//     if (fillColors_12[i].value === symbolValue) {
-//       color = `rgb(${fillColors_12[i].color})`;
-//       break;
-//     }
-//   }
-
+    width: 2,
+  });
   let style = new Style({
-    stroke: stroke_red,
-    // fill: new Fill({
-    //   color: color,
-    // }),
+    stroke: stroke_blu,
   });
   return [style];
   };
+/* ***************END STYLE FUNCTIONS**************** */
 
+/* ***************BEGIN POPUP CONTENT FUNCTIONS**************** */
 // Function for creating content for point feature
 function pointPopupContent(feature) {
   var geometry = feature.getGeometry();
@@ -565,6 +550,7 @@ function multipolyPopupContent(feature) {
     
 //     map.getTarget().style.cursor = hit ? 'pointer' : '';
 // });
+/* ***************END POPUP CONTENT FUNCTIONS**************** */
 
 /* ****DOM element variables**** */
 let groups = document.getElementById("groups");
@@ -720,6 +706,7 @@ for (let i =0; i < filter_businessATT_jsonObj.length; i++) {
   };
 };
 
+/* ******************BEGIN FILTER FUNCTIONS***************** */
 // instantiate variables to hold filtered layers
 let geojsonObj_filtered;
 let geojsonObjWFS_filtered;
@@ -786,8 +773,9 @@ tag_dropdown_select.addEventListener("change", function(event) {
   addFilterLayer(businessLayer_filtered, businessLayer, map, filtered_extent)
   filterCloser(businessLayer_filtered, businessLayer);
 });
+/* ****End Business Tag filters**** */
 
-/* ****Land Inventory property filters**** */
+/* ********** BEGIN LAND INVENTORY FILTER FUNCTIONS ********** */
 // Get the property select and value select elements
 var propertySelect = document.getElementById("property1");
 var filter_submit_btn = document.getElementById("filter-submit-btn");
@@ -938,6 +926,7 @@ function submitFilter(property, values) {
       }  
     }  
 };
+/* ********** END LAND INVENTORY FILTER FUNCTIONS ********** */
 
 // Filters geojsonObj by tag and returns a new FeatureCollection
 function TagSearch(tag) {
@@ -1050,7 +1039,9 @@ function closeFilterPane() {
   List.style.display = "flex"; 
   filter_pane.style.display = "none";
 }
+/* ********** END FILTER FUNCTIONS ********** */
 
+/* *** begin business list functions *** */
 /* dynamically created DOM element selections */
 const groupItems = document.querySelector('#groups');
 const regionItems = document.querySelectorAll('.regions > a > span');
@@ -1141,8 +1132,8 @@ function hideList() {
 
 // hides feature attribute list and shows main business list and zooms back out to previous position
 function showList() {
-  let searchText = document.getElementById('browser-input');
-  searchText.value = '';
+  let search_input = document.getElementById('search-input');
+  search_input.value = '';
   FeatureList.style.display = "none";
   List.style.display = "flex"; 
   let table = document.getElementById(tableid);
@@ -1175,8 +1166,23 @@ function regionCLick() {
       console.log("An element without an id was hovered.");
   }
 };
+/* *** end business list functions *** */
 
-/* *** utilization button and pane *** */
+// function to get current mapview values
+function getValues() {
+  let currentCenter = view.getCenter();
+  //console.log(currentCenter);
+  let currentZoom = view.getZoom();
+  //console.log(currentZoom);
+  let viewValues = {
+    currentCenter: currentCenter,
+    currentZoom: currentZoom
+  }
+  // console.log(viewValues);
+  return viewValues;
+};
+
+/* *** begin utilization button and pane *** */
 const utilization = document.getElementById("utilization");
 const uti_button = document.getElementById("uti-button");
 const uti_closer = document.getElementById("uti-closer");
@@ -1195,8 +1201,9 @@ uti_closer.addEventListener("click", function() {
     utilization.style.display = "block";
   }
 });
+/* *** end utilization button and pane *** */
 
-/* *** Legend button and pane *** */
+/* *** Begin legend button and pane *** */
 const legend_wrapper = document.getElementById("legend-wrapper");
 const legend_button = document.getElementById("legend-button");
 const legend_closer = document.getElementById("legend-closer");
@@ -1230,10 +1237,10 @@ map.getView().on("change:resolution", function() {
   let resolution = map.getView().getResolution();
   let source = vectorSourceWFS;
   let landInvExtent = source.getExtent();
-  let viewExtent = map.getView().calculateExtent(map.getSize()); 
-  let legendVisibility = resolution < 80 && (landInvLayerWFS.getVisible() || (landInvLayer_filtered &&landInvLayer_filtered.getVisible())) && !isWithoutExtent(landInvExtent, viewExtent);
+  let viewExtent = map.getView().calculateExtent(map.getSize());
+  let legendVisibility = resolution < 80 && (landInvLayerWFS.getVisible() || (landInvLayer_filtered && landInvLayer_filtered.getVisible())) && !isWithoutExtent(landInvExtent, viewExtent);
   legend_wrapper.classList.toggle("hidden", !legendVisibility);
-  slider.classList.toggle("hidden", !legendVisibility);
+  slider_container.classList.toggle("hidden", !legendVisibility);
 });
 
 document.addEventListener("change", function() {
@@ -1241,9 +1248,9 @@ document.addEventListener("change", function() {
   let source = vectorSourceWFS;
   let landInvExtent = source.getExtent();
   let viewExtent = map.getView().calculateExtent(map.getSize()); 
-  let legendVisibility = resolution < 80 && (landInvLayerWFS.getVisible() || (landInvLayer_filtered &&landInvLayer_filtered.getVisible())) && !isWithoutExtent(landInvExtent, viewExtent);
+  let legendVisibility = resolution < 80 && (landInvLayerWFS.getVisible() || (landInvLayer_filtered && landInvLayer_filtered.getVisible())) && !isWithoutExtent(landInvExtent, viewExtent);
   legend_wrapper.classList.toggle("hidden", !legendVisibility);
-  slider.classList.toggle("hidden", !legendVisibility);
+  slider_container.classList.toggle("hidden", !legendVisibility);;
 });
 
 map.getView().on("change:center", function() {
@@ -1251,9 +1258,9 @@ map.getView().on("change:center", function() {
   let source = vectorSourceWFS;
   let landInvExtent = source.getExtent();
   let viewExtent = map.getView().calculateExtent(map.getSize()); 
-  let legendVisibility = resolution < 80 && (landInvLayerWFS.getVisible() || (landInvLayer_filtered &&landInvLayer_filtered.getVisible())) && !isWithoutExtent(landInvExtent, viewExtent);
+  let legendVisibility = resolution < 80 && (landInvLayerWFS.getVisible() || (landInvLayer_filtered && landInvLayer_filtered.getVisible())) && !isWithoutExtent(landInvExtent, viewExtent);
   legend_wrapper.classList.toggle("hidden", !legendVisibility);
-  slider.classList.toggle("hidden", !legendVisibility);
+  slider_container.classList.toggle("hidden", !legendVisibility);
 });
 // 
 function isWithoutExtent(testExtent, extent) {
@@ -1262,8 +1269,10 @@ function isWithoutExtent(testExtent, extent) {
          testExtent[2] < extent[0] ||
          testExtent[3] < extent[1];
 }
+/* *** End Legend button and pane *** */
 
-// /* *** Slider *** */
+// /* *** Begin Slider *** */
+let slider_container = document.getElementById('transparency');
 let slider = document.getElementById('slider');
 slider.min = 0
 slider.max = 100
@@ -1274,22 +1283,31 @@ slider.addEventListener('input',function (event) {
   landInvLayerWFS.setOpacity(event.target.value / 100)
   landInvLayer_filtered.setOpacity(event.target.value / 100)
  });
+/* *** End Slider *** */
 
-// function to get current mapview values
-function getValues() {
-  let currentCenter = view.getCenter();
-  //console.log(currentCenter);
-  let currentZoom = view.getZoom();
-  //console.log(currentZoom);
-  let viewValues = {
-    currentCenter: currentCenter,
-    currentZoom: currentZoom
-  }
-  // console.log(viewValues);
-  return viewValues;
-};
 
-const fuzzySearchBrowsersList = fuzzySearch(geoJSONPointArr, ['properties.label', 'properties.tag', 'properties.description', 'properties.category', 'properties.region']);
+/* *** Begin fuzzy search functions *** */
+const fuzzySearchBrowsersList = fuzzySearch(geoJSONPointArr, [
+  {
+    name: 'properties.label',
+    weight: 1  
+  }, 
+  {
+    name: 'properties.tag',
+    weight: 0.8
+  }, 
+  {
+    name: 'properties.description',
+    weight: 0.3
+  }, 
+  {
+    name:'properties.category',
+    weight: 0.7
+  }, 
+  {
+    name: 'properties.region',
+    weight: 0.5
+  }]);
   
 /** @type {HTMLInputElement} */
 const browserInputElement = document.getElementById(BROWSER_INPUT_ELEMENT_ID);
@@ -1332,7 +1350,6 @@ const renderInputSuggestions = (inputEl, suggestions) => {
   createdEl.options = suggestions;
   createdEl.connectedTo = inputEl;
 
-
   // On click, set the input value to the suggestion
   createdEl.addEventListener('option-select', () => {
     console.log('option-select', createdEl.selected);
@@ -1341,10 +1358,11 @@ const renderInputSuggestions = (inputEl, suggestions) => {
     const result = geojsonObj.features.find(function(feature) {
       return feature.properties.label === createdEl.selected;
     });
-   // get current view value 
-    
+   
     const coords = result ? result.geometry.coordinates : undefined;
+    // get current view value 
     current_view_values = getValues();
+    // get current table id
     let tableID = `table-${result.properties.id}`;
     let table = document.getElementById(tableID);
     tableid = tableID;
@@ -1365,4 +1383,6 @@ const renderInputSuggestions = (inputEl, suggestions) => {
   });
   document.documentElement.appendChild(createdEl);
 };
- 
+/* *** End fuzzy search functions *** */ 
+
+
