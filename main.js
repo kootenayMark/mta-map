@@ -69,7 +69,7 @@ async function getData() {
   return fetch(businessLayerURL)
   .then(res => res.json())
 } 
-console.log(jsonObj);
+
 // to GeoJSON Point array
 const geoJSONPointArr = jsonObj.map((row, index) => {
   return {
@@ -238,11 +238,11 @@ var overlays = new LayerGroup({
 // }
 
 const map = new Map({
-  controls: defaultControls().extend([new ZoomToExtent({
+  controls: defaultControls().extend([/*new ZoomToExtent({
     extent: initialExtent,
     label: 'H',
     duration: 2000,
-  })  /* new TagSearch(), new TagClose(),new Search()*/ ]),
+  })   new TagSearch(), new TagClose(),new Search()*/ ]),
   target: 'map',
   layers: [baseMaps, overlays, businessLayer],
   view: view,
@@ -285,6 +285,41 @@ var layerSwitcher = new LayerSwitcher({
 });
 
 map.addControl(layerSwitcher);
+
+layerSwitcher.on('show', (evt) => {
+  console.log('show', evt);
+  const media_query_list = window.matchMedia("(max-width: 768px)");
+  const top_button_bar = document.getElementById("top-button-bar");
+  const uti_button = document.getElementById("uti-button");
+  const legend_button = document.getElementById("legend-button");
+  function handleMediaChange(media_query_list) {
+  uti_button.style.display = "none";
+  legend_button.style.display = "none";
+    if (media_query_list.matches) {
+      top_button_bar.style.display = "none";
+    } else {
+      top_button_bar.style.display = "flex";
+    }
+  }
+  handleMediaChange(media_query_list);
+});
+layerSwitcher.on('hide', (evt) => {
+  console.log('hide', evt);
+ 
+  const top_button_bar = document.getElementById("top-button-bar");
+  const uti_button = document.getElementById("uti-button");
+  const legend_button = document.getElementById("legend-button");
+      top_button_bar.style.display = "flex";
+      uti_button.style.display = "block";
+      legend_button.style.display = "block";
+});
+
+
+
+
+// layer_switcher.addEventListener('mouseover', handleMediaChange);
+
+
 // sync(map); need to import ol-hashed if using
 
 /* ********************bEGIN POPUPS********************* */
@@ -1316,7 +1351,6 @@ const browserInputElement = document.getElementById(BROWSER_INPUT_ELEMENT_ID);
 browserInputElement.addEventListener('input', () => {
   const searchKeyword = browserInputElement.value;
   const filteredList = fuzzySearchBrowsersList(searchKeyword);
-  console.log(filteredList);
   const cleanFilteredList = filteredList.slice(0, BROWSER_SUGGESTIONS_MAX_SIZE).map(el => el.item.properties.label);
   renderInputSuggestions(browserInputElement, cleanFilteredList);
 });

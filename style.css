@@ -37,23 +37,22 @@ ol, ul {
 } 
 select:focus {
   outline: none;
-}
-select:focus {
-  outline: none;
   box-shadow: 0 0 5px #333;
 }
-
 .button {
  margin: auto;
  border-radius: 5px;
 }
-/* STyles */
+/* Styles */
 html, body {
   margin: 0;
   height: 100vh;
   font-family: Comfortaa;
   color: #8e8d8d;
   overflow: hidden;
+}
+.hidden {
+  display: none;
 }
 #wrapper {
   margin:0;
@@ -73,7 +72,6 @@ html, body {
   height: 100vh;
   text-align: center;
 }
-
 /* business list styles */
 #list {
   display: flex;
@@ -87,9 +85,12 @@ html, body {
   line-height: 1.125em;
 }
 #mta_logo {
-  margin-top: 0.75em;
+  display: flex;
+  left: 0;
+  right: 0;
+  margin: 0.75em auto 0 auto;
 }
-#mta_logo > img {
+#mta_logo > a > img {
   width:98%;
 } 
 #groups {
@@ -136,7 +137,6 @@ a:visited {
 .business:hover {
   color:#f6921b;
 }
-
 /* styles for business info pane */
 #feature-list {
   display: none;
@@ -206,9 +206,6 @@ td {
 #phone-innerValue{
   color: #f6921b;
 }
-.hidden {
-  display: none;
-}
 .tags {
   color: black;
   background-color:#8e8d8d ;
@@ -220,12 +217,12 @@ td {
   font-size: 1em;
   /* cursor: pointer; */
 }
-.tags.active {
+/* .tags.active {
   background-color: #f6921b;
   color: black;
   font-weight: bold;
   border-color: #f6921b;
-}
+} */
 /* styles for switching panes */
 .close {
   display: block;
@@ -260,7 +257,6 @@ td {
   font-size:xx-large;
   cursor: pointer;
 }
-
 /* popup styles */
 .ol-popup {
   position: absolute;
@@ -337,14 +333,12 @@ hr.rounded {
 #popup-email > a, #popup-phone > a {
   color: #f6921b;
 }
-
 /* Land Inventory Popup Styles */
 .landInv {
   background-color: black;
   color: #8e8d8d;
   text-align: left;
 }
-
 /* ol controls styles */
 /* .search-bar{
   top: 0.5em !important;
@@ -353,7 +347,7 @@ hr.rounded {
   width : 10em;
   border-radius: 5px;
 } */
-.ol-zoom-extent {
+/* .ol-zoom-extent {
   top: 4.5em !important;
   background-image: url(https://marktrueman.ca/wp-content/uploads/2023/02/home_icon.png) !important;
   border-radius: 5px;
@@ -361,7 +355,7 @@ hr.rounded {
   background-size: 20px !important;
   background-repeat: no-repeat !important;
   background-color: none !important;
-}
+} */
 /* .feature {
   left: 2em;
   height: 2.3em;
@@ -385,21 +379,37 @@ hr.rounded {
   border-radius: 5px;
 } */
 /* #filter-butns-wrapper {
-  
 } */
-#tag-filter-wrapper {
+#top-button-bar {
   position: absolute;
   display: flex;
   justify-content: center;
-  /* flex-wrap: wrap; */
-  align-items: stretch;
   gap: 0.5em;
-  left: 0;
-  right: 0;
+  left: 3em;
+  right: 3em;
+  padding-left: 0em;
   height: 2.3em;
-  width: 26em; 
+  width: 75%; 
   top: 0.5em;
-  margin: auto;
+  z-index: 9;
+  
+}
+#search-container {
+  justify-content: left;
+  max-width: 13em;
+  min-width: 5em;
+  top: 0.6em;
+  z-index: 10;
+}
+#tag-filter-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5em;
+  right: 5em;
+  height: 2.3em;
+  width: 100%; 
+  top: 0.5em;
   z-index: 9;
   
 }
@@ -409,21 +419,20 @@ hr.rounded {
   border: #f6921b solid 1px;
   border-radius: 5px;
   padding: 0 0 0 0.4em;
-  /* flex-grow: 1; */
-  width: 20em;
+  max-width: 13em;
+
 }
 .top-buttons {
   z-index: 6;
   color: #8e8d8d;
-  /* flex-grow: 1; */
-  width: 15em;
+  width: 8em;
+  height: fit-content;
   background-color: black;
   border: 1px solid #8e8d8d;
   cursor: pointer;
   font-weight: 500;
   font-size: 0.8em;
   border-radius: 5px;
-
 }
 #filter-button {
   order: 1;
@@ -437,7 +446,7 @@ hr.rounded {
 }*/
 
 /* Layer Switcher Styles */
-div.ol-unselectable:nth-child(6) {
+div.ol-unselectable:nth-child(5) {
   top: 1.5em !important;
   right: 0.9em;
 }
@@ -460,15 +469,15 @@ div.ol-unselectable:nth-child(6) {
   border-radius: 5px !important;
   max-width: 300px;
 }
-li.group:nth-child(1) > label:nth-child(2) {
+/* li.group:nth-child(1) > label:nth-child(2) {
   color: #f6921b;
-}
+} */
 li.group:nth-child(3) > label:nth-child(1) {
   color: #EC2034;
 }
-li.group:nth-child(2) > label:nth-child(1) {
+/* li.group:nth-child(2) > label:nth-child(1) {
   color: #f6921b;
-}
+} */
 /* Radio element, when checked */
 input[type="radio"]:checked {
   accent-color: #f6921b;
@@ -597,19 +606,16 @@ select {
   z-index: 6;
 }
 #uti-button {
+  display: block;
   border: 1px solid #8e8d8d;
 
   background-image: url(https://marktrueman.ca/wp-content/uploads/2023/01/info_icon_org.png);
   background-size: 32px; 
   background-repeat: no-repeat;
 }
-/* #uti-button img {
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  
-} */
+/* legend styles */
 #legend-button {
+  display: block;
   border: 1px solid #8e8d8d;
   background-image: url(https://marktrueman.ca/wp-content/uploads/2023/01/legend_icon_red.png);
   background-size: 28px; 
@@ -648,12 +654,7 @@ select {
   left: 75%;
   background-color: black;
 }
-#search-container {
-  position: absolute;
-  top: 0.6em;
-  left: 3em;
-  z-index: 10;
-}
+/* Slider styles */
 #transparency {
   position: absolute;
   bottom: 1em;
@@ -755,8 +756,6 @@ input[type=range]:focus::-ms-fill-lower {
 input[type=range]:focus::-ms-fill-upper {
   background: #f6921b;
 }
-
-
 /* Style the scrollbar background */
 ::-webkit-scrollbar {
   background: black;
@@ -767,14 +766,173 @@ input[type=range]:focus::-ms-fill-upper {
 }
 
 /* ************* Media Queries ************** */
+@media screen and (max-width: 1024px) { 
+  /* styles to be applied when the screen width is 768px or less (tablet-landscape) */
+  /* body {
+    font-size: 14px;
+  } */
+  /* .top-buttons {
+    flex-grow: 1;
+    max-width: 13.5em;
+  } */
+}
 
-/* @media screen and (max-width: 767px) { */  
-  /* styles to be applied when the screen width is 767px or less */
-  /*body {
+@media screen and (max-width: 980px) { 
+  /* styles to be applied when the screen width is 980px or less (small desktop)*/
+  /* body {
     font-size: 16px;
   }
-
   header {
     display: none;
+  } */
+  .top-buttons {
+    flex-grow: 1;
+    max-width: 13.5em;
   }
-} */
+}
+
+@media screen and (max-width: 768px) { 
+  /* styles to be applied when the screen width is 768px or less (laptop, tablet-portrait) */
+  /* body {
+    font-size: 14px;
+  } */
+  #wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: stretch;
+    width: 100%;
+  }
+#map {
+    order: 1;
+    width: 100%;
+  }
+#list-toggle {
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  max-height: 1.5em;
+  order: 2;
+  width: 100%;
+  }
+#list-toggle > div {
+  width: fit-content;
+  height: fit-content;
+  transform: rotate(90deg);
+  
+  }
+#list-container {
+    max-height: 30%;
+    order: 3;
+    width: 100%;
+  }
+#list {
+    max-height: 100%;
+    width: 100%;
+  }
+#mta_logo {
+    margin: 0;
+  }
+#mta_logo > a > img {
+  
+    width: 50%;
+    /* left: 0;
+    right: 0;
+    margin: 0 auto; */
+  }
+#groups {
+  margin-top: 0;
+  }
+#top-button-bar {
+
+  top: -0.5em;
+  left: 0;
+  right: 0;
+  margin: 1em auto;
+  width: 50%;
+  max-width: 16em;
+}
+#search-container {
+
+  max-width: 13.5em;
+}
+.top-buttons {
+  flex-grow: 1;
+  justify-content: center;
+  max-width: 13.5em;
+}
+} 
+
+@media screen and (max-width: 480px) { 
+  /* styles to be applied when the screen width is 480px or less (mobile -landscape) */
+  /* body {
+    font-size: 12px;
+  } */
+#wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: stretch;
+    width: 100%;
+  }
+#map {
+    order: 1;
+    width: 100%;
+  }
+#list-toggle {
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  max-height: 1.5em;
+  order: 2;
+  width: 100%;
+  }
+#list-toggle > div {
+  width: fit-content;
+  height: fit-content;
+  transform: rotate(90deg);
+  
+  }
+#list-container {
+    max-height: 30%;
+    order: 3;
+    width: 100%;
+  }
+#list {
+    max-height: 100%;
+    width: 100%;
+  }
+#mta_logo {
+    margin: 0;
+  }
+#mta_logo > a > img {
+    width: 94%;
+  }
+#groups {
+  margin-top: 0;
+  }
+#top-button-bar { 
+  position: absolute;
+  flex-direction: column;
+  top: 0.5em;
+  left: 0;
+  right: 0;
+  margin: 1em auto;
+  width: 50%;
+  max-width: 9em;
+  }
+.top-buttons {
+  flex-grow: 1;
+    justify-content: center;
+  }
+}
+#uti-content {
+  overflow: auto;
+}
+@media screen and (max-width: 320px) { 
+  /* styles to be applied when the screen width is 320px or less (mobile) */
+  /* body {
+    font-size: 10px;
+  } */
+
+}
