@@ -125,14 +125,14 @@ const vectorSourceWFS = new VectorSource({
 const OSMbaseMap = new TileLayer({
   title: 'Open Street Maps',
   type: 'base',
-  visible: false,
+  visible: true,
   source: new OSM()
 });
 
 const BingBaseDark = new TileLayer({
   title: 'Bing Canvas Dark',
   type: 'base',
-  visible: true,
+  visible: false,
   source: new BingMaps({
     key: 'Aq3zTnJcwqxgsr49ctWDJQbSaZsmhkdIrDuFMBdoCXZTBE31Gl-nam7XhVkbHHy9',
     imagerySet: 'CanvasDark'
@@ -176,7 +176,7 @@ const view = new View({
 
 const baseMaps = new LayerGroup({
   title: 'Base maps',
-  layers: [BingArielBase, OSMbaseMap, BingBaseDark]
+  layers: [BingArielBase, BingBaseDark, OSMbaseMap]
 })
 var overlays = new LayerGroup({
   title: 'Overlays',
@@ -793,10 +793,10 @@ tag_dropdown_select.addEventListener("change", function(event) {
   geojsonObj_filtered = TagSearch(business_tag);
   let filter_layer = business_tag + " Businesses"
   let selectedOption = tag_dropdown_select.options[tag_dropdown_select.selectedIndex];
-  selectedOption.style.color = "#f6921b";
+  selectedOption.classList.add('tagSelected');
   
   if (tag_dropdown_select.selectedIndex !== -1) {
-    tag_filter_clear.style.color = "#f6921b";
+    tag_filter_clear.classList.add('tagSelected');
     //console.log("An option is selected");
   } else {
     //console.log("No option is selected");
@@ -1001,9 +1001,12 @@ function filterCloser (filteredLayer, layer) {
   tag_filter_clear.addEventListener("click", function() {
   document.getElementById("tag-dropdown-select").selectedIndex = 0;
   removeFilterLayer(filteredLayer, layer, map)
-  tag_filter_clear.style.color = "#8e8d8d";
-  });
-}
+  tag_filter_clear.classList.remove('tagSelected');
+  const options = document.querySelectorAll('option'); 
+  options.forEach(option => option.classList.remove('tagSelected'));
+});
+};
+
 function addFilterLayer (filteredLayer, layer, layerGroup, extent) {
   //console.log(filteredLayer)
   layer.setVisible(false)
