@@ -658,6 +658,27 @@ select {
   left: 75%;
   background-color: black;
 }
+/* *** TruGIS Logo Styles *** */
+.ol-attribution {
+  right: 6em !important;
+}
+#tg-logo {
+  position: absolute;
+  right: 0.5em;
+  bottom: 0.5em;
+  width: 5em;
+  height: 2.5em;
+  z-index: 10;
+}
+#tg-logo > a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+#tg-logo > a > img {
+  width: 100%;
+  height: 100%;
+}
 /* Slider styles */
 #transparency {
   position: absolute;
