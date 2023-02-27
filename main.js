@@ -62,53 +62,64 @@ const regions = [
 ]
 
 /* **** data **** */
+const spinnerContainer = document.querySelector('.spinner-container');
+spinnerContainer.style.display = 'block';
 
 /** Business data */
-const jsonObj = await getData();
-async function getData() {
-  return fetch(businessLayerURL)
-  .then(res => res.json())
-} 
+async function fetchData() {
+  spinnerContainer.style.display = 'block';
+  try {
+    const [jsonObj, geojsonObjWFS] = await Promise.all([
+      fetch(businessLayerURL).then(res => res.json()),
+      fetch(featureLayerWFS).then(res => res.json())
+    ]);
 
-// to GeoJSON Point array
-const geoJSONPointArr = jsonObj.map((row, index) => {
-  return {
-    "geometry_name": "geom",
-    "id": "MTA_Companies." + index,
-    "type": "Feature",
-    "geometry": {
-      "type": "Point",
-      "coordinates": fromLonLat([row.longitude, row.latitude])
-    },
-    "properties": row
-  }
-});
+    // to GeoJSON Point array
+    const geoJSONPointArr = jsonObj.map((row, index) => {
+      return {
+        "geometry_name": "geom",
+        "id": "MTA_Companies." + index,
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": fromLonLat([row.longitude, row.latitude])
+        },
+        "properties": row
+      }
+    });
 
-// to GeoJSON.FeatureCollection
-const geojsonObj = {
- "type": "FeatureCollection",
- 
- "features": geoJSONPointArr,
-//   "numberMatched": 85,
-//   "numberReturned": 85,
-//   "timeStamp": "2023-01-08T18:56:56.904Z",
- "crs": {
-  "type": "name",
-  "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
+    // to GeoJSON.FeatureCollection
+    const geojsonObj = {
+    "type": "FeatureCollection",
+    
+    "features": geoJSONPointArr,
+    "crs": {
+      "type": "name",
+      "properties": { "name": "urn:ogc:def:crs:EPSG::3857" }
+      }
+    }
+
+    // cast property "pid" to number
+    geojsonObjWFS.features.forEach((feature) => {
+      feature.properties.pid = Number(feature.properties.pid)
+    })
+
+    console.log('fetch complete')
+  return { jsonObj, geoJSONPointArr, geojsonObj, geojsonObjWFS };
+} catch (error) {
+    console.log('Error fetching data:', error);
+    location.reload();
   }
 }
 
-/** Land Inventory Data */
-const geojsonObjWFS = await getData1();
+const { jsonObj, geoJSONPointArr, geojsonObj, geojsonObjWFS } = await fetchData();
 
-async function getData1() {
-  return fetch(featureLayerWFS)
-  .then(res => res.json())
-}
-// cast property "pid" to number
-geojsonObjWFS.features.forEach((feature) => {
-  feature.properties.pid = Number(feature.properties.pid)
-})
+// replace spinner with map when data fetched
+spinnerContainer.style.display = 'none';
+const outer_wrapper = document.getElementById('outer-wrapper');
+outer_wrapper.style.display = 'flex';
+
+
 
 
 /* ***map Variables*** */
@@ -183,60 +194,6 @@ var overlays = new LayerGroup({
   layers: [landInvLayerWFS]
 })
 
-// class Search extends Control {
-//   /**
-//    * @param {Object} [opt_options] Control options.
-//    */
-//   constructor(opt_options) {
-//     const options = opt_options || {};
-    
-//     //const optionsArray = ['test1', 'test2', 'test3', 'test4'];
-//     const element = document.createElement('div');
-//     const searchInput = document.createElement('input');
-//     //const searchList = document.createElement('datalist');
-//     //let option = document.createElement('option');
-    
-//     searchInput.setAttribute("id", "browser-input");
-//     searchInput.setAttribute("type", "search");
-//     //searchInput.setAttribute("autocomplete", "on");
-//     searchInput.setAttribute("autofocus", "on");
-//     //searchInput.setAttribute("list", "search-list");
-//     searchInput.setAttribute("name", "browser");
-//     searchInput.setAttribute("placeholder", "Search...name, tag, keyword");
-//     searchInput.classList.add("search-bar");
-    
-//     //searchList.setAttribute("id", "search-list");
-//     //searchList.classList.add("dropdown-content");
-
-//     //option.setAttribute("value", "test");
-
-//     element.className = 'search-bar ol-unselectable ol-control';
-//     element.appendChild(searchInput);
-//     //element.appendChild(searchList);
-//     //optionsArray.forEach((item) => {
-//       //option = document.createElement('option');
-//       //option.setAttribute("value", item);
-//       //option.innerHTML = item;
-//       //searchList.appendChild(option);
-//     //});
-    
-    
-    
-//     super({
-//       element: element,
-//       target: options.target,
-//     });
-//     searchInput.addEventListener("change", function(event) {
-//       console.log("The input value has changed: " + event.target.value);
-//     });
-//     //button.addEventListener('click', this.handleRotateNorth.bind(this), false);
-//   }
-
-//   Search() {
-//     //this.getMap().getView().setRotation(0);
-//   }
-// }
-
 const map = new Map({
   controls: defaultControls().extend([/*new ZoomToExtent({
     extent: initialExtent,
@@ -248,36 +205,6 @@ const map = new Map({
   view: view,
   //interactions: defaults({ zoomDuration: 0 })
 });
-
-// var searchFeature = new SearchFeature({
-//   source: vectorSource,
-//   property: 'label',
-//   //layer: businessLayer,
-//   options: {
-//     autocomplete: true, // autocomplete feature 
-//     caseSensitive: false, // case sensitive search
-//     minLength: 2, // minimum length of search term
-//     limit: 10, // limit of search results
-//     position: 'topright', // position of search results
-//     zoom: 10, // zoom level of map after search
-//     placeholder: 'Search for a business', // placeholder text
-//     title: 'Business Search', // title of search results
-//     marker: false, // show marker on map
-//     autoCollapse: false, // collapse search results after click
-//     autoType: false, // automatically type search term in input field
-//     autoPan: true, // pan to search result
-//     keepResult: false, // keep search result after map move
-//     showMarker: true, // show marker on map
-//     showPopup: true, // show popup when clicking on marker
-//     retainZoomLevel: false, // retain zoom level after search result click
-//     animateZoom: true, // animate the zoom
-//     searchLabel: 'name', // search label
-//     notFoundMessage: 'Sorry, that business was not found', // message for not found results
-//    //propertyName: 'label', // property name to search
-//     collapsed: false, // collapse search results after click
-//   }
-// });
-// map.addControl(searchFeature);
 
 var layerSwitcher = new LayerSwitcher({
   tipLabel: 'Layer Switcher', // Optional label for button
