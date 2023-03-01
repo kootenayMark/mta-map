@@ -374,7 +374,7 @@ function styleFunction (feature, resolution) {
 
 const fillColors_12 = [
     {
-        "values": 8,
+        "value": 8,
         "color": '215, 25, 28',
     },
     {
